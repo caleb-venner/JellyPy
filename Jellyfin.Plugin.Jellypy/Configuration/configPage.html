@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Template</title>
+</head>
+<body>
+    <div id="JellyPyConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-select,emby-checkbox">
+        <div data-role="content">
+            <div class="content-primary">
+                <form id="JellyPyConfigForm">
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="PythonExecutablePath">Python executable path</label>
+                        <input id="PythonExecutablePath" name="PythonExecutablePath" type="text" is="emby-input" />
+                        <div class="fieldDescription">Absolute path to the Python interpreter that should execute the script.</div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="ScriptPath">Script path</label>
+                        <input id="ScriptPath" name="ScriptPath" type="text" is="emby-input" />
+                        <div class="fieldDescription">Absolute path to the Python script to run.</div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="ScriptWorkingDirectory">Working directory</label>
+                        <input id="ScriptWorkingDirectory" name="ScriptWorkingDirectory" type="text" is="emby-input" />
+                        <div class="fieldDescription">Optional working directory for the script (leave blank to use the script's folder).</div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="AdditionalArguments">Additional arguments</label>
+                        <input id="AdditionalArguments" name="AdditionalArguments" type="text" is="emby-input" />
+                        <div class="fieldDescription">Arguments appended after the automatic episode/movie parameters.</div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="SonarrApiKey">Sonarr API key</label>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <input id="SonarrApiKey" name="SonarrApiKey" type="password" is="emby-input" autocomplete="new-password" style="flex:1;" />
+                            <button id="SonarrApiKeyToggle" type="button" is="emby-button" class="emby-button" aria-label="Toggle Sonarr API key visibility" onclick="togglePassword('SonarrApiKey','SonarrApiKeyToggle')">Show</button>
+                            <span id="SonarrApiKeyStatus" class="fieldDescription" style="margin-left:8px;">Not configured</span>
+                        </div>
+                        <div class="fieldDescription">Key used to authenticate with Sonarr. Leave blank to keep the existing stored key.</div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="SonarrUrl">Sonarr URL</label>
+                        <input id="SonarrUrl" name="SonarrUrl" type="text" is="emby-input" />
+                        <div class="fieldDescription">Base URL to the Sonarr instance (e.g. http://sonarr:8989).</div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="RadarrApiKey">Radarr API key</label>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <input id="RadarrApiKey" name="RadarrApiKey" type="password" is="emby-input" autocomplete="new-password" style="flex:1;" />
+                            <button id="RadarrApiKeyToggle" type="button" is="emby-button" class="emby-button" aria-label="Toggle Radarr API key visibility" onclick="togglePassword('RadarrApiKey','RadarrApiKeyToggle')">Show</button>
+                            <span id="RadarrApiKeyStatus" class="fieldDescription" style="margin-left:8px;">Not configured</span>
+                        </div>
+                        <div class="fieldDescription">Key used to authenticate with Radarr. Leave blank to keep the existing stored key.</div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="RadarrUrl">Radarr URL</label>
+                        <input id="RadarrUrl" name="RadarrUrl" type="text" is="emby-input" />
+                        <div class="fieldDescription">Base URL to the Radarr instance (e.g. http://radarr:7878).</div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="ScriptTimeoutSeconds">Timeout (seconds)</label>
+                        <input id="ScriptTimeoutSeconds" name="ScriptTimeoutSeconds" type="number" is="emby-input" min="0" />
+                        <div class="fieldDescription">Maximum time to wait before aborting the script.</div>
+                    </div>
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label class="emby-checkbox-label">
+                            <input id="EnableEpisodeProcessing" name="EnableEpisodeProcessing" type="checkbox" is="emby-checkbox" />
+                            <span>Trigger script for episodes</span>
+                        </label>
+                    </div>
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label class="emby-checkbox-label">
+                            <input id="EnableMovieProcessing" name="EnableMovieProcessing" type="checkbox" is="emby-checkbox" />
+                            <span>Trigger script for movies</span>
+                        </label>
+                    </div>
+                    <div>
+                        <button is="emby-button" type="submit" class="raised button-submit block emby-button">
+                            <span>Save</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script type="text/javascript">
+            var JellyPyConfig = {
+                pluginUniqueId: 'a5bd541f-38dc-467e-9a9a-15fe3f3bcf5c'
+            };
+
+            document.querySelector('#JellyPyConfigPage')
+                .addEventListener('pageshow', function() {
+                    Dashboard.showLoadingMsg();
+                    ApiClient.getPluginConfiguration(JellyPyConfig.pluginUniqueId).then(function (config) {
+                        document.querySelector('#PythonExecutablePath').value = config.PythonExecutablePath || '';
+                        document.querySelector('#ScriptPath').value = config.ScriptPath || '';
+                        document.querySelector('#ScriptWorkingDirectory').value = config.ScriptWorkingDirectory || '';
+                        document.querySelector('#AdditionalArguments').value = config.AdditionalArguments || '';
+                        // Do not echo API keys back into the UI. Use a status indicator instead.
+                        document.querySelector('#SonarrApiKey').value = '';
+                        document.querySelector('#RadarrApiKey').value = '';
+                        document.querySelector('#SonarrApiKeyStatus').textContent = config.SonarrApiKey ? 'Configured' : 'Not configured';
+                        document.querySelector('#RadarrApiKeyStatus').textContent = config.RadarrApiKey ? 'Configured' : 'Not configured';
+                        document.querySelector('#SonarrUrl').value = config.SonarrUrl || '';
+                        document.querySelector('#RadarrUrl').value = config.RadarrUrl || '';
+                        document.querySelector('#ScriptTimeoutSeconds').value = config.ScriptTimeoutSeconds || 0;
+                        document.querySelector('#EnableEpisodeProcessing').checked = config.EnableEpisodeProcessing === undefined ? true : config.EnableEpisodeProcessing;
+                        document.querySelector('#EnableMovieProcessing').checked = config.EnableMovieProcessing === undefined ? true : config.EnableMovieProcessing;
+                        Dashboard.hideLoadingMsg();
+                    });
+                });
+
+            document.querySelector('#JellyPyConfigForm')
+                .addEventListener('submit', function(e) {
+                Dashboard.showLoadingMsg();
+                ApiClient.getPluginConfiguration(JellyPyConfig.pluginUniqueId).then(function (config) {
+                    config.PythonExecutablePath = document.querySelector('#PythonExecutablePath').value;
+                    config.ScriptPath = document.querySelector('#ScriptPath').value;
+                    config.ScriptWorkingDirectory = document.querySelector('#ScriptWorkingDirectory').value;
+                    config.AdditionalArguments = document.querySelector('#AdditionalArguments').value;
+                    // Only overwrite stored API keys when a non-empty value is provided.
+                    var sonarrVal = document.querySelector('#SonarrApiKey').value;
+                    if (sonarrVal && sonarrVal.length > 0) {
+                        config.SonarrApiKey = sonarrVal;
+                    }
+                    var radarrVal = document.querySelector('#RadarrApiKey').value;
+                    if (radarrVal && radarrVal.length > 0) {
+                        config.RadarrApiKey = radarrVal;
+                    }
+                    config.SonarrUrl = document.querySelector('#SonarrUrl').value;
+                    config.RadarrUrl = document.querySelector('#RadarrUrl').value;
+                    config.ScriptTimeoutSeconds = parseInt(document.querySelector('#ScriptTimeoutSeconds').value || 0, 10);
+                    config.EnableEpisodeProcessing = document.querySelector('#EnableEpisodeProcessing').checked;
+                    config.EnableMovieProcessing = document.querySelector('#EnableMovieProcessing').checked;
+                    ApiClient.updatePluginConfiguration(JellyPyConfig.pluginUniqueId, config).then(function (result) {
+                        // Clear sensitive inputs after save and update status indicators.
+                        document.querySelector('#SonarrApiKey').value = '';
+                        document.querySelector('#RadarrApiKey').value = '';
+                        document.querySelector('#SonarrApiKeyStatus').textContent = config.SonarrApiKey ? 'Configured' : 'Not configured';
+                        document.querySelector('#RadarrApiKeyStatus').textContent = config.RadarrApiKey ? 'Configured' : 'Not configured';
+                        Dashboard.processPluginConfigurationUpdateResult(result);
+                    });
+                });
+
+                e.preventDefault();
+                return false;
+            });
+
+            // Password reveal toggle helper
+            function togglePassword(inputId, toggleId) {
+                var input = document.getElementById(inputId);
+                var btn = document.getElementById(toggleId);
+                if (!input || !btn) return;
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    btn.textContent = 'Hide';
+                } else {
+                    input.type = 'password';
+                    btn.textContent = 'Show';
+                }
+                // keep focus on the input for a fluid UX
+                input.focus();
+            }
+        </script>
+    </div>
+</body>
+</html>

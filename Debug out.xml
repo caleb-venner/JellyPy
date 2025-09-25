@@ -1,0 +1,24 @@
+
+
+
+[2025-03-29 12:44:31.002 +00:00] [ERR] [1] Emby.Server.Implementations.Plugins.PluginManager: Failed to load assembly "/config/data/plugins/Jellypy/IronPython.Wpf.dll". 
+This error occurs when a plugin references an incompatible version of one of the shared libraries. Disabling plugin
+System.Reflection.ReflectionTypeLoadException: Unable to load one or more of the requested types.
+Could not load file or assembly 'System.Xaml, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'. The system cannot find the file specified.
+
+Could not load file or assembly 'System.Xaml, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'. The system cannot find the file specified.
+
+Could not load file or assembly 'System.Xaml, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'. The system cannot find the file specified.
+
+   at System.Reflection.RuntimeModule.GetTypes(RuntimeModule module)
+   at System.Reflection.RuntimeModule.GetTypes()
+   at Emby.Server.Implementations.Plugins.PluginManager.LoadAssemblies()+MoveNext()
+System.IO.FileNotFoundException: Could not load file or assembly 'System.Xaml, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'. The system cannot find the file specified.
+
+File name: 'System.Xaml, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
+System.IO.FileNotFoundException: Could not load file or assembly 'System.Xaml, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'. The system cannot find the file specified.
+
+File name: 'System.Xaml, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'
+System.IO.FileNotFoundException: Could not load file or assembly 'System.Xaml, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'. The system cannot find the file specified.
+
+File name: 'System.Xaml, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089'

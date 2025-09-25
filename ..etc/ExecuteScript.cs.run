@@ -1,0 +1,43 @@
+using System;
+using System.Collections.Generic;
+using System.Web;
+using IronPython.Hosting;
+using IronPython.Runtime;
+using MediaBrowser.Controller.Entities;
+using MediaBrowser.Controller.Entities.TV;
+
+namespace Jellyfin.Plugin.Jellypy;
+
+internal class ExecuteScript
+{
+    public static void RunScript(BaseItem item)
+    {
+        if (item is null)
+        {
+            return;
+        }
+
+        if (item is Episode)
+        {
+            Episode episode = item as Episode;
+            string seasonTitle = episode.Series.Name;
+            int seasonNumber = (int)episode.Season.IndexNumber;
+            int episodeNumber = (int)episode.IndexNumber;
+            var args = new Dictionary<string, object>
+            {
+                { "-st", seasonTitle },
+                { "-sn", seasonNumber },
+                {"-en", episodeNumber }
+            };
+            var engine = Python.CreateEngine();
+            var searchPaths = new List<string>
+            {
+                AppDomain.CurrentDomain.BaseDirectory + @"/opt/anaconda3/lib/python3.1/site-packages",
+                @"/Users/calebvenner/projects/jellyfin/jellypy/Jellyfin.Plugin.Jellypy"
+            };
+            engine.SetSearchPaths(searchPaths);
+            engine.GetSysModule.argv = args;
+            engine.ExecuteFile("test.py");
+        }
+    }
+}

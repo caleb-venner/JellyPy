@@ -1,0 +1,37 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Web;
+using IronPython.Hosting;
+using MediaBrowser.Controller.Entities;
+using MediaBrowser.Controller.Entities.TV;
+
+namespace Jellyfin.Plugin.Jellypy;
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+public static class SendHook
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+{
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+        public static async Task SendNotification(BaseItem item)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+        {
+
+            if (item is null)
+            {
+                return;
+            }
+
+            var builder = new UriBuilder("http://192.168.0.222:9000/hooks/next?");
+            Episode episode = item as Episode;
+            string query = "title=" + HttpUtility.UrlEncode(episode.Series.Name) + "&series=" +
+            episode.Season.IndexNumber + "&episode=" + episode.IndexNumber;;
+            builder.Query = query;
+
+            builder.Query = query.ToString();
+            using HttpClient client = new HttpClient();
+            await client.GetAsync(builder.Uri).ConfigureAwait(false);
+        }
+}
