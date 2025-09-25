@@ -13,6 +13,7 @@ out/
 **/*.log
 /.idea/
 *.env
+.DS_Store
 bin/
 obj/
 .vs/
