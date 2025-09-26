@@ -20,10 +20,11 @@ namespace Jellyfin.Plugin.Jellypy;
 /// <summary>
 /// Service responsible for executing the configured external script on playback events.
 /// </summary>
-public class ExecuteScript : IEventConsumer<PlaybackProgressEventArgs>
+public class ExecuteScript : IEventConsumer<PlaybackProgressEventArgs>, IDisposable
 {
     private readonly ILogger<ExecuteScript> _logger;
-    private static readonly SemaphoreSlim ScriptSemaphore = new(1, 1);
+    private readonly SemaphoreSlim _scriptSemaphore;
+    private bool _disposed;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ExecuteScript"/> class.
@@ -32,6 +33,7 @@ public class ExecuteScript : IEventConsumer<PlaybackProgressEventArgs>
     public ExecuteScript(ILogger<ExecuteScript> logger)
     {
         _logger = logger;
+        _scriptSemaphore = new SemaphoreSlim(1, 1);
     }
 
     /// <inheritdoc/>
@@ -176,7 +178,7 @@ public class ExecuteScript : IEventConsumer<PlaybackProgressEventArgs>
             startInfo.Environment["RADARR_URL"] = config.RadarrUrl;
         }
 
-        await ScriptSemaphore.WaitAsync().ConfigureAwait(false);
+        await _scriptSemaphore.WaitAsync().ConfigureAwait(false);
         try
         {
             using var process = Process.Start(startInfo);
@@ -237,7 +239,7 @@ public class ExecuteScript : IEventConsumer<PlaybackProgressEventArgs>
         }
         finally
         {
-            ScriptSemaphore.Release();
+            _scriptSemaphore.Release();
         }
     }
 
@@ -312,6 +314,28 @@ public class ExecuteScript : IEventConsumer<PlaybackProgressEventArgs>
         if (current.Length > 0)
         {
             yield return current.ToString();
+        }
+    }
+
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+    /// </summary>
+    /// <param name="disposing">True if disposing from user code, false if called from finalizer.</param>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed && disposing)
+        {
+            _scriptSemaphore?.Dispose();
+            _disposed = true;
         }
     }
 }

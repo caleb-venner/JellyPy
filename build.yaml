@@ -11,6 +11,6 @@ description: >
 category: "General"
 owner: "Caleb"
 artifacts:
-- "Jellyfin.Plugin.JellyPy.dll"
+- "Jellyfin.Plugin.Jellypy.dll"
 changelog: >
   changelog

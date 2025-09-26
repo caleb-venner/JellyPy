@@ -9,16 +9,6 @@ using MediaBrowser.Model.Serialization;
 
 namespace Jellyfin.Plugin.Jellypy;
 
-// Need to register something as a running service, currently ExecuteScript, this will
-// create an instance of that class, also need to have eventplaybackstart registered as
-// being active. Running service/entry-point then creates ... ?
-
-// Also make a simple config page? Not sure if that is necessary?
-// References to .Instance! --- so if the instance exists? For this current instance?
-
-// Create "EntryPoint-service" that receives playback start notifications, then creates a
-// new ExecuteScript object that handles each instance of playback = RunScript.
-
 /// <summary>
 /// The main plugin.
 /// </summary>
@@ -27,8 +17,8 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
     /// <summary>
     /// Initializes a new instance of the <see cref="Plugin"/> class.
     /// </summary>
-    /// <param name="applicationPaths">mmm.</param>
-    /// <param name="xmlSerializer">mmnm.</param>
+    /// <param name="applicationPaths">Instance of the IApplicationPaths interface.</param>
+    /// <param name="xmlSerializer">Instance of the IXmlSerializer interface.</param>
     public Plugin(IApplicationPaths applicationPaths, IXmlSerializer xmlSerializer)
         : base(applicationPaths, xmlSerializer)
     {

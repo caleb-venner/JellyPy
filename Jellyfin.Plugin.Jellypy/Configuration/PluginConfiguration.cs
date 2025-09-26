@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using MediaBrowser.Model.Plugins;
 
 namespace Jellyfin.Plugin.Jellypy.Configuration;
@@ -20,7 +22,11 @@ public class PluginConfiguration : BasePluginConfiguration
         ScriptTimeoutSeconds = 300;
         SonarrUrl = "http://sonarr:8989";
         RadarrUrl = "http://radarr:7878";
+        ScriptSettings = new Collection<ScriptSetting>();
+        GlobalSettings = new GlobalScriptSettings();
     }
+
+    // Legacy configuration properties (maintained for backward compatibility)
 
     /// <summary>
     /// Gets or sets the absolute path to the Python interpreter used to run scripts.
@@ -76,4 +82,16 @@ public class PluginConfiguration : BasePluginConfiguration
     /// Gets or sets the Radarr base URL used when invoking the script.
     /// </summary>
     public string RadarrUrl { get; set; }
+
+    // New enhanced configuration properties
+
+    /// <summary>
+    /// Gets the list of script settings for enhanced event handling.
+    /// </summary>
+    public Collection<ScriptSetting> ScriptSettings { get; }
+
+    /// <summary>
+    /// Gets or sets global settings for script execution.
+    /// </summary>
+    public GlobalScriptSettings GlobalSettings { get; set; }
 }
