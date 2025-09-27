@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Session;
 using Microsoft.Extensions.DependencyInjection;
@@ -60,7 +61,16 @@ public class EntryPoint : IHostedService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to execute script for playback start of {ItemName}", eventArgs.Item?.Name ?? "<unknown>");
+            string itemName;
+            if (eventArgs.Item is Episode episode)
+            {
+                itemName = episode.SeriesName ?? episode.Name ?? "<unknown>";
+            }
+            else
+            {
+                itemName = eventArgs.Item?.Name ?? "<unknown>";
+            }
+            _logger.LogError(ex, "Failed to execute script for playback start of {ItemName}", itemName);
         }
     }
 }

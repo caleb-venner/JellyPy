@@ -34,6 +34,7 @@ public class PluginServiceRegistrator : IPluginServiceRegistrator
         serviceCollection.AddTransient<IEventConsumer<PlaybackProgressEventArgs>, EnhancedEntryPoint>();
 
         // Keep legacy registration for backward compatibility
+        serviceCollection.AddTransient<ExecuteScript>();
         serviceCollection.AddTransient<IEventConsumer<PlaybackProgressEventArgs>, ExecuteScript>();
     }
 }

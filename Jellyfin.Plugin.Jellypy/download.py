@@ -19,10 +19,10 @@ import sys
 import requests
 
 # ## EDIT THESE SETTINGS ##
-SONARR_APIKEY = os.environ.get('SONARR_APIKEY', '')  # Your SONARR API key
-SONARR_URL = os.environ.get('SONARR_URL', 'http://sonarr:8989')  # Your SONARR URL
-RADARR_APIKEY = os.environ.get('RADARR_APIKEY', '')
-RADARR_URL = os.environ.get('RADARR_URL', 'http://radarr:7878')
+SONARR_APIKEY = '252709f0870949c78ffce5eff7dad326'  # Your SONARR API key
+SONARR_URL = 'http://sonarr:8989'  # Your SONARR URL
+RADARR_APIKEY = '0d1c58ceb4d34ad992c1fd016ce60a6a'
+RADARR_URL = 'http://radarr:7878'
 
 EPISODE_BUFFER = 6 # The number of next episodes you want to set wanted and search for
 SET_WANTED = True # Whether to mark the next episodes as wanted

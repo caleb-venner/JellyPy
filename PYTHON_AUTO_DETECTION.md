@@ -30,11 +30,11 @@ The plugin automatically detects the best available Python interpreter on your s
 
 ## 🐳 **Docker/Unraid Benefits**
 
-✅ **Zero Configuration** - Works out of the box in most containers  
-✅ **Container-Aware** - Checks Docker-specific paths first  
-✅ **Diagnostic Logging** - Detailed logs help with troubleshooting  
-✅ **Multiple Fallbacks** - Won't fail if one interpreter is missing  
-✅ **Multi-Executor Support** - Works with Python, PowerShell, Bash, Node.js  
+✅ **Zero Configuration** - Works out of the box in most containers
+✅ **Container-Aware** - Checks Docker-specific paths first
+✅ **Diagnostic Logging** - Detailed logs help with troubleshooting
+✅ **Multiple Fallbacks** - Won't fail if one interpreter is missing
+✅ **Multi-Executor Support** - Works with Python, PowerShell, Bash, Node.js
 
 ## 📋 **User Experience**
 
@@ -65,7 +65,7 @@ The plugin automatically detects the best available Python interpreter on your s
 ```json
 {
   "Execution": {
-    "ExecutorType": "Python", 
+    "ExecutorType": "Python",
     "ExecutablePath": "auto",  // Forces auto-detection
     "ScriptPath": "/config/scripts/notify.py"
   }
@@ -103,7 +103,7 @@ If auto-detection fails, you'll see detailed diagnostics:
 ## 🌟 **Supported Executors**
 
 - **Python**: `python3`, `python`, version-specific variants
-- **PowerShell**: `pwsh`, `powershell`  
+- **PowerShell**: `pwsh`, `powershell`
 - **Bash**: `/bin/bash`, `/usr/bin/bash`, `bash`, `sh`
 - **Node.js**: `node`, `/usr/bin/node`, `nodejs`
 - **Binary**: Direct executable execution (no interpreter needed)

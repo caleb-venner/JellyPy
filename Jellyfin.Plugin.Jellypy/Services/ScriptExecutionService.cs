@@ -207,19 +207,19 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
             // 1. Bundled Python in plugin directory (future enhancement)
             Path.Combine(pluginDirectory, "runtime", "bin", "python3"),
             Path.Combine(pluginDirectory, "runtime", "bin", "python"),
-            
+
             // 2. Common Docker container locations
             "/usr/bin/python3",
             "/usr/bin/python",
             "/usr/local/bin/python3",
             "/usr/local/bin/python",
-            
+
             // 3. Alpine Linux locations (common in Docker)
             "/usr/bin/python3.12",
             "/usr/bin/python3.11",
             "/usr/bin/python3.10",
             "/usr/bin/python3.9",
-            
+
             // 4. System PATH locations
             "python3",
             "python"
@@ -236,7 +236,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
 
         // Log detailed diagnostic info for troubleshooting
         LogPythonDiagnostics();
-        
+
         // Fallback to default - will likely fail but provides clear error
         var fallback = "/usr/bin/python3";
         _logger.LogWarning("No Python executable found. Using fallback: {Path}", fallback);
@@ -249,7 +249,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
     private string ResolvePowerShellPath()
     {
         var candidates = new[] { "pwsh", "powershell", "/usr/bin/pwsh", "/usr/local/bin/pwsh" };
-        
+
         foreach (var candidate in candidates)
         {
             if (IsExecutableAvailable(candidate))
@@ -258,7 +258,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                 return candidate;
             }
         }
-        
+
         _logger.LogWarning("No PowerShell executable found. Using fallback: pwsh");
         return "pwsh"; // Fallback
     }
@@ -269,7 +269,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
     private string ResolveBashPath()
     {
         var candidates = new[] { "/bin/bash", "/usr/bin/bash", "bash", "/bin/sh", "sh" };
-        
+
         foreach (var candidate in candidates)
         {
             if (IsExecutableAvailable(candidate))
@@ -278,7 +278,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                 return candidate;
             }
         }
-        
+
         _logger.LogWarning("No Bash executable found. Using fallback: /bin/bash");
         return "/bin/bash"; // Fallback
     }
@@ -289,7 +289,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
     private string ResolveNodePath()
     {
         var candidates = new[] { "node", "/usr/bin/node", "/usr/local/bin/node", "nodejs" };
-        
+
         foreach (var candidate in candidates)
         {
             if (IsExecutableAvailable(candidate))
@@ -298,7 +298,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                 return candidate;
             }
         }
-        
+
         _logger.LogWarning("No Node.js executable found. Using fallback: node");
         return "node"; // Fallback
     }
@@ -332,7 +332,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                     _logger.LogDebug("Python version check for {Path}: {Output}", path, output.Trim());
                     return output.Contains("Python", StringComparison.OrdinalIgnoreCase);
                 }
-                
+
                 if (!completed)
                 {
                     try
@@ -381,7 +381,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                 {
                     return true;
                 }
-                
+
                 if (!completed)
                 {
                     try
@@ -423,7 +423,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                 {
                     return true;
                 }
-                
+
                 if (!completed)
                 {
                     try
@@ -453,11 +453,11 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         try
         {
             _logger.LogWarning("Python auto-detection failed. Diagnostic information:");
-            
+
             // Log environment info
             _logger.LogInformation("Operating System: {OS}", RuntimeInformation.OSDescription);
             _logger.LogInformation("Architecture: {Arch}", RuntimeInformation.OSArchitecture);
-            
+
             // Log common directories
             var directories = new[] { "/usr/bin", "/usr/local/bin", "/bin" };
             foreach (var dir in directories)
@@ -467,7 +467,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                     var pythonFiles = Directory.GetFiles(dir, "python*")
                         .Where(f => !Path.GetFileName(f).Contains("config", StringComparison.OrdinalIgnoreCase))
                         .Take(5);
-                    
+
                     if (pythonFiles.Any())
                     {
                         _logger.LogInformation(
