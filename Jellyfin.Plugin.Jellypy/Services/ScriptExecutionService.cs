@@ -5,6 +5,8 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -158,22 +160,341 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         }
     }
 
-    private static string GetExecutorPath(ScriptExecutorType executorType, string customExecutorPath)
+    private string GetExecutorPath(ScriptExecutorType executorType, string customExecutorPath)
     {
-        if (!string.IsNullOrEmpty(customExecutorPath))
+        // If user explicitly set a path (and it's not default), use it
+        if (!string.IsNullOrWhiteSpace(customExecutorPath) &&
+            customExecutorPath != "auto" &&
+            !IsDefaultPath(executorType, customExecutorPath))
         {
             return customExecutorPath;
         }
 
+        // Auto-detect based on executor type
         return executorType switch
         {
-            ScriptExecutorType.Python => "/usr/bin/python3", // Default paths - should be configurable
-            ScriptExecutorType.PowerShell => "/usr/local/bin/pwsh",
-            ScriptExecutorType.Bash => "/bin/bash",
-            ScriptExecutorType.NodeJs => "/usr/bin/node",
-            ScriptExecutorType.Binary => string.Empty, // Binary doesn't need an executor
-            _ => string.Empty
+            ScriptExecutorType.Python => ResolvePythonPath(),
+            ScriptExecutorType.PowerShell => ResolvePowerShellPath(),
+            ScriptExecutorType.Bash => ResolveBashPath(),
+            ScriptExecutorType.NodeJs => ResolveNodePath(),
+            ScriptExecutorType.Binary => string.Empty, // Binary is the script itself
+            _ => customExecutorPath ?? string.Empty
         };
+    }
+
+    private static bool IsDefaultPath(ScriptExecutorType executorType, string path)
+    {
+        return executorType switch
+        {
+            ScriptExecutorType.Python => path.Equals("/usr/bin/python3", StringComparison.OrdinalIgnoreCase),
+            ScriptExecutorType.PowerShell => path.Equals("/usr/local/bin/pwsh", StringComparison.OrdinalIgnoreCase),
+            ScriptExecutorType.Bash => path.Equals("/bin/bash", StringComparison.OrdinalIgnoreCase),
+            ScriptExecutorType.NodeJs => path.Equals("/usr/bin/node", StringComparison.OrdinalIgnoreCase),
+            _ => false
+        };
+    }
+
+    /// <summary>
+    /// Resolves Python executable path with multiple fallback strategies.
+    /// </summary>
+    private string ResolvePythonPath()
+    {
+        // Get plugin directory for potential bundled runtime
+        var pluginDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty;
+
+        var candidates = new[]
+        {
+            // 1. Bundled Python in plugin directory (future enhancement)
+            Path.Combine(pluginDirectory, "runtime", "bin", "python3"),
+            Path.Combine(pluginDirectory, "runtime", "bin", "python"),
+            
+            // 2. Common Docker container locations
+            "/usr/bin/python3",
+            "/usr/bin/python",
+            "/usr/local/bin/python3",
+            "/usr/local/bin/python",
+            
+            // 3. Alpine Linux locations (common in Docker)
+            "/usr/bin/python3.12",
+            "/usr/bin/python3.11",
+            "/usr/bin/python3.10",
+            "/usr/bin/python3.9",
+            
+            // 4. System PATH locations
+            "python3",
+            "python"
+        };
+
+        foreach (var candidate in candidates)
+        {
+            if (IsPythonExecutable(candidate))
+            {
+                _logger.LogInformation("Found Python executable: {Path}", candidate);
+                return candidate;
+            }
+        }
+
+        // Log detailed diagnostic info for troubleshooting
+        LogPythonDiagnostics();
+        
+        // Fallback to default - will likely fail but provides clear error
+        var fallback = "/usr/bin/python3";
+        _logger.LogWarning("No Python executable found. Using fallback: {Path}", fallback);
+        return fallback;
+    }
+
+    /// <summary>
+    /// Resolves PowerShell executable path.
+    /// </summary>
+    private string ResolvePowerShellPath()
+    {
+        var candidates = new[] { "pwsh", "powershell", "/usr/bin/pwsh", "/usr/local/bin/pwsh" };
+        
+        foreach (var candidate in candidates)
+        {
+            if (IsExecutableAvailable(candidate))
+            {
+                _logger.LogInformation("Found PowerShell executable: {Path}", candidate);
+                return candidate;
+            }
+        }
+        
+        _logger.LogWarning("No PowerShell executable found. Using fallback: pwsh");
+        return "pwsh"; // Fallback
+    }
+
+    /// <summary>
+    /// Resolves Bash executable path.
+    /// </summary>
+    private string ResolveBashPath()
+    {
+        var candidates = new[] { "/bin/bash", "/usr/bin/bash", "bash", "/bin/sh", "sh" };
+        
+        foreach (var candidate in candidates)
+        {
+            if (IsExecutableAvailable(candidate))
+            {
+                _logger.LogInformation("Found Bash executable: {Path}", candidate);
+                return candidate;
+            }
+        }
+        
+        _logger.LogWarning("No Bash executable found. Using fallback: /bin/bash");
+        return "/bin/bash"; // Fallback
+    }
+
+    /// <summary>
+    /// Resolves Node.js executable path.
+    /// </summary>
+    private string ResolveNodePath()
+    {
+        var candidates = new[] { "node", "/usr/bin/node", "/usr/local/bin/node", "nodejs" };
+        
+        foreach (var candidate in candidates)
+        {
+            if (IsExecutableAvailable(candidate))
+            {
+                _logger.LogInformation("Found Node.js executable: {Path}", candidate);
+                return candidate;
+            }
+        }
+        
+        _logger.LogWarning("No Node.js executable found. Using fallback: node");
+        return "node"; // Fallback
+    }
+
+    /// <summary>
+    /// Checks if a path points to a valid Python executable.
+    /// </summary>
+    private bool IsPythonExecutable(string path)
+    {
+        try
+        {
+            using var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = path,
+                    Arguments = "--version",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                }
+            };
+
+            if (process.Start())
+            {
+                var completed = process.WaitForExit(5000);
+                if (completed && process.ExitCode == 0)
+                {
+                    var output = process.StandardOutput.ReadToEnd();
+                    _logger.LogDebug("Python version check for {Path}: {Output}", path, output.Trim());
+                    return output.Contains("Python", StringComparison.OrdinalIgnoreCase);
+                }
+                
+                if (!completed)
+                {
+                    try
+                    {
+                        process.Kill(true);
+                    }
+                    catch
+                    {
+                        /* Ignore */
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug("Failed to check Python executable {Path}: {Error}", path, ex.Message);
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Checks if an executable is available on the system.
+    /// </summary>
+    private bool IsExecutableAvailable(string executableName)
+    {
+        try
+        {
+            // Try using 'which' command first (Unix-like systems)
+            using var whichProcess = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "which",
+                    Arguments = executableName,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true
+                }
+            };
+
+            if (whichProcess.Start())
+            {
+                var completed = whichProcess.WaitForExit(3000);
+                if (completed && whichProcess.ExitCode == 0)
+                {
+                    return true;
+                }
+                
+                if (!completed)
+                {
+                    try
+                    {
+                        whichProcess.Kill(true);
+                    }
+                    catch
+                    {
+                        /* Ignore */
+                    }
+                }
+            }
+        }
+        catch
+        {
+            // If 'which' command fails, try direct execution
+        }
+
+        // Fallback: try direct execution
+        try
+        {
+            using var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = executableName,
+                    Arguments = "--version",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                }
+            };
+
+            if (process.Start())
+            {
+                var completed = process.WaitForExit(3000);
+                if (completed && process.ExitCode == 0)
+                {
+                    return true;
+                }
+                
+                if (!completed)
+                {
+                    try
+                    {
+                        process.Kill(true);
+                    }
+                    catch
+                    {
+                        /* Ignore */
+                    }
+                }
+            }
+        }
+        catch
+        {
+            // Ignore
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Logs diagnostic information to help with troubleshooting Python detection.
+    /// </summary>
+    private void LogPythonDiagnostics()
+    {
+        try
+        {
+            _logger.LogWarning("Python auto-detection failed. Diagnostic information:");
+            
+            // Log environment info
+            _logger.LogInformation("Operating System: {OS}", RuntimeInformation.OSDescription);
+            _logger.LogInformation("Architecture: {Arch}", RuntimeInformation.OSArchitecture);
+            
+            // Log common directories
+            var directories = new[] { "/usr/bin", "/usr/local/bin", "/bin" };
+            foreach (var dir in directories)
+            {
+                if (Directory.Exists(dir))
+                {
+                    var pythonFiles = Directory.GetFiles(dir, "python*")
+                        .Where(f => !Path.GetFileName(f).Contains("config", StringComparison.OrdinalIgnoreCase))
+                        .Take(5);
+                    
+                    if (pythonFiles.Any())
+                    {
+                        _logger.LogInformation(
+                            "Python-like files in {Directory}: {Files}",
+                            dir,
+                            string.Join(", ", pythonFiles.Select(Path.GetFileName)));
+                    }
+                }
+                else
+                {
+                    _logger.LogDebug("Directory does not exist: {Directory}", dir);
+                }
+            }
+
+            // Log PATH environment variable
+            var pathVar = Environment.GetEnvironmentVariable("PATH");
+            if (!string.IsNullOrEmpty(pathVar))
+            {
+                var paths = pathVar.Split(':', StringSplitOptions.RemoveEmptyEntries);
+                _logger.LogInformation("PATH contains {Count} directories", paths.Length);
+                _logger.LogDebug("PATH directories: {Paths}", string.Join(", ", paths.Take(10)));
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug("Failed to collect Python diagnostics: {Error}", ex.Message);
+        }
     }
 
     private async Task ExecuteLegacyScriptAsync(PluginConfiguration config, EventData eventData)
