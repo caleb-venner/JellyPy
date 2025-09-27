@@ -1,4 +1,4 @@
-﻿using Jellyfin.Plugin.Jellypy.Events;
+using Jellyfin.Plugin.Jellypy.Events;
 using Jellyfin.Plugin.Jellypy.Events.Handlers;
 using Jellyfin.Plugin.Jellypy.Services;
 using MediaBrowser.Controller;

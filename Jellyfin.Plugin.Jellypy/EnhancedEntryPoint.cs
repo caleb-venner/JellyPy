@@ -74,7 +74,7 @@ public class EnhancedEntryPoint : IHostedService,
     private void OnPlaybackProgress(object sender, PlaybackProgressEventArgs eventArgs)
     {
         // We can use this for pause/resume detection by checking IsPaused
-        _ = HandlePlaybackProgressEventAsync(eventArgs);
+        HandlePlaybackProgressEventAsync(eventArgs);
     }
 
     private async Task HandlePlaybackStartEventAsync(PlaybackProgressEventArgs eventArgs)
@@ -87,16 +87,18 @@ public class EnhancedEntryPoint : IHostedService,
         await HandleEventAsync<PlaybackStopEventArgs, PlaybackStopHandler>(eventArgs).ConfigureAwait(false);
     }
 
-    private async Task HandlePlaybackProgressEventAsync(PlaybackProgressEventArgs eventArgs)
+    private void HandlePlaybackProgressEventAsync(PlaybackProgressEventArgs eventArgs)
     {
         // Determine if this is a pause or resume based on IsPaused
         // For now, we'll just log it and potentially handle it later
-        _logger.LogDebug("Playback progress event: Paused={IsPaused}, Position={Position}",
-            eventArgs.IsPaused, eventArgs.PlaybackPositionTicks);
+        _logger.LogDebug(
+            "Playback progress event: Paused={IsPaused}, Position={Position}",
+            eventArgs.IsPaused,
+            eventArgs.PlaybackPositionTicks);
     }
 
     private async Task HandleEventAsync<TEventArgs, THandler>(TEventArgs eventArgs)
-        where THandler : class, IGenericEventHandler<TEventArgs>
+        where THandler : class, IEventProcessor<TEventArgs>
     {
         try
         {

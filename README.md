@@ -1,50 +1,372 @@
 # JellyPy — Jellyfin plugin for running Python scripts on events
 
-A small Jellyfin plugin that runs external Python scripts on playback events (episodes/movies).
+A powerful Jellyfin plugin that runs external scripts on various Jellyfin events with advanced configuration options.
 
-This repository contains the C# plugin (Jellyfin.Plugin.Jellypy) and supporting Python scripts used to automate Sonarr/Radarr actions when media is played.
+This repository contains a C# plugin (Jellyfin.Plugin.Jellypy) that can execute custom scripts in response to Jellyfin events like playback start/stop, item added/updated, and user management events.
 
-## Quick start
+## ✨ Features
 
-1. Build the plugin:
+### 🎯 **Advanced Script Configuration**
+- **Multi-Event Support**: React to PlaybackStart, PlaybackStop, ItemAdded, UserCreated, and more
+- **Conditional Execution**: Set conditions based on event data (content type, user, device, etc.)
+- **Custom Data Attributes**: Choose which event data to pass to your scripts
+- **Multiple Executor Support**: Python, PowerShell, Bash, Node.js, and binary execution
+- **Flexible Data Formats**: Pass data as command arguments, environment variables, or JSON
+
+### 🔧 **Legacy Compatibility**
+- **Backward Compatible**: Existing simple script configurations continue to work
+- **Dual Mode Operation**: Use both legacy and advanced settings simultaneously
+- **Migration Path**: Easy upgrade from simple to advanced configurations
+
+### 🌐 **Enhanced Web UI**
+- **Tabbed Interface**: Separate configuration sections for different features
+- **Visual Script Builder**: Create complex script configurations through the web interface
+- **Real-time Validation**: Immediate feedback on configuration validity
+- **Export/Import**: Save and share script configurations
+
+## 🚀 Quick Start
+
+### 1. Build and Install
 
 ```bash
+# Build the plugin
 dotnet build Jellyfin.Plugin.Jellypy.sln
-```
 
-2. Copy the built assembly to your Jellyfin `plugins` directory (adjust paths for your install):
-
-```bash
-# Example (Linux systemd):
+# Copy to Jellyfin plugins directory
 sudo mkdir -p /var/lib/jellyfin/plugins/Jellyfin.Plugin.Jellypy
 sudo cp Jellyfin.Plugin.Jellypy/bin/Debug/net8.0/Jellyfin.Plugin.Jellypy.dll /var/lib/jellyfin/plugins/Jellyfin.Plugin.Jellypy/
 ```
 
-3. Ensure the external Python script is available to the Jellyfin process. By default the plugin expects the script at `/config/scripts/download.py` — either place it there or update the plugin configuration in Jellyfin.
+### 2. Configure Scripts
 
-4. Restart Jellyfin and open the plugin configuration page in the server dashboard to fill Sonarr/Radarr credentials and script path.
+1. Restart Jellyfin
+2. Go to Admin → Plugins → JellyPy
+3. Choose your configuration approach:
+   - **Legacy Settings**: Simple Python script configuration (backward compatible)
+   - **Advanced Script Settings**: Full-featured script configuration system
+   - **Global Settings**: System-wide execution parameters
 
-## Development
+### 3. Create Your Scripts
 
-- Use `dotnet build` for iterative development. Use `dotnet publish` if you need to produce a folder with dependencies for distribution.
-- Tests: none included. Manual testing: copy DLL into a dev Jellyfin instance and verify logs on playback start.
+The plugin can execute any type of script or binary. Here's a simple Python example:
 
-## Configuration
+```python
+#!/usr/bin/env python3
+import os
+import sys
+import json
 
-Configure the plugin in Jellyfin (Admin → Plugins → JellyPy). Key fields:
-- Python executable path (e.g. /usr/bin/python3)
-- Script path (absolute path to the Python script)
-- Sonarr API key / URL
-- Radarr API key / URL
-- Additional arguments, timeout, and toggles for episode/movie handling
+# Access event data through environment variables
+event_type = os.getenv('EVENT_TYPE')
+user_name = os.getenv('USER_NAME')
+item_name = os.getenv('ITEM_NAME')
+item_type = os.getenv('ITEM_TYPE')
 
-The plugin passes the Sonarr/Radarr keys to the script as environment variables `SONARR_APIKEY`, `SONARR_URL`, `RADARR_APIKEY`, and `RADARR_URL`.
+# Or through command line arguments
+if len(sys.argv) > 1:
+    event_data = json.loads(sys.argv[1])
+    print(f"Processing {event_data['EventType']} for {event_data['ItemName']}")
 
-## Packaging & distribution
+# Your automation logic here
+print(f"User {user_name} triggered {event_type} on {item_type}: {item_name}")
+```
 
-- For distribution, create a zip containing the plugin DLL and any non-managed companion files. If your plugin depends on managed DLLs not present in Jellyfin, include them from `dotnet publish` output.
+## 📋 Configuration Guide
 
-## License
+### Legacy Configuration (Simple)
+
+Perfect for basic use cases:
+
+| Setting | Description | Example |
+|---------|-------------|---------|
+| Python Executable Path | Path to Python interpreter | `/usr/bin/python3` |
+| Script Path | Path to your script | `/config/scripts/notify.py` |
+| Working Directory | Script working directory | `/config/scripts` |
+| Additional Arguments | Extra command line args | `--verbose --format json` |
+| Timeout | Script execution timeout | `300` |
+
+### Advanced Script Settings
+
+Create multiple script configurations with specific triggers and conditions:
+
+#### 🎬 **Example: Movie Download Notifier**
+```json
+{
+  "Name": "Movie Download Notifier",
+  "Description": "Notify when movies are played for the first time",
+  "Enabled": true,
+  "Triggers": ["PlaybackStart"],
+  "Conditions": [
+    {
+      "Field": "ItemType",
+      "Operator": "Equals",
+      "Value": "Movie"
+    }
+  ],
+  "Execution": {
+    "ExecutorType": "Python",
+    "ExecutablePath": "/usr/bin/python3",
+    "ScriptPath": "/scripts/movie-notify.py",
+    "TimeoutSeconds": 60
+  },
+  "DataAttributes": [
+    {
+      "Name": "movie-title",
+      "SourceField": "ItemName",
+      "Format": "Argument"
+    },
+    {
+      "Name": "USER_NAME",
+      "SourceField": "UserName",
+      "Format": "Environment"
+    }
+  ]
+}
+```
+
+#### 📺 **Example: TV Show Episode Tracker**
+```json
+{
+  "Name": "Episode Tracker",
+  "Description": "Track TV episode viewing progress",
+  "Enabled": true,
+  "Triggers": ["PlaybackStart", "PlaybackStop"],
+  "Conditions": [
+    {
+      "Field": "ItemType",
+      "Operator": "Equals",
+      "Value": "Episode"
+    }
+  ],
+  "Execution": {
+    "ExecutorType": "NodeJs",
+    "ExecutablePath": "/usr/bin/node",
+    "ScriptPath": "/scripts/episode-tracker.js"
+  },
+  "DataAttributes": [
+    {
+      "Name": "series-info",
+      "SourceField": "SeriesName",
+      "Format": "Json"
+    },
+    {
+      "Name": "EPISODE_NUMBER",
+      "SourceField": "EpisodeNumber",
+      "Format": "Environment"
+    }
+  ]
+}
+```
+
+### Available Event Types
+
+| Event | Trigger | Use Cases |
+|-------|---------|-----------|
+| `PlaybackStart` | Media playback begins | Notifications, analytics, automation |
+| `PlaybackStop` | Media playback ends | Completion tracking, cleanup |
+| `PlaybackPause` | Playback paused | User behavior analysis |
+| `PlaybackResume` | Playback resumed | Session management |
+| `ItemAdded` | New media added to library | Download completion processing |
+| `ItemUpdated` | Media metadata updated | Library maintenance |
+| `UserCreated` | New user account created | Welcome automation |
+| `UserDeleted` | User account removed | Cleanup procedures |
+
+### Available Data Fields
+
+Access comprehensive event information:
+
+| Field | Description | Available For |
+|-------|-------------|---------------|
+| `EventType` | Type of event triggered | All events |
+| `Timestamp` | When event occurred | All events |
+| `UserId` / `UserName` | User information | User-related events |
+| `SessionId` | Playback session ID | Playback events |
+| `ItemId` / `ItemName` / `ItemType` | Media item details | Media events |
+| `ItemPath` | File system path | Media events |
+| `LibraryId` / `LibraryName` | Library information | Library events |
+| `PlaybackPositionTicks` | Playback position | Playback events |
+| `ClientName` / `DeviceName` | Playback device info | Playback events |
+| `SeriesName` / `SeasonNumber` / `EpisodeNumber` | TV show details | Episode events |
+| `Year` / `Genres` / `ContentRating` | Media metadata | Media events |
+
+### Condition Operators
+
+Fine-tune when scripts execute:
+
+| Operator | Use Case | Example |
+|----------|----------|---------|
+| `Equals` / `NotEquals` | Exact matching | `ItemType = "Movie"` |
+| `Contains` / `NotContains` | Substring search | `ItemName contains "Marvel"` |
+| `StartsWith` / `EndsWith` | Prefix/suffix matching | `ClientName starts with "TV"` |
+| `Regex` | Pattern matching | `ItemName matches "S\d+E\d+"` |
+| `GreaterThan` / `LessThan` | Numeric comparison | `Year > 2020` |
+| `In` / `NotIn` | List membership | `Genre in "Action,Sci-Fi"` |
+
+### Data Formats
+
+Choose how data is passed to your scripts:
+
+| Format | Description | Example |
+|--------|-------------|---------|
+| `Argument` | Command line argument | `--movie-title "Inception"` |
+| `Environment` | Environment variable | `MOVIE_TITLE=Inception` |
+| `Json` | JSON object argument | `--data '{"title":"Inception"}'` |
+| `String` | Simple string argument | `"Inception"` |
+
+## 🔧 Global Settings
+
+Configure system-wide execution parameters:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| Max Concurrent Executions | 5 | Maximum simultaneous scripts |
+| Default Timeout | 300s | Default script timeout |
+| Queue Size | 100 | Maximum pending executions |
+| Enable Verbose Logging | false | Detailed execution logging |
+| Use Legacy Mode | true | Enable backward compatibility |
+
+## 🐍 Python Script Examples
+
+### Basic Event Handler
+```python
+#!/usr/bin/env python3
+import os
+import json
+import logging
+
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+def main():
+    # Get event data from environment
+    event_type = os.getenv('EVENT_TYPE', 'Unknown')
+    user_name = os.getenv('USER_NAME', 'System')
+    item_name = os.getenv('ITEM_NAME', 'Unknown')
+
+    logger.info(f"Processing {event_type}: {item_name} for user {user_name}")
+
+    # Your logic here
+    if event_type == 'PlaybackStart':
+        handle_playback_start(item_name, user_name)
+    elif event_type == 'ItemAdded':
+        handle_new_item(item_name)
+
+def handle_playback_start(item_name, user_name):
+    # Send notification, log analytics, etc.
+    logger.info(f"User {user_name} started watching {item_name}")
+
+def handle_new_item(item_name):
+    # Process new media, update databases, etc.
+    logger.info(f"New item added to library: {item_name}")
+
+if __name__ == '__main__':
+    main()
+```
+
+### Sonarr/Radarr Integration
+```python
+#!/usr/bin/env python3
+import os
+import requests
+import logging
+
+def notify_sonarr_episode_watched():
+    """Mark episode as watched in Sonarr"""
+    sonarr_url = os.getenv('SONARR_URL')
+    sonarr_key = os.getenv('SONARR_APIKEY')
+    series_name = os.getenv('SERIES_NAME')
+    season = os.getenv('SEASON_NUMBER')
+    episode = os.getenv('EPISODE_NUMBER')
+
+    if not all([sonarr_url, sonarr_key, series_name, season, episode]):
+        logging.warning("Missing required environment variables for Sonarr integration")
+        return
+
+    # Sonarr API integration logic here
+    headers = {'X-Api-Key': sonarr_key}
+    # ... implement your Sonarr logic
+
+def notify_radarr_movie_watched():
+    """Mark movie as watched in Radarr"""
+    # Similar pattern for Radarr integration
+    pass
+
+if __name__ == '__main__':
+    event_type = os.getenv('EVENT_TYPE')
+    item_type = os.getenv('ITEM_TYPE')
+
+    if event_type == 'PlaybackStart':
+        if item_type == 'Episode':
+            notify_sonarr_episode_watched()
+        elif item_type == 'Movie':
+            notify_radarr_movie_watched()
+```
+
+## 🔄 Migration from Simple to Advanced
+
+Existing simple configurations automatically work alongside new advanced settings. To migrate:
+
+1. **Keep existing settings** - They continue to work in legacy mode
+2. **Create advanced script settings** - Add new configurations for enhanced features
+3. **Test both modes** - Ensure smooth operation
+4. **Gradually disable legacy** - Turn off legacy mode when ready
+
+## 🛠️ Development
+
+### Building
+```bash
+# Development build
+dotnet build
+
+# Release build
+dotnet publish --configuration=Release
+```
+
+### Testing
+- **Manual Testing**: Copy DLL to development Jellyfin instance
+- **Log Monitoring**: Check Jellyfin logs for script execution
+- **Configuration Validation**: Use web interface to validate settings
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Enhanced Entry Point                 │
+│                   (Multi-Event Handler)                 │
+└─────────────────┬───────────────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────────────┐
+│                Script Execution Service                 │
+│  • Configuration Processing                             │
+│  • Condition Evaluation                                 │
+│  • Data Attribute Processing                            │
+│  • Multi-Executor Support                               │
+└─────────────────┬───────────────────────────────────────┘
+                  │
+         ┌────────┼────────┐
+         ▼        ▼        ▼
+    ┌────────┐ ┌────────┐ ┌─────────┐
+    │ Python │ │PowerShl│ │  Bash   │
+    │Scripts │ │Scripts │ │ Scripts │
+    └────────┘ └────────┘ └─────────┘
+```
+
+## 📦 Distribution
+
+Create plugin distribution:
+```bash
+# Build release
+dotnet publish --configuration=Release
+
+# Create distribution package
+mkdir JellyPy-Plugin
+cp Jellyfin.Plugin.Jellypy/bin/Release/net8.0/publish/* JellyPy-Plugin/
+zip -r JellyPy-Plugin.zip JellyPy-Plugin/
+```
+
+## 📄 License
 
 This project is licensed under the terms in `LICENSE`.
 # So you want to make a Jellyfin plugin

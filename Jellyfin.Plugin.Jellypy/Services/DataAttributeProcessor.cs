@@ -1,5 +1,7 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Text.Json;
@@ -14,6 +16,7 @@ namespace Jellyfin.Plugin.Jellypy.Services;
 /// </summary>
 public class DataAttributeProcessor
 {
+    private static readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = false };
     private readonly ILogger<DataAttributeProcessor> _logger;
 
     /// <summary>
@@ -32,7 +35,7 @@ public class DataAttributeProcessor
     /// <param name="eventData">The event data to extract values from.</param>
     /// <returns>A tuple containing arguments and environment variables.</returns>
     public (List<string> Arguments, Dictionary<string, string> EnvironmentVariables) ProcessDataAttributes(
-        IEnumerable<DataAttribute> dataAttributes, EventData eventData)
+        IEnumerable<ScriptDataElement> dataAttributes, EventData eventData)
     {
         var arguments = new List<string>();
         var environmentVariables = new Dictionary<string, string>();
@@ -65,7 +68,7 @@ public class DataAttributeProcessor
         return (arguments, environmentVariables);
     }
 
-    private void ProcessAttribute(DataAttribute attribute, string value, List<string> arguments, Dictionary<string, string> environmentVariables)
+    private void ProcessAttribute(ScriptDataElement attribute, string value, List<string> arguments, Dictionary<string, string> environmentVariables)
     {
         switch (attribute.Format)
         {
@@ -93,7 +96,7 @@ public class DataAttributeProcessor
         }
     }
 
-    private string GetAttributeValue(DataAttribute attribute, EventData eventData)
+    private string GetAttributeValue(ScriptDataElement attribute, EventData eventData)
     {
         var sourceField = attribute.SourceField.ToLowerInvariant();
 
@@ -140,7 +143,7 @@ public class DataAttributeProcessor
         return key != null ? eventData.AdditionalData[key]?.ToString() ?? string.Empty : string.Empty;
     }
 
-    private string FormatAsJson(DataAttribute attribute, string value)
+    private string FormatAsJson(ScriptDataElement attribute, string value)
     {
         try
         {
@@ -148,7 +151,7 @@ public class DataAttributeProcessor
             if (value.StartsWith('{') || value.StartsWith('['))
             {
                 var parsed = JsonSerializer.Deserialize<object>(value);
-                return JsonSerializer.Serialize(parsed, new JsonSerializerOptions { WriteIndented = false });
+                return JsonSerializer.Serialize(parsed, _jsonOptions);
             }
             else
             {
@@ -167,10 +170,10 @@ public class DataAttributeProcessor
     /// Creates default data attributes for common use cases.
     /// </summary>
     /// <param name="eventType">The event type to create attributes for.</param>
-    /// <returns>A list of default data attributes.</returns>
-    public static List<DataAttribute> CreateDefaultDataAttributes(EventType eventType)
+    /// <returns>A collection of default data elements.</returns>
+    public static Collection<ScriptDataElement> CreateDefaultDataAttributes(EventType eventType)
     {
-        var attributes = new List<DataAttribute>
+        var attributesList = new List<ScriptDataElement>
         {
             new() { Name = "event-type", SourceField = "EventType", Format = DataAttributeFormat.Argument },
             new() { Name = "timestamp", SourceField = "Timestamp", Format = DataAttributeFormat.Environment },
@@ -184,34 +187,34 @@ public class DataAttributeProcessor
         {
             case EventType.PlaybackStart:
             case EventType.PlaybackStop:
-                attributes.AddRange(new[]
+                attributesList.AddRange(new[]
                 {
-                    new DataAttribute { Name = "client-name", SourceField = "ClientName", Format = DataAttributeFormat.Environment },
-                    new DataAttribute { Name = "device-name", SourceField = "DeviceName", Format = DataAttributeFormat.Environment },
-                    new DataAttribute { Name = "playback-position", SourceField = "PlaybackPositionTicks", Format = DataAttributeFormat.Argument }
+                    new ScriptDataElement { Name = "client-name", SourceField = "ClientName", Format = DataAttributeFormat.Environment },
+                    new ScriptDataElement { Name = "device-name", SourceField = "DeviceName", Format = DataAttributeFormat.Environment },
+                    new ScriptDataElement { Name = "playback-position", SourceField = "PlaybackPositionTicks", Format = DataAttributeFormat.Argument }
                 });
                 break;
 
             case EventType.ItemAdded:
             case EventType.ItemUpdated:
-                attributes.AddRange(new[]
+                attributesList.AddRange(new[]
                 {
-                    new DataAttribute { Name = "item-path", SourceField = "ItemPath", Format = DataAttributeFormat.Argument },
-                    new DataAttribute { Name = "library-name", SourceField = "LibraryName", Format = DataAttributeFormat.Environment }
+                    new ScriptDataElement { Name = "item-path", SourceField = "ItemPath", Format = DataAttributeFormat.Argument },
+                    new ScriptDataElement { Name = "library-name", SourceField = "LibraryName", Format = DataAttributeFormat.Environment }
                 });
                 break;
         }
 
         // Add media-specific attributes
-        attributes.AddRange(new[]
+        attributesList.AddRange(new[]
         {
-            new DataAttribute { Name = "series-name", SourceField = "SeriesName", Format = DataAttributeFormat.Argument },
-            new DataAttribute { Name = "season-number", SourceField = "SeasonNumber", Format = DataAttributeFormat.Argument },
-            new DataAttribute { Name = "episode-number", SourceField = "EpisodeNumber", Format = DataAttributeFormat.Argument },
-            new DataAttribute { Name = "year", SourceField = "Year", Format = DataAttributeFormat.Argument },
-            new DataAttribute { Name = "genres", SourceField = "Genres", Format = DataAttributeFormat.Environment }
+            new ScriptDataElement { Name = "series-name", SourceField = "SeriesName", Format = DataAttributeFormat.Argument },
+            new ScriptDataElement { Name = "season-number", SourceField = "SeasonNumber", Format = DataAttributeFormat.Argument },
+            new ScriptDataElement { Name = "episode-number", SourceField = "EpisodeNumber", Format = DataAttributeFormat.Argument },
+            new ScriptDataElement { Name = "year", SourceField = "Year", Format = DataAttributeFormat.Argument },
+            new ScriptDataElement { Name = "genres", SourceField = "Genres", Format = DataAttributeFormat.Environment }
         });
 
-        return attributes;
+        return new Collection<ScriptDataElement>(attributesList);
     }
 }

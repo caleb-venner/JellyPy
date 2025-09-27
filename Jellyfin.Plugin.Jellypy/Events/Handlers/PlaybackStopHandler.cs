@@ -13,7 +13,7 @@ namespace Jellyfin.Plugin.Jellypy.Events.Handlers;
 /// <summary>
 /// Handler for playback stop events.
 /// </summary>
-public class PlaybackStopHandler : IGenericEventHandler<PlaybackStopEventArgs>
+public class PlaybackStopHandler : IEventProcessor<PlaybackStopEventArgs>
 {
     private readonly ILogger<PlaybackStopHandler> _logger;
     private readonly IScriptExecutionService _scriptExecutionService;
@@ -80,7 +80,12 @@ public class PlaybackStopHandler : IGenericEventHandler<PlaybackStopEventArgs>
         // Add common media information
         if (eventArgs.Item is BaseItem item)
         {
-            eventData.Genres = item.Genres?.ToList() ?? new List<string>();
+            var genres = item.Genres?.ToList() ?? new List<string>();
+            foreach (var genre in genres)
+            {
+                eventData.Genres.Add(genre);
+            }
+
             eventData.ContentRating = item.OfficialRating;
             eventData.AdditionalData["CommunityRating"] = item.CommunityRating;
             eventData.AdditionalData["Runtime"] = item.RunTimeTicks;

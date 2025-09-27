@@ -1,5 +1,7 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Jellyfin.Plugin.Jellypy.Events;
 
 namespace Jellyfin.Plugin.Jellypy.Configuration;
@@ -30,14 +32,14 @@ public class ScriptSetting
     public bool Enabled { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the list of event types that trigger this script.
+    /// Gets the list of event types that trigger this script.
     /// </summary>
-    public List<EventType> Triggers { get; set; } = new();
+    public Collection<EventType> Triggers { get; } = new();
 
     /// <summary>
-    /// Gets or sets the execution conditions for this script.
+    /// Gets the execution conditions for this script.
     /// </summary>
-    public List<ExecutionCondition> Conditions { get; set; } = new();
+    public Collection<ExecutionCondition> Conditions { get; } = new();
 
     /// <summary>
     /// Gets or sets the script execution configuration.
@@ -45,9 +47,9 @@ public class ScriptSetting
     public ScriptExecution Execution { get; set; } = new();
 
     /// <summary>
-    /// Gets or sets the data attributes to pass to the script.
+    /// Gets the data attributes to pass to the script.
     /// </summary>
-    public List<DataAttribute> DataAttributes { get; set; } = new();
+    public Collection<ScriptDataElement> DataAttributes { get; } = new();
 
     /// <summary>
     /// Gets or sets the priority of this script (lower numbers = higher priority).
@@ -114,7 +116,7 @@ public class ScriptExecution
     /// <summary>
     /// Gets or sets environment variables to set for the script.
     /// </summary>
-    public Dictionary<string, string> EnvironmentVariables { get; set; } = new();
+    public Collection<EnvironmentVariable> EnvironmentVariables { get; } = new();
 
     /// <summary>
     /// Gets or sets the timeout in seconds for script execution.
@@ -123,9 +125,9 @@ public class ScriptExecution
 }
 
 /// <summary>
-/// Represents a data attribute to pass to a script.
+/// Represents a data element to pass to a script.
 /// </summary>
-public class DataAttribute
+public class ScriptDataElement
 {
     /// <summary>
     /// Gets or sets the name of the attribute.
@@ -143,7 +145,7 @@ public class DataAttribute
     public DataAttributeFormat Format { get; set; } = DataAttributeFormat.String;
 
     /// <summary>
-    /// Gets or sets whether this attribute is required.
+    /// Gets or sets a value indicating whether gets or sets whether this attribute is required.
     /// </summary>
     public bool Required { get; set; } = false;
 
@@ -243,6 +245,22 @@ public enum ScriptExecutorType
     /// Direct binary execution.
     /// </summary>
     Binary
+}
+
+/// <summary>
+/// Represents an environment variable for script execution.
+/// </summary>
+public class EnvironmentVariable
+{
+    /// <summary>
+    /// Gets or sets the name of the environment variable.
+    /// </summary>
+    public string Name { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the value of the environment variable.
+    /// </summary>
+    public string Value { get; set; } = string.Empty;
 }
 
 /// <summary>

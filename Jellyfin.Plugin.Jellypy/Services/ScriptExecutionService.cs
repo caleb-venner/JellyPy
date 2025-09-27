@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,6 +19,7 @@ namespace Jellyfin.Plugin.Jellypy.Services;
 /// </summary>
 public class ScriptExecutionService : IScriptExecutionService, IDisposable
 {
+    private static readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = false };
     private readonly ILogger<ScriptExecutionService> _logger;
     private readonly ConditionEvaluator _conditionEvaluator;
     private readonly DataAttributeProcessor _dataAttributeProcessor;
@@ -52,7 +54,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         }
 
         // Execute enhanced script settings if available
-        if (config.ScriptSettings?.Any() == true)
+        if (config.ScriptSettings?.Count > 0)
         {
             await ExecuteEnhancedScriptsAsync(config, eventData).ConfigureAwait(false);
         }
@@ -70,7 +72,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
             .Where(setting => setting.Triggers.Contains(eventData.EventType))
             .ToList();
 
-        if (!applicableSettings.Any())
+        if (applicableSettings.Count == 0)
         {
             _logger.LogDebug("No script settings configured for event type {EventType}", eventData.EventType);
             return;
@@ -259,6 +261,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                 {
                     // Process already exited
                 }
+
                 return;
             }
 
@@ -373,8 +376,10 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                 TryTerminateProcess(process);
                 await process.WaitForExitAsync().ConfigureAwait(false);
                 await Task.WhenAll(stdOutTask, stdErrTask).ConfigureAwait(false);
-                _logger.LogError("Script execution timed out after {TimeoutSeconds} seconds for event {EventType}",
-                    config.ScriptTimeoutSeconds, eventData.EventType);
+                _logger.LogError(
+                    "Script execution timed out after {TimeoutSeconds} seconds for event {EventType}",
+                    config.ScriptTimeoutSeconds,
+                    eventData.EventType);
                 return;
             }
 
@@ -399,7 +404,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
 
         // Add event data as JSON
         arguments.Add("--event-data");
-        arguments.Add(JsonSerializer.Serialize(eventData, new JsonSerializerOptions { WriteIndented = false }));
+        arguments.Add(JsonSerializer.Serialize(eventData, _jsonOptions));
 
         // Legacy arguments for backward compatibility with existing scripts
         if (eventData.EventType == EventType.PlaybackStart || eventData.EventType == EventType.PlaybackStop)
@@ -413,6 +418,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                     arguments.Add("-sn");
                     arguments.Add(eventData.SeasonNumber.Value.ToString(CultureInfo.InvariantCulture));
                 }
+
                 if (eventData.EpisodeNumber.HasValue)
                 {
                     arguments.Add("-en");

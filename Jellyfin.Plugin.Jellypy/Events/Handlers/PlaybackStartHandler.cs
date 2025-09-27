@@ -13,7 +13,7 @@ namespace Jellyfin.Plugin.Jellypy.Events.Handlers;
 /// <summary>
 /// Handler for playback start events.
 /// </summary>
-public class PlaybackStartHandler : IGenericEventHandler<PlaybackProgressEventArgs>
+public class PlaybackStartHandler : IEventProcessor<PlaybackProgressEventArgs>
 {
     private readonly ILogger<PlaybackStartHandler> _logger;
     private readonly IScriptExecutionService _scriptExecutionService;
@@ -77,7 +77,12 @@ public class PlaybackStartHandler : IGenericEventHandler<PlaybackProgressEventAr
         // Add common media information
         if (eventArgs.Item is BaseItem item)
         {
-            eventData.Genres = item.Genres?.ToList() ?? new List<string>();
+            var genres = item.Genres?.ToList() ?? new List<string>();
+            foreach (var genre in genres)
+            {
+                eventData.Genres.Add(genre);
+            }
+
             eventData.ContentRating = item.OfficialRating;
             eventData.AdditionalData["CommunityRating"] = item.CommunityRating;
             eventData.AdditionalData["Runtime"] = item.RunTimeTicks;

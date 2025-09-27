@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -34,12 +35,13 @@ public class ConditionEvaluator
     /// <returns>True if all conditions are met, false otherwise.</returns>
     public bool EvaluateConditions(System.Collections.Generic.IEnumerable<ExecutionCondition> conditions, EventData eventData)
     {
-        if (!conditions.Any())
+        var conditionsList = conditions.ToList();
+        if (conditionsList.Count == 0)
         {
             return true; // No conditions means always execute
         }
 
-        foreach (var condition in conditions)
+        foreach (var condition in conditionsList)
         {
             if (!EvaluateCondition(condition, eventData))
             {
@@ -66,7 +68,9 @@ public class ConditionEvaluator
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Error evaluating condition {Field} {Operator} {Value}",
-                condition.Field, condition.Operator, condition.Value);
+                condition.Field,
+                condition.Operator,
+                condition.Value);
             return false;
         }
     }

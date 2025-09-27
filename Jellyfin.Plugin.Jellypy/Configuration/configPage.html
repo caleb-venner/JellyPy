@@ -3,51 +3,815 @@
 <head>
     <meta charset="utf-8">
     <title>JellyPy</title>
+    <style>
+        .advanced-section {
+            margin-top: 30px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.1);
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #555;
+        }
+        .section-title {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .script-setting-item {
+            border: 1px solid #555;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .script-setting-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .script-setting-name {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        .script-setting-controls {
+            display: flex;
+            gap: 10px;
+        }
+        .expandable-section {
+            margin-top: 10px;
+        }
+        .expandable-header {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .expandable-header:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .expandable-content {
+            display: none;
+            padding: 10px;
+            border-left: 2px solid #555;
+            margin-left: 10px;
+        }
+        .expandable-content.expanded {
+            display: block;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .form-grid-full {
+            grid-column: 1 / -1;
+        }
+        .condition-item, .attribute-item {
+            border: 1px solid #666;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .item-controls {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        .trigger-checkboxes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .small-button {
+            font-size: 0.8em;
+            padding: 4px 8px;
+        }
+        .danger-button {
+            background-color: #d32f2f !important;
+        }
+        .tab-container {
+            margin-bottom: 20px;
+        }
+        .tab-buttons {
+            display: flex;
+            border-bottom: 1px solid #555;
+            margin-bottom: 20px;
+        }
+        .tab-button {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        .tab-button.active {
+            color: #fff;
+            border-bottom-color: #00a4dc;
+        }
+        .tab-button:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
 </head>
 <body>
     <div id="JellyPyConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-select,emby-checkbox">
         <div data-role="content">
             <div class="content-primary">
                 <form id="JellyPyConfigForm">
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="PythonExecutablePath">Python executable path</label>
-                        <input id="PythonExecutablePath" name="PythonExecutablePath" type="text" is="emby-input" />
-                        <div class="fieldDescription">Absolute path to the Python interpreter that should execute the script.</div>
-                    </div>
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="ScriptPath">Script path</label>
-                        <input id="ScriptPath" name="ScriptPath" type="text" is="emby-input" />
-                        <div class="fieldDescription">Absolute path to the Python script to run.</div>
-                    </div>
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="ScriptWorkingDirectory">Working directory</label>
-                        <input id="ScriptWorkingDirectory" name="ScriptWorkingDirectory" type="text" is="emby-input" />
-                        <div class="fieldDescription">Optional working directory for the script (leave blank to use the script's folder).</div>
-                    </div>
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="AdditionalArguments">Additional arguments</label>
-                        <input id="AdditionalArguments" name="AdditionalArguments" type="text" is="emby-input" />
-                        <div class="fieldDescription">Arguments appended after the automatic episode/movie parameters.</div>
-                    </div>
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="SonarrApiKey">Sonarr API key</label>
-                        <div style="display:flex;align-items:center;gap:8px;">
-                            <input id="SonarrApiKey" name="SonarrApiKey" type="password" is="emby-input" autocomplete="new-password" style="flex:1;" />
-                            <button id="SonarrApiKeyToggle" type="button" is="emby-button" class="emby-button" aria-label="Toggle Sonarr API key visibility" onclick="togglePassword('SonarrApiKey','SonarrApiKeyToggle')">Show</button>
-                            <span id="SonarrApiKeyStatus" class="fieldDescription" style="margin-left:8px;">Not configured</span>
+
+                    <!-- Tab Navigation -->
+                    <div class="tab-container">
+                        <div class="tab-buttons">
+                            <button type="button" class="tab-button active" onclick="switchTab('legacy')">Legacy Settings</button>
+                            <button type="button" class="tab-button" onclick="switchTab('advanced')">Advanced Script Settings</button>
+                            <button type="button" class="tab-button" onclick="switchTab('global')">Global Settings</button>
                         </div>
-                        <div class="fieldDescription">Key used to authenticate with Sonarr. Leave blank to keep the existing stored key.</div>
                     </div>
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="SonarrUrl">Sonarr URL</label>
-                        <input id="SonarrUrl" name="SonarrUrl" type="text" is="emby-input" />
-                        <div class="fieldDescription">Base URL to the Sonarr instance (e.g. http://sonarr:8989).</div>
+
+                    <!-- Legacy Settings Tab -->
+                    <div id="legacy-tab" class="tab-content active">
+                        <div class="inputContainer">
+                            <label class="inputLabel inputLabelUnfocused" for="PythonExecutablePath">Python executable path</label>
+                            <input id="PythonExecutablePath" name="PythonExecutablePath" type="text" is="emby-input" />
+                            <div class="fieldDescription">Absolute path to the Python interpreter that should execute the script.</div>
+                        </div>
+                        <div class="inputContainer">
+                            <label class="inputLabel inputLabelUnfocused" for="ScriptPath">Script path</label>
+                            <input id="ScriptPath" name="ScriptPath" type="text" is="emby-input" />
+                            <div class="fieldDescription">Absolute path to the Python script to run.</div>
+                        </div>
+                        <div class="inputContainer">
+                            <label class="inputLabel inputLabelUnfocused" for="ScriptWorkingDirectory">Working directory</label>
+                            <input id="ScriptWorkingDirectory" name="ScriptWorkingDirectory" type="text" is="emby-input" />
+                            <div class="fieldDescription">Optional working directory for the script (leave blank to use the script's folder).</div>
+                        </div>
+                        <div class="inputContainer">
+                            <label class="inputLabel inputLabelUnfocused" for="AdditionalArguments">Additional arguments</label>
+                            <input id="AdditionalArguments" name="AdditionalArguments" type="text" is="emby-input" />
+                            <div class="fieldDescription">Arguments appended after the automatic episode/movie parameters.</div>
+                        </div>
+                        <div class="inputContainer">
+                            <label class="inputLabel inputLabelUnfocused" for="SonarrApiKey">Sonarr API key</label>
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <input id="SonarrApiKey" name="SonarrApiKey" type="password" is="emby-input" autocomplete="new-password" style="flex:1;" />
+                                <button id="SonarrApiKeyToggle" type="button" is="emby-button" class="emby-button" aria-label="Toggle Sonarr API key visibility" onclick="togglePassword('SonarrApiKey','SonarrApiKeyToggle')">Show</button>
+                                <span id="SonarrApiKeyStatus" class="fieldDescription" style="margin-left:8px;">Not configured</span>
+                            </div>
+                            <div class="fieldDescription">Key used to authenticate with Sonarr. Leave blank to keep the existing stored key.</div>
+                        </div>
+                        <div class="inputContainer">
+                            <label class="inputLabel inputLabelUnfocused" for="SonarrUrl">Sonarr URL</label>
+                            <input id="SonarrUrl" name="SonarrUrl" type="text" is="emby-input" />
+                            <div class="fieldDescription">Base URL to the Sonarr instance (e.g. http://sonarr:8989).</div>
+                        </div>
+                        <div class="inputContainer">
+                            <label class="inputLabel inputLabelUnfocused" for="RadarrApiKey">Radarr API key</label>
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <input id="RadarrApiKey" name="RadarrApiKey" type="password" is="emby-input" autocomplete="new-password" style="flex:1;" />
+                                <button id="RadarrApiKeyToggle" type="button" is="emby-button" class="emby-button" aria-label="Toggle Radarr API key visibility" onclick="togglePassword('RadarrApiKey','RadarrApiKeyToggle')">Show</button>
+                                <span id="RadarrApiKeyStatus" class="fieldDescription" style="margin-left:8px;">Not configured</span>
+                            </div>
+                            <div class="fieldDescription">Key used to authenticate with Radarr. Leave blank to keep the existing stored key.</div>
+                        </div>
+                        <div class="inputContainer">
+                            <label class="inputLabel inputLabelUnfocused" for="RadarrUrl">Radarr URL</label>
+                            <input id="RadarrUrl" name="RadarrUrl" type="text" is="emby-input" />
+                            <div class="fieldDescription">Base URL to the Radarr instance (e.g. http://radarr:7878).</div>
+                        </div>
+                        <div class="inputContainer">
+                            <label class="inputLabel inputLabelUnfocused" for="ScriptTimeoutSeconds">Timeout (seconds)</label>
+                            <input id="ScriptTimeoutSeconds" name="ScriptTimeoutSeconds" type="number" is="emby-input" min="0" />
+                            <div class="fieldDescription">Maximum time to wait before aborting the script.</div>
+                        </div>
+                        <div class="checkboxContainer checkboxContainer-withDescription">
+                            <label class="emby-checkbox-label">
+                                <input id="EnableEpisodeProcessing" name="EnableEpisodeProcessing" type="checkbox" is="emby-checkbox" />
+                                <span>Trigger script for episodes</span>
+                            </label>
+                        </div>
+                        <div class="checkboxContainer checkboxContainer-withDescription">
+                            <label class="emby-checkbox-label">
+                                <input id="EnableMovieProcessing" name="EnableMovieProcessing" type="checkbox" is="emby-checkbox" />
+                                <span>Trigger script for movies</span>
+                            </label>
+                        </div>
                     </div>
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="RadarrApiKey">Radarr API key</label>
-                        <div style="display:flex;align-items:center;gap:8px;">
-                            <input id="RadarrApiKey" name="RadarrApiKey" type="password" is="emby-input" autocomplete="new-password" style="flex:1;" />
-                            <button id="RadarrApiKeyToggle" type="button" is="emby-button" class="emby-button" aria-label="Toggle Radarr API key visibility" onclick="togglePassword('RadarrApiKey','RadarrApiKeyToggle')">Show</button>
+
+                    <!-- Advanced Script Settings Tab -->
+                    <div id="advanced-tab" class="tab-content">
+                        <div class="section-header">
+                            <div class="section-title">Advanced Script Settings</div>
+                            <button type="button" is="emby-button" class="emby-button" onclick="addScriptSetting()">Add Script Setting</button>
+                        </div>
+                        <div id="script-settings-container">
+                            <!-- Script settings will be dynamically generated here -->
+                        </div>
+                        <div class="fieldDescription" style="margin-top: 20px;">
+                            Create custom script configurations with specific triggers, conditions, and data attributes.
+                            Each setting can respond to different Jellyfin events and pass selected data to your scripts.
+                        </div>
+                    </div>
+
+                    <!-- Global Settings Tab -->
+                    <div id="global-tab" class="tab-content">
+                        <div class="section-title" style="margin-bottom: 20px;">Global Execution Settings</div>
+                        <div class="inputContainer">
+                            <label class="inputLabel inputLabelUnfocused" for="MaxConcurrentExecutions">Max concurrent executions</label>
+                            <input id="MaxConcurrentExecutions" name="MaxConcurrentExecutions" type="number" is="emby-input" min="1" max="20" />
+                            <div class="fieldDescription">Maximum number of scripts that can run simultaneously.</div>
+                        </div>
+                        <div class="inputContainer">
+                            <label class="inputLabel inputLabelUnfocused" for="DefaultTimeoutSeconds">Default timeout (seconds)</label>
+                            <input id="DefaultTimeoutSeconds" name="DefaultTimeoutSeconds" type="number" is="emby-input" min="30" />
+                            <div class="fieldDescription">Default timeout for script execution when not specified in individual settings.</div>
+                        </div>
+                        <div class="inputContainer">
+                            <label class="inputLabel inputLabelUnfocused" for="QueueSize">Queue size</label>
+                            <input id="QueueSize" name="QueueSize" type="number" is="emby-input" min="10" />
+                            <div class="fieldDescription">Maximum number of pending script executions to queue.</div>
+                        </div>
+                        <div class="checkboxContainer checkboxContainer-withDescription">
+                            <label class="emby-checkbox-label">
+                                <input id="EnableVerboseLogging" name="EnableVerboseLogging" type="checkbox" is="emby-checkbox" />
+                                <span>Enable verbose logging</span>
+                            </label>
+                            <div class="fieldDescription">Log detailed information about script execution for debugging.</div>
+                        </div>
+                        <div class="checkboxContainer checkboxContainer-withDescription">
+                            <label class="emby-checkbox-label">
+                                <input id="UseLegacyMode" name="UseLegacyMode" type="checkbox" is="emby-checkbox" />
+                                <span>Use legacy mode</span>
+                            </label>
+                            <div class="fieldDescription">Continue to execute legacy script settings alongside advanced settings.</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 30px;">
+                        <button is="emby-button" type="submit" class="raised button-submit block emby-button">
+                            <span>Save</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script type="text/javascript">
+            var JellyPyConfig = {
+                pluginUniqueId: 'a5bd541f-38dc-467e-9a9a-15fe3f3bcf5c',
+                currentConfig: null,
+                eventTypes: [
+                    'PlaybackStart', 'PlaybackStop', 'PlaybackPause', 'PlaybackResume', 'PlaybackProgress',
+                    'ItemAdded', 'ItemUpdated', 'UserCreated', 'UserDeleted'
+                ],
+                executorTypes: [
+                    'Python', 'PowerShell', 'Bash', 'NodeJs', 'Binary'
+                ],
+                conditionOperators: [
+                    'Equals', 'NotEquals', 'Contains', 'NotContains', 'StartsWith', 'EndsWith',
+                    'Regex', 'GreaterThan', 'LessThan', 'In', 'NotIn'
+                ],
+                dataAttributeFormats: [
+                    'String', 'Json', 'Environment', 'Argument'
+                ],
+                availableFields: [
+                    'EventType', 'Timestamp', 'UserId', 'UserName', 'SessionId', 'ItemId', 'ItemName',
+                    'ItemType', 'ItemPath', 'LibraryId', 'LibraryName', 'PlaybackPositionTicks',
+                    'IsPaused', 'ClientName', 'DeviceName', 'DeviceId', 'SeriesName', 'SeasonNumber',
+                    'EpisodeNumber', 'Year', 'Genres', 'ContentRating'
+                ]
+            };
+
+            // Tab Management
+            function switchTab(tabName) {
+                // Hide all tab contents
+                document.querySelectorAll('.tab-content').forEach(function(content) {
+                    content.style.display = 'none';
+                });
+
+                // Remove active class from all tab buttons
+                document.querySelectorAll('.tab-button').forEach(function(button) {
+                    button.classList.remove('active');
+                });
+
+                // Show the selected tab content
+                var targetTab = document.getElementById(tabName + '-tab');
+                if (targetTab) {
+                    targetTab.style.display = 'block';
+                }
+
+                // Add active class to the button that matches this tab
+                var targetButton = document.querySelector(".tab-button[onclick*=\"'" + tabName + "'\"]");
+                if (targetButton) {
+                    targetButton.classList.add('active');
+                }
+            }
+
+            // Script Settings Management
+            function addScriptSetting() {
+                var newSetting = {
+                    Id: generateGuid(),
+                    Name: '',
+                    Description: '',
+                    Enabled: true,
+                    Triggers: [],
+                    Conditions: [],
+                    Execution: {
+                        ExecutorType: 'Python',
+                        ExecutablePath: '/usr/bin/python3',
+                        ScriptPath: '',
+                        WorkingDirectory: '',
+                        AdditionalArguments: '',
+                        EnvironmentVariables: {},
+                        TimeoutSeconds: 300
+                    },
+                    DataAttributes: [],
+                    Priority: 100
+                };
+
+                JellyPyConfig.currentConfig.ScriptSettings.push(newSetting);
+                renderScriptSettings();
+            }
+
+            function deleteScriptSetting(index) {
+                if (confirm('Are you sure you want to delete this script setting?')) {
+                    JellyPyConfig.currentConfig.ScriptSettings.splice(index, 1);
+                    renderScriptSettings();
+                }
+            }
+
+            function moveScriptSetting(index, direction) {
+                var settings = JellyPyConfig.currentConfig.ScriptSettings;
+                var newIndex = index + direction;
+
+                if (newIndex < 0 || newIndex >= settings.length) return;
+
+                var temp = settings[index];
+                settings[index] = settings[newIndex];
+                settings[newIndex] = temp;
+
+                renderScriptSettings();
+            }
+
+            function renderScriptSettings() {
+                var container = document.getElementById('script-settings-container');
+                container.innerHTML = '';
+
+                if (!JellyPyConfig.currentConfig.ScriptSettings || JellyPyConfig.currentConfig.ScriptSettings.length === 0) {
+                    container.innerHTML = '<div class="fieldDescription">No script settings configured. Click "Add Script Setting" to create your first custom script configuration.</div>';
+                    return;
+                }
+
+                JellyPyConfig.currentConfig.ScriptSettings.forEach(function(setting, index) {
+                    var settingHtml = createScriptSettingHtml(setting, index);
+                    container.appendChild(settingHtml);
+                });
+            }
+
+            function createScriptSettingHtml(setting, index) {
+                var div = document.createElement('div');
+                div.className = 'script-setting-item';
+
+                // Build HTML using string concatenation instead of template literals
+                var html = '<div class="script-setting-header">' +
+                    '<div>' +
+                        '<div class="script-setting-name">' + escapeHtml(setting.Name || 'Unnamed Script Setting') + '</div>' +
+                        '<div class="fieldDescription">' + escapeHtml(setting.Description || 'No description') + '</div>' +
+                    '</div>' +
+                    '<div class="script-setting-controls">' +
+                        '<button type="button" is="emby-button" class="emby-button small-button" onclick="moveScriptSetting(' + index + ', -1)" ' + (index === 0 ? 'disabled' : '') + '>↑</button>' +
+                        '<button type="button" is="emby-button" class="emby-button small-button" onclick="moveScriptSetting(' + index + ', 1)" ' + (index === JellyPyConfig.currentConfig.ScriptSettings.length - 1 ? 'disabled' : '') + '>↓</button>' +
+                        '<button type="button" is="emby-button" class="emby-button small-button" onclick="toggleScriptSetting(' + index + ')">' + (setting.Enabled ? 'Disable' : 'Enable') + '</button>' +
+                        '<button type="button" is="emby-button" class="emby-button small-button danger-button" onclick="deleteScriptSetting(' + index + ')">Delete</button>' +
+                    '</div>' +
+                '</div>' +
+
+                '<!-- Basic Configuration -->' +
+                '<div class="form-grid">' +
+                    '<div class="inputContainer">' +
+                        '<label class="inputLabel inputLabelUnfocused">Name</label>' +
+                        '<input type="text" is="emby-input" value="' + escapeHtml(setting.Name) + '" onchange="updateScriptSetting(' + index + ', \'Name\', this.value)" />' +
+                    '</div>' +
+                    '<div class="inputContainer">' +
+                        '<label class="inputLabel inputLabelUnfocused">Priority</label>' +
+                        '<input type="number" is="emby-input" value="' + setting.Priority + '" min="0" onchange="updateScriptSetting(' + index + ', \'Priority\', parseInt(this.value))" />' +
+                    '</div>' +
+                    '<div class="inputContainer form-grid-full">' +
+                        '<label class="inputLabel inputLabelUnfocused">Description</label>' +
+                        '<input type="text" is="emby-input" value="' + escapeHtml(setting.Description) + '" onchange="updateScriptSetting(' + index + ', \'Description\', this.value)" />' +
+                    '</div>' +
+                '</div>' +
+
+                '<!-- Event Triggers -->' +
+                '<div class="expandable-section">' +
+                    '<div class="expandable-header" onclick="toggleExpandable(this)">' +
+                        '<span>▶</span>' +
+                        '<span>Event Triggers (' + setting.Triggers.length + ' selected)</span>' +
+                    '</div>' +
+                    '<div class="expandable-content">' +
+                        '<div class="trigger-checkboxes" id="triggers-' + index + '">' +
+                            JellyPyConfig.eventTypes.map(function(eventType) {
+                                return '<label class="emby-checkbox-label">' +
+                                    '<input type="checkbox" is="emby-checkbox" ' + (setting.Triggers.includes(eventType) ? 'checked' : '') +
+                                    ' onchange="updateTriggers(' + index + ', \'' + eventType + '\', this.checked)" />' +
+                                    '<span>' + eventType + '</span>' +
+                                '</label>';
+                            }).join('') +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+
+                '<!-- Execution Configuration -->' +
+                '<div class="expandable-section">' +
+                    '<div class="expandable-header" onclick="toggleExpandable(this)">' +
+                        '<span>▶</span>' +
+                        '<span>Script Execution</span>' +
+                    '</div>' +
+                    '<div class="expandable-content">' +
+                        '<div class="form-grid">' +
+                            '<div class="inputContainer">' +
+                                '<label class="inputLabel inputLabelUnfocused">Executor Type</label>' +
+                                '<select is="emby-select" onchange="updateScriptExecution(' + index + ', \'ExecutorType\', this.value)">' +
+                                    JellyPyConfig.executorTypes.map(function(type) {
+                                        return '<option value="' + type + '" ' + (setting.Execution.ExecutorType === type ? 'selected' : '') + '>' + type + '</option>';
+                                    }).join('') +
+                                '</select>' +
+                            '</div>' +
+                            '<div class="inputContainer">' +
+                                '<label class="inputLabel inputLabelUnfocused">Timeout (seconds)</label>' +
+                                '<input type="number" is="emby-input" value="' + setting.Execution.TimeoutSeconds + '" min="30" onchange="updateScriptExecution(' + index + ', \'TimeoutSeconds\', parseInt(this.value))" />' +
+                            '</div>' +
+                            '<div class="inputContainer form-grid-full">' +
+                                '<label class="inputLabel inputLabelUnfocused">Executable Path</label>' +
+                                '<input type="text" is="emby-input" value="' + escapeHtml(setting.Execution.ExecutablePath) + '" onchange="updateScriptExecution(' + index + ', \'ExecutablePath\', this.value)" />' +
+                            '</div>' +
+                            '<div class="inputContainer form-grid-full">' +
+                                '<label class="inputLabel inputLabelUnfocused">Script Path</label>' +
+                                '<input type="text" is="emby-input" value="' + escapeHtml(setting.Execution.ScriptPath) + '" onchange="updateScriptExecution(' + index + ', \'ScriptPath\', this.value)" />' +
+                            '</div>' +
+                            '<div class="inputContainer form-grid-full">' +
+                                '<label class="inputLabel inputLabelUnfocused">Working Directory</label>' +
+                                '<input type="text" is="emby-input" value="' + escapeHtml(setting.Execution.WorkingDirectory) + '" onchange="updateScriptExecution(' + index + ', \'WorkingDirectory\', this.value)" />' +
+                            '</div>' +
+                            '<div class="inputContainer form-grid-full">' +
+                                '<label class="inputLabel inputLabelUnfocused">Additional Arguments</label>' +
+                                '<input type="text" is="emby-input" value="' + escapeHtml(setting.Execution.AdditionalArguments) + '" onchange="updateScriptExecution(' + index + ', \'AdditionalArguments\', this.value)" />' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+
+                '<!-- Execution Conditions -->' +
+                '<div class="expandable-section">' +
+                    '<div class="expandable-header" onclick="toggleExpandable(this)">' +
+                        '<span>▶</span>' +
+                        '<span>Execution Conditions (' + setting.Conditions.length + ')</span>' +
+                    '</div>' +
+                    '<div class="expandable-content">' +
+                        '<div id="conditions-' + index + '">' +
+                            setting.Conditions.map(function(condition, condIndex) { return createConditionHtml(condition, index, condIndex); }).join('') +
+                        '</div>' +
+                        '<button type="button" is="emby-button" class="emby-button small-button" onclick="addCondition(' + index + ')">Add Condition</button>' +
+                    '</div>' +
+                '</div>' +
+
+                '<!-- Data Attributes -->' +
+                '<div class="expandable-section">' +
+                    '<div class="expandable-header" onclick="toggleExpandable(this)">' +
+                        '<span>▶</span>' +
+                        '<span>Data Attributes (' + setting.DataAttributes.length + ')</span>' +
+                    '</div>' +
+                    '<div class="expandable-content">' +
+                        '<div id="attributes-' + index + '">' +
+                            setting.DataAttributes.map(function(attr, attrIndex) { return createDataAttributeHtml(attr, index, attrIndex); }).join('') +
+                        '</div>' +
+                        '<button type="button" is="emby-button" class="emby-button small-button" onclick="addDataAttribute(' + index + ')">Add Data Attribute</button>' +
+                    '</div>' +
+                '</div>';
+
+                div.innerHTML = html;
+                return div;
+            }
+
+            function createConditionHtml(condition, settingIndex, conditionIndex) {
+                var fieldOptions = JellyPyConfig.availableFields.map(function(field) {
+                    return '<option value="' + field + '" ' + (condition.Field === field ? 'selected' : '') + '>' + field + '</option>';
+                }).join('');
+
+                var operatorOptions = JellyPyConfig.conditionOperators.map(function(op) {
+                    return '<option value="' + op + '" ' + (condition.Operator === op ? 'selected' : '') + '>' + op + '</option>';
+                }).join('');
+
+                return '<div class="condition-item">' +
+                    '<div class="form-grid">' +
+                        '<div class="inputContainer">' +
+                            '<label class="inputLabel inputLabelUnfocused">Field</label>' +
+                            '<select is="emby-select" onchange="updateCondition(' + settingIndex + ', ' + conditionIndex + ', \'Field\', this.value)">' +
+                                '<option value="">Select field...</option>' +
+                                fieldOptions +
+                            '</select>' +
+                        '</div>' +
+                        '<div class="inputContainer">' +
+                            '<label class="inputLabel inputLabelUnfocused">Operator</label>' +
+                            '<select is="emby-select" onchange="updateCondition(' + settingIndex + ', ' + conditionIndex + ', \'Operator\', this.value)">' +
+                                operatorOptions +
+                            '</select>' +
+                        '</div>' +
+                        '<div class="inputContainer">' +
+                            '<label class="inputLabel inputLabelUnfocused">Value</label>' +
+                            '<input type="text" is="emby-input" value="' + escapeHtml(condition.Value) + '"' +
+                                   ' onchange="updateCondition(' + settingIndex + ', ' + conditionIndex + ', \'Value\', this.value)" />' +
+                        '</div>' +
+                        '<div class="inputContainer">' +
+                            '<label class="emby-checkbox-label">' +
+                                '<input type="checkbox" is="emby-checkbox" ' + (condition.CaseSensitive ? 'checked' : '') +
+                                       ' onchange="updateCondition(' + settingIndex + ', ' + conditionIndex + ', \'CaseSensitive\', this.checked)" />' +
+                                '<span>Case sensitive</span>' +
+                            '</label>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="item-controls">' +
+                        '<button type="button" is="emby-button" class="emby-button small-button danger-button" onclick="removeCondition(' + settingIndex + ', ' + conditionIndex + ')">Remove</button>' +
+                    '</div>' +
+                '</div>';
+            }
+
+            function createDataAttributeHtml(attribute, settingIndex, attributeIndex) {
+                var fieldOptions = JellyPyConfig.availableFields.map(function(field) {
+                    return '<option value="' + field + '" ' + (attribute.SourceField === field ? 'selected' : '') + '>' + field + '</option>';
+                }).join('');
+
+                var formatOptions = JellyPyConfig.dataAttributeFormats.map(function(format) {
+                    return '<option value="' + format + '" ' + (attribute.Format === format ? 'selected' : '') + '>' + format + '</option>';
+                }).join('');
+
+                return '<div class="attribute-item">' +
+                    '<div class="form-grid">' +
+                        '<div class="inputContainer">' +
+                            '<label class="inputLabel inputLabelUnfocused">Name</label>' +
+                            '<input type="text" is="emby-input" value="' + escapeHtml(attribute.Name) + '"' +
+                                   ' onchange="updateDataAttribute(' + settingIndex + ', ' + attributeIndex + ', \'Name\', this.value)" />' +
+                        '</div>' +
+                        '<div class="inputContainer">' +
+                            '<label class="inputLabel inputLabelUnfocused">Source Field</label>' +
+                            '<select is="emby-select" onchange="updateDataAttribute(' + settingIndex + ', ' + attributeIndex + ', \'SourceField\', this.value)">' +
+                                '<option value="">Select field...</option>' +
+                                fieldOptions +
+                            '</select>' +
+                        '</div>' +
+                        '<div class="inputContainer">' +
+                            '<label class="inputLabel inputLabelUnfocused">Format</label>' +
+                            '<select is="emby-select" onchange="updateDataAttribute(' + settingIndex + ', ' + attributeIndex + ', \'Format\', this.value)">' +
+                                formatOptions +
+                            '</select>' +
+                        '</div>' +
+                        '<div class="inputContainer">' +
+                            '<label class="emby-checkbox-label">' +
+                                '<input type="checkbox" is="emby-checkbox" ' + (attribute.Required ? 'checked' : '') +
+                                       ' onchange="updateDataAttribute(' + settingIndex + ', ' + attributeIndex + ', \'Required\', this.checked)" />' +
+                                '<span>Required</span>' +
+                            '</label>' +
+                        '</div>' +
+                        '<div class="inputContainer form-grid-full">' +
+                            '<label class="inputLabel inputLabelUnfocused">Default Value</label>' +
+                            '<input type="text" is="emby-input" value="' + escapeHtml(attribute.DefaultValue || '') + '"' +
+                                   ' onchange="updateDataAttribute(' + settingIndex + ', ' + attributeIndex + ', \'DefaultValue\', this.value)" />' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="item-controls">' +
+                        '<button type="button" is="emby-button" class="emby-button small-button danger-button" onclick="removeDataAttribute(' + settingIndex + ', ' + attributeIndex + ')">Remove</button>' +
+                    '</div>' +
+                '</div>';
+            }
+
+            // Update functions
+            function updateScriptSetting(index, property, value) {
+                JellyPyConfig.currentConfig.ScriptSettings[index][property] = value;
+            }
+
+            function updateScriptExecution(index, property, value) {
+                JellyPyConfig.currentConfig.ScriptSettings[index].Execution[property] = value;
+            }
+
+            function updateTriggers(index, eventType, checked) {
+                var triggers = JellyPyConfig.currentConfig.ScriptSettings[index].Triggers;
+                if (checked && !triggers.includes(eventType)) {
+                    triggers.push(eventType);
+                } else if (!checked && triggers.includes(eventType)) {
+                    var idx = triggers.indexOf(eventType);
+                    triggers.splice(idx, 1);
+                }
+                // Update the trigger count display
+                renderScriptSettings();
+            }
+
+            function toggleScriptSetting(index) {
+                var setting = JellyPyConfig.currentConfig.ScriptSettings[index];
+                setting.Enabled = !setting.Enabled;
+                renderScriptSettings();
+            }
+
+            // Condition management
+            function addCondition(settingIndex) {
+                var newCondition = {
+                    Field: '',
+                    Operator: 'Equals',
+                    Value: '',
+                    CaseSensitive: false
+                };
+                JellyPyConfig.currentConfig.ScriptSettings[settingIndex].Conditions.push(newCondition);
+                renderScriptSettings();
+            }
+
+            function removeCondition(settingIndex, conditionIndex) {
+                JellyPyConfig.currentConfig.ScriptSettings[settingIndex].Conditions.splice(conditionIndex, 1);
+                renderScriptSettings();
+            }
+
+            function updateCondition(settingIndex, conditionIndex, property, value) {
+                JellyPyConfig.currentConfig.ScriptSettings[settingIndex].Conditions[conditionIndex][property] = value;
+            }
+
+            // Data attribute management
+            function addDataAttribute(settingIndex) {
+                var newAttribute = {
+                    Name: '',
+                    SourceField: '',
+                    Format: 'String',
+                    Required: false,
+                    DefaultValue: ''
+                };
+                JellyPyConfig.currentConfig.ScriptSettings[settingIndex].DataAttributes.push(newAttribute);
+                renderScriptSettings();
+            }
+
+            function removeDataAttribute(settingIndex, attributeIndex) {
+                JellyPyConfig.currentConfig.ScriptSettings[settingIndex].DataAttributes.splice(attributeIndex, 1);
+                renderScriptSettings();
+            }
+
+            function updateDataAttribute(settingIndex, attributeIndex, property, value) {
+                JellyPyConfig.currentConfig.ScriptSettings[settingIndex].DataAttributes[attributeIndex][property] = value;
+            }
+
+            // Utility functions
+            function toggleExpandable(header) {
+                var content = header.nextElementSibling;
+                var arrow = header.querySelector('span:first-child');
+
+                if (content.classList.contains('expanded')) {
+                    content.classList.remove('expanded');
+                    arrow.textContent = '▶';
+                } else {
+                    content.classList.add('expanded');
+                    arrow.textContent = '▼';
+                }
+            }
+
+            function escapeHtml(text) {
+                if (text === null || text === undefined) return '';
+                return text.toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            }
+
+            function generateGuid() {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    var r = Math.random() * 16 | 0,
+                        v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            }
+
+            // Page initialization
+            document.querySelector('#JellyPyConfigPage')
+                .addEventListener('pageshow', function() {
+                    Dashboard.showLoadingMsg();
+                    ApiClient.getPluginConfiguration(JellyPyConfig.pluginUniqueId).then(function (config) {
+                        JellyPyConfig.currentConfig = config;
+
+                        // Load legacy settings
+                        document.querySelector('#PythonExecutablePath').value = config.PythonExecutablePath || '';
+                        document.querySelector('#ScriptPath').value = config.ScriptPath || '';
+                        document.querySelector('#ScriptWorkingDirectory').value = config.ScriptWorkingDirectory || '';
+                        document.querySelector('#AdditionalArguments').value = config.AdditionalArguments || '';
+                        document.querySelector('#SonarrApiKey').value = '';
+                        document.querySelector('#RadarrApiKey').value = '';
+                        document.querySelector('#SonarrApiKeyStatus').textContent = config.SonarrApiKey ? 'Configured' : 'Not configured';
+                        document.querySelector('#RadarrApiKeyStatus').textContent = config.RadarrApiKey ? 'Configured' : 'Not configured';
+                        document.querySelector('#SonarrUrl').value = config.SonarrUrl || '';
+                        document.querySelector('#RadarrUrl').value = config.RadarrUrl || '';
+                        document.querySelector('#ScriptTimeoutSeconds').value = config.ScriptTimeoutSeconds || 0;
+                        document.querySelector('#EnableEpisodeProcessing').checked = config.EnableEpisodeProcessing === undefined ? true : config.EnableEpisodeProcessing;
+                        document.querySelector('#EnableMovieProcessing').checked = config.EnableMovieProcessing === undefined ? true : config.EnableMovieProcessing;
+
+                        // Load global settings
+                        var globalSettings = config.GlobalSettings || {};
+                        document.querySelector('#MaxConcurrentExecutions').value = globalSettings.MaxConcurrentExecutions || 5;
+                        document.querySelector('#DefaultTimeoutSeconds').value = globalSettings.DefaultTimeoutSeconds || 300;
+                        document.querySelector('#QueueSize').value = globalSettings.QueueSize || 100;
+                        document.querySelector('#EnableVerboseLogging').checked = globalSettings.EnableVerboseLogging || false;
+                        document.querySelector('#UseLegacyMode').checked = globalSettings.UseLegacyMode === undefined ? true : globalSettings.UseLegacyMode;
+
+                        // Initialize script settings
+                        if (!config.ScriptSettings) {
+                            config.ScriptSettings = [];
+                        }
+                        renderScriptSettings();
+
+                        Dashboard.hideLoadingMsg();
+                    });
+                });
+
+            document.querySelector('#JellyPyConfigForm')
+                .addEventListener('submit', function(e) {
+                    Dashboard.showLoadingMsg();
+
+                    var config = JellyPyConfig.currentConfig;
+
+                    // Save legacy settings
+                    config.PythonExecutablePath = document.querySelector('#PythonExecutablePath').value;
+                    config.ScriptPath = document.querySelector('#ScriptPath').value;
+                    config.ScriptWorkingDirectory = document.querySelector('#ScriptWorkingDirectory').value;
+                    config.AdditionalArguments = document.querySelector('#AdditionalArguments').value;
+
+                    // Only overwrite stored API keys when a non-empty value is provided
+                    var sonarrVal = document.querySelector('#SonarrApiKey').value;
+                    if (sonarrVal && sonarrVal.length > 0) {
+                        config.SonarrApiKey = sonarrVal;
+                    }
+                    var radarrVal = document.querySelector('#RadarrApiKey').value;
+                    if (radarrVal && radarrVal.length > 0) {
+                        config.RadarrApiKey = radarrVal;
+                    }
+
+                    config.SonarrUrl = document.querySelector('#SonarrUrl').value;
+                    config.RadarrUrl = document.querySelector('#RadarrUrl').value;
+                    config.ScriptTimeoutSeconds = parseInt(document.querySelector('#ScriptTimeoutSeconds').value || 0, 10);
+                    config.EnableEpisodeProcessing = document.querySelector('#EnableEpisodeProcessing').checked;
+                    config.EnableMovieProcessing = document.querySelector('#EnableMovieProcessing').checked;
+
+                    // Save global settings
+                    if (!config.GlobalSettings) {
+                        config.GlobalSettings = {};
+                    }
+                    config.GlobalSettings.MaxConcurrentExecutions = parseInt(document.querySelector('#MaxConcurrentExecutions').value || 5, 10);
+                    config.GlobalSettings.DefaultTimeoutSeconds = parseInt(document.querySelector('#DefaultTimeoutSeconds').value || 300, 10);
+                    config.GlobalSettings.QueueSize = parseInt(document.querySelector('#QueueSize').value || 100, 10);
+                    config.GlobalSettings.EnableVerboseLogging = document.querySelector('#EnableVerboseLogging').checked;
+                    config.GlobalSettings.UseLegacyMode = document.querySelector('#UseLegacyMode').checked;
+
+                    ApiClient.updatePluginConfiguration(JellyPyConfig.pluginUniqueId, config).then(function (result) {
+                        // Clear sensitive inputs after save and update status indicators
+                        document.querySelector('#SonarrApiKey').value = '';
+                        document.querySelector('#RadarrApiKey').value = '';
+                        document.querySelector('#SonarrApiKeyStatus').textContent = config.SonarrApiKey ? 'Configured' : 'Not configured';
+                        document.querySelector('#RadarrApiKeyStatus').textContent = config.RadarrApiKey ? 'Configured' : 'Not configured';
+                        Dashboard.processPluginConfigurationUpdateResult(result);
+                    });
+
+                    e.preventDefault();
+                    return false;
+                });
+
+            // Password reveal toggle helper
+            function togglePassword(inputId, toggleId) {
+                var input = document.getElementById(inputId);
+                var btn = document.getElementById(toggleId);
+                if (!input || !btn) return;
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    btn.textContent = 'Hide';
+                } else {
+                    input.type = 'password';
+                    btn.textContent = 'Show';
+                }
+                input.focus();
+            }
+        </script>
+    </div>
+</body>
+</html>
                             <span id="RadarrApiKeyStatus" class="fieldDescription" style="margin-left:8px;">Not configured</span>
                         </div>
                         <div class="fieldDescription">Key used to authenticate with Radarr. Leave blank to keep the existing stored key.</div>
@@ -144,22 +908,6 @@
                 e.preventDefault();
                 return false;
             });
-
-            // Password reveal toggle helper
-            function togglePassword(inputId, toggleId) {
-                var input = document.getElementById(inputId);
-                var btn = document.getElementById(toggleId);
-                if (!input || !btn) return;
-                if (input.type === 'password') {
-                    input.type = 'text';
-                    btn.textContent = 'Hide';
-                } else {
-                    input.type = 'password';
-                    btn.textContent = 'Show';
-                }
-                // keep focus on the input for a fluid UX
-                input.focus();
-            }
         </script>
     </div>
 </body>

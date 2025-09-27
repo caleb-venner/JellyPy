@@ -1,4 +1,6 @@
+#nullable enable
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Jellyfin.Plugin.Jellypy.Events;
 
@@ -63,9 +65,9 @@ public class EventData
     public string? LibraryName { get; set; }
 
     /// <summary>
-    /// Gets or sets additional event-specific properties.
+    /// Gets additional event-specific properties.
     /// </summary>
-    public Dictionary<string, object> AdditionalData { get; set; } = new();
+    public Dictionary<string, object> AdditionalData { get; } = new();
 
     /// <summary>
     /// Gets or sets playback position in ticks (for playback events).
@@ -93,6 +95,7 @@ public class EventData
     public string? DeviceId { get; set; }
 
     // Media-specific properties
+
     /// <summary>
     /// Gets or sets the series name (for TV shows).
     /// </summary>
@@ -114,9 +117,9 @@ public class EventData
     public int? Year { get; set; }
 
     /// <summary>
-    /// Gets or sets the genres.
+    /// Gets the genres.
     /// </summary>
-    public List<string> Genres { get; set; } = new();
+    public Collection<string> Genres { get; } = new();
 
     /// <summary>
     /// Gets or sets the content rating.
