@@ -1,0 +1,20 @@
+[
+    {
+        "guid": "a5bd541f-38dc-467e-9a9a-15fe3f3bcf5c",
+        "name": "Jellypy",
+        "description": "Jellypy automatically manages your Sonarr and Radarr monitoring based on what you watch in Jellyfin.\n\nNative Sonarr Integration:\n- Automatically monitors next N episodes after watching\n- Smart episode buffer management with configurable minimum unwatched queue\n- Season-by-season monitoring control\n- Unmonitor watched episodes to reduce clutter\n- Automatic search triggering for newly monitored content\n\nNative Radarr Integration:\n- Automatically unmonitor movies after watching\n- Percentage-based watch detection (configurable threshold)\n- Quality cutoff checking to prevent premature unmonitoring\n- Keep movies monitored if upgrades are still possible\n\nLegacy Features:\n- Execute custom Python scripts on Jellyfin events (PlaybackStart, PlaybackStop, etc.)\n- Flexible conditional execution based on media properties\n- Custom environment variables and data attributes\n\nPerfect for maintaining an organized, automated download workflow without manual intervention.",
+        "overview": "Automatically manage Sonarr & Radarr monitoring based on your Jellyfin watch activity.",
+        "owner": "caleb-venner",
+        "category": "Notifications",
+        "versions": [
+            {
+                "version": "1.0.0.0",
+                "changelog": "### Version 1.0.0\n\nInitial Release\n\nFeatures:\n- Native Sonarr integration with automatic episode monitoring\n- Native Radarr integration with smart movie unmonitoring\n- Configurable watch percentage detection\n- Quality cutoff checking for upgrade-eligible content\n- Season-based monitoring control\n- Dynamic episode buffer management\n- Custom script execution support (legacy feature)\n- Comprehensive configuration UI",
+                "targetAbi": "10.9.0.0",
+                "sourceUrl": "https://github.com/caleb-venner/jellypy/releases/download/v1.0.0/jellypy_1.0.0.0.zip",
+                "checksum": "1b7c19fe9fcfd63f8b1290fc84a76cbc",
+                "timestamp": "2025-10-07T12:33:48Z"
+            }
+        ]
+    }
+]
