@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Initial Release
 
 - Native Sonarr integration with automatic episode monitoring
-- Native Radarr integration with smart movie unmonitoring  
+- Native Radarr integration with smart movie unmonitoring
 - Configurable watch percentage detection
 - Quality cutoff checking for upgrade-eligible content
 - Season-based monitoring control

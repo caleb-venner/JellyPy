@@ -43,15 +43,15 @@ get_current_version() {
 increment_version() {
     local version=$1
     local bump_type=$2
-    
+
     # Split version into parts (remove .0 suffix for processing)
     local base_version=$(echo $version | sed 's/\.0$//')
     IFS='.' read -ra VERSION_PARTS <<< "$base_version"
-    
+
     local major=${VERSION_PARTS[0]}
     local minor=${VERSION_PARTS[1]}
     local patch=${VERSION_PARTS[2]}
-    
+
     case $bump_type in
         "major")
             major=$((major + 1))
@@ -70,7 +70,7 @@ increment_version() {
             exit 1
             ;;
     esac
-    
+
     echo "${major}.${minor}.${patch}.0"
 }
 
@@ -78,12 +78,12 @@ increment_version() {
 update_version_files() {
     local new_version=$1
     local short_version=$(echo $new_version | sed 's/\.0$//')
-    
+
     print_status "Updating version to $new_version in project files..."
-    
+
     # Update build.yaml
     sed -i '' "s/^version: \".*\"/version: \"$new_version\"/" build.yaml
-    
+
     # Update manifest.json version (add new version to array)
     # This is more complex - we'll handle it separately
     print_status "build.yaml updated"
@@ -93,16 +93,16 @@ update_version_files() {
 build_package() {
     local version=$1
     local package_name="${PLUGIN_NAME}_${version}.zip"
-    
+
     print_status "Building plugin package v${version}..."
-    
+
     # Clean and build
     dotnet clean --configuration Release >/dev/null 2>&1
     dotnet publish --configuration Release --framework net8.0 >/dev/null 2>&1
-    
+
     # Create release directory
     mkdir -p "${RELEASE_DIR}"
-    
+
     # Create zip package
     cd "${BUILD_DIR}"
     zip -q -r "../../../../${RELEASE_DIR}/${package_name}" \
@@ -110,7 +110,7 @@ build_package() {
         Jellyfin.Plugin.Jellypy.xml \
         Jellyfin.Plugin.Jellypy.deps.json
     cd - >/dev/null
-    
+
     # Calculate checksum
     if command -v md5 &> /dev/null; then
         local checksum=$(md5 -q "${RELEASE_DIR}/${package_name}")
@@ -120,7 +120,7 @@ build_package() {
         print_error "No MD5 command found"
         exit 1
     fi
-    
+
     echo "$checksum:$package_name"
 }
 
@@ -132,14 +132,14 @@ update_manifest() {
     local commit_message=$4
     local short_version=$(echo $version | sed 's/\.0$//')
     local timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-    
+
     print_status "Updating manifest.json..."
-    
+
     if [[ ! -f "manifest.json" ]]; then
         print_error "manifest.json not found"
         exit 1
     fi
-    
+
     # Create new version entry JSON
     local new_version_json=$(cat <<EOF
             {
@@ -152,10 +152,10 @@ update_manifest() {
             }
 EOF
     )
-    
+
     # Create a temporary file for the updated manifest
     local temp_file=$(mktemp)
-    
+
     # Use Python to properly update the JSON (more reliable than sed)
     python3 << PYTHON_EOF
 import json
@@ -168,7 +168,7 @@ with open('manifest.json', 'r') as f:
 # Create new version entry
 new_version = {
     "version": "${version}",
-    "changelog": "${commit_message}", 
+    "changelog": "${commit_message}",
     "targetAbi": "10.9.0.0",
     "sourceUrl": "https://github.com/caleb-venner/jellypy/releases/download/v${short_version}/${package_name}",
     "checksum": "${checksum}",
@@ -183,7 +183,7 @@ with open('${temp_file}', 'w') as f:
     json.dump(manifest, f, indent=4)
     f.write('\n')  # Add trailing newline
 PYTHON_EOF
-    
+
     if [[ $? -eq 0 ]]; then
         mv "$temp_file" manifest.json
         print_success "manifest.json updated with version $version"
@@ -198,21 +198,21 @@ PYTHON_EOF
 main() {
     local bump_type=${1:-"patch"}
     local commit_message=${2:-"Version bump"}
-    
+
     if [[ ! -f "build.yaml" ]]; then
         print_error "build.yaml not found. Run from project root directory."
         exit 1
     fi
-    
+
     # Get current version
     local current_version=$(get_current_version)
     print_status "Current version: $current_version"
-    
+
     # Calculate new version
     local new_version=$(increment_version "$current_version" "$bump_type")
     local short_version=$(echo $new_version | sed 's/\.0$//')
     print_status "New version: $new_version"
-    
+
     # Confirm with user
     echo
     print_warning "This will:"
@@ -227,32 +227,32 @@ main() {
         print_status "Cancelled."
         exit 0
     fi
-    
+
     # Update version files
     update_version_files "$new_version"
-    
+
     # Build package
     local build_result=$(build_package "$new_version")
     local checksum=$(echo "$build_result" | cut -d':' -f1)
     local package_name=$(echo "$build_result" | cut -d':' -f2)
-    
+
     print_success "Package created: ${RELEASE_DIR}/${package_name}"
     print_success "Checksum: $checksum"
-    
+
     # Update manifest
     update_manifest "$new_version" "$checksum" "$package_name" "$commit_message"
-    
+
     # Git operations
     print_status "Creating git commit and tags..."
     git add build.yaml manifest.json "${RELEASE_DIR}/${package_name}"
     git commit -m "chore: Bump version to $new_version
 
 $commit_message"
-    
+
     # Create tags
     git tag "v$new_version"
     git tag "v$short_version"
-    
+
     print_success "Version $new_version ready!"
     echo
     print_status "Next steps:"
