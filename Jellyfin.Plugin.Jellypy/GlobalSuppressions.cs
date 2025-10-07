@@ -24,6 +24,18 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:File may only contain a single type", Justification = "Intentional grouping of related models and DTOs", Scope = "namespaceanddescendants", Target = "~N:Jellyfin.Plugin.Jellypy.Services.Arr")]
 [assembly: SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:File may only contain a single type", Justification = "Intentional grouping of related configuration classes", Scope = "namespaceanddescendants", Target = "~N:Jellyfin.Plugin.Jellypy.Configuration")]
 
+// SA1200: Using directives should appear within namespace (10 warnings)
+// Justification: Project uses file-scoped namespaces (C# 10+ feature) and global using directives.
+// Modern C# style places using directives at the top of the file outside the namespace for better
+// readability and consistency with the language evolution. This is the recommended pattern for new projects.
+[assembly: SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1200:Using directives should appear within a namespace declaration", Justification = "Project uses file-scoped namespaces and modern C# using directive placement", Scope = "namespaceanddescendants", Target = "~N:Jellyfin.Plugin.Jellypy")]
+
+// SA1633: File header required (2 warnings)
+// Justification: File headers add clutter without providing value in this context. The project
+// uses standard licensing via LICENSE file and copyright information is maintained at the
+// repository level. Individual file headers would be redundant and reduce readability.
+[assembly: SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1633:File should have header", Justification = "File headers not required - licensing handled at repository level", Scope = "namespaceanddescendants", Target = "~N:Jellyfin.Plugin.Jellypy")]
+
 // CS8632: Nullable reference type annotations (7 warnings)
 // Justification: This codebase does not use nullable reference types globally.
 // The warnings appear on nullable return types which are required for optional values
