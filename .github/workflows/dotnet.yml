@@ -1,19 +1,49 @@
-name: .NET Build
+name: Build and Test
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
+    paths-ignore:
+      - '**/*.md'
+      - 'LICENSE'
+      - '.gitignore'
   pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
+    paths-ignore:
+      - '**/*.md'
+      - 'LICENSE'
+      - '.gitignore'
+  workflow_dispatch:
 
 jobs:
   build:
+    name: Build Plugin
     runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup .NET 8.0
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-      - name: Restore and Build
-        run: dotnet build Jellyfin.Plugin.Jellypy.sln --configuration Release
+      
+      - name: Restore dependencies
+        run: dotnet restore Jellyfin.Plugin.Jellypy.sln
+      
+      - name: Build (Debug)
+        run: dotnet build Jellyfin.Plugin.Jellypy.sln --configuration Debug --no-restore
+      
+      - name: Build (Release)
+        run: dotnet build Jellyfin.Plugin.Jellypy.sln --configuration Release --no-restore
+      
+      - name: Publish plugin
+        run: dotnet publish Jellyfin.Plugin.Jellypy/Jellyfin.Plugin.Jellypy.csproj --configuration Release --no-build --output ./dist
+      
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jellypy-plugin
+          path: dist/
+          retention-days: 30
