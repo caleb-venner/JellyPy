@@ -7,25 +7,25 @@ framework: "net8.0"
 overview: "Automatically manage Sonarr & Radarr monitoring based on your Jellyfin watch activity."
 description: >
   Jellypy automatically manages your Sonarr and Radarr monitoring based on what you watch in Jellyfin.
-  
+
   Native Sonarr Integration:
   - Automatically monitors next N episodes after watching
   - Smart episode buffer management with configurable minimum unwatched queue
   - Season-by-season monitoring control
   - Unmonitor watched episodes to reduce clutter
   - Automatic search triggering for newly monitored content
-  
+
   Native Radarr Integration:
   - Automatically unmonitor movies after watching
   - Percentage-based watch detection (configurable threshold)
   - Quality cutoff checking to prevent premature unmonitoring
   - Keep movies monitored if upgrades are still possible
-  
+
   Legacy Features:
   - Execute custom Python scripts on Jellyfin events (PlaybackStart, PlaybackStop, etc.)
   - Flexible conditional execution based on media properties
   - Custom environment variables and data attributes
-  
+
   Perfect for maintaining an organized, automated download workflow without manual intervention.
 category: "Notifications"
 owner: "caleb-venner"
@@ -33,9 +33,9 @@ artifacts:
 - "Jellyfin.Plugin.Jellypy.dll"
 changelog: >
   ### Version 1.0.0
-  
+
   Initial Release
-  
+
   Features:
   - Native Sonarr integration with automatic episode monitoring
   - Native Radarr integration with smart movie unmonitoring
@@ -45,9 +45,4 @@ changelog: >
   - Dynamic episode buffer management
   - Custom script execution support (legacy feature)
   - Comprehensive configuration UI
-  
-  Requirements:
-  - Jellyfin 10.9.0 or higher
-  - .NET 8.0
-  - Sonarr v3 API (optional)
-  - Radarr v3 API (optional)
+
