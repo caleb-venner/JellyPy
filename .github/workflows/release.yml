@@ -17,16 +17,16 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Setup .NET 8.0
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-      
+
       - name: Extract version
         id: version
         run: |
@@ -35,37 +35,37 @@ jobs:
           else
             echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
           fi
-      
+
       - name: Restore dependencies
         run: dotnet restore Jellyfin.Plugin.Jellypy.sln
-      
+
       - name: Build Release
         run: dotnet build Jellyfin.Plugin.Jellypy.sln --configuration Release --no-restore
-      
+
       - name: Publish plugin
         run: dotnet publish Jellyfin.Plugin.Jellypy/Jellyfin.Plugin.Jellypy.csproj --configuration Release --no-build --output ./publish
-      
+
       - name: Create plugin archive
         run: |
           cd publish
           zip -r ../jellypy-${{ steps.version.outputs.VERSION }}.zip .
           cd ..
-      
+
       - name: Generate release notes
         id: notes
         run: |
           cat << EOF > release-notes.md
           ## Jellypy Plugin ${{ steps.version.outputs.VERSION }}
-          
+
           ### Installation
-          
+
           1. Download \`jellypy-${{ steps.version.outputs.VERSION }}.zip\`
           2. Extract to your Jellyfin plugins directory
           3. Restart Jellyfin
-          
+
           See [README.md](https://github.com/${{ github.repository }}/blob/main/README.md) for configuration instructions.
           EOF
-      
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
