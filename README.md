@@ -1,5 +1,9 @@
 # Jellypy - Jellyfin Plugin for Sonarr & Radarr Integration
 
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![.NET](https://img.shields.io/badge/.NET-8.0-purple)](https://dotnet.microsoft.com/)
+[![Jellyfin](https://img.shields.io/badge/Jellyfin-10.9+-aa5cc3)](https://jellyfin.org/)
+
 A Jellyfin plugin that automatically updates your Sonarr and Radarr monitoring based on what you watch. Keep your media organised and automatic without manual intervention.
 
 ## 🚀 Features
@@ -234,7 +238,9 @@ Contributions welcome! Please:
 
 ## 📝 License
 
-This project is licensed under the MIT License - see [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU General Public License v3.0 - see [LICENSE](LICENSE) file for details.
+
+**Why GPLv3?** Jellyfin is licensed under GPLv3, and to ensure compatibility and maintain the free and open-source nature of the ecosystem, this plugin uses the same license.
 
 ## 🙏 Acknowledgments
 
