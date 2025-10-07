@@ -150,22 +150,26 @@ Result:
 ## 🔍 Use Cases
 
 ### Scenario 1: Binge Watching
+
 - Watch S01E01 of a new show
 - Plugin automatically queues next 5 episodes
 - Sonarr downloads them overnight
 - Continue watching seamlessly
 
 ### Scenario 2: Quality Upgrades
+
 - Disable "Skip Episodes With Files"
 - Re-monitor episodes for quality upgrades
 - Sonarr automatically upgrades to better quality
 
 ### Scenario 3: Season-by-Season
+
 - Enable "Monitor Only Current Season"
 - Finish Season 1
 - Season 2 automatically starts monitoring when you begin watching
 
 ### Scenario 4: Movie Collection
+
 - Watch movies from your library
 - Movies automatically unmonitor after watching
 - Only keep unwatched movies monitored
