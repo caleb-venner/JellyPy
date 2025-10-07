@@ -79,3 +79,9 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Project-specific configuration files
+jellypy.code-workspace
+jellyfin.ruleset
+Makefile
+Directory.Build.props
