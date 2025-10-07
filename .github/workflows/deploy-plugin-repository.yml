@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
     paths: [ 'manifest.json' ]
-  workflow_dispatch:
+  workflow_dispatch:  # Allows manual triggering
 
 permissions:
   contents: read
@@ -32,6 +32,13 @@ jobs:
         run: |
           mkdir -p _site
           cp manifest.json _site/
+          echo "Manifest.json copied successfully"
+          ls -la _site/
+          
+      - name: Validate manifest.json
+        run: |
+          python3 -m json.tool _site/manifest.json > /dev/null
+          echo "Manifest.json is valid JSON"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
