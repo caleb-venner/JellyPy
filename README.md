@@ -6,7 +6,7 @@
 
 A Jellyfin plugin that automatically updates your Sonarr and Radarr monitoring based on what you watch. Keep your media organised and automatic without manual intervention.
 
-## 🚀 Features
+## Features
 
 ### Native Sonarr Integration
 
@@ -31,7 +31,7 @@ A Jellyfin plugin that automatically updates your Sonarr and Radarr monitoring b
 - Custom environment variables and data attributes
 - Conditional execution based on media properties
 
-## 📋 Requirements
+## Requirements
 
 - **Jellyfin**: 10.10.0 or higher
 - **Sonarr**: v3 API (optional)
@@ -99,7 +99,7 @@ A Jellyfin plugin that automatically updates your Sonarr and Radarr monitoring b
    | **Minimum Watch Percentage** | 90% | Percentage required to consider movie "watched" |
    | **Unmonitor After Quality Cutoff** | ✗ | Only unmonitor movies at their quality target |
 
-## 🎯 How It Works
+## How It Works
 
 ### TV Shows (Sonarr)
 
@@ -231,7 +231,7 @@ The plugin also supports custom Python script execution:
 
 See `examples/` directory for sample scripts.
 
-## 🤝 Contributing
+## Contributing
 
 Contributions welcome! Please:
 
@@ -245,16 +245,5 @@ Contributions welcome! Please:
 This project is licensed under the GNU General Public License v3.0 - see [LICENSE](LICENSE) file for details.
 
 **Why GPLv3?** Jellyfin is licensed under GPLv3, and to ensure compatibility and maintain the free and open-source nature of the ecosystem, this plugin uses the same license.
-
-## 🙏 Acknowledgments
-
-- Built for the [Jellyfin](https://jellyfin.org/) community
-- Integrates with [Sonarr](https://sonarr.tv/) and [Radarr](https://radarr.video/)
-- Inspired by the original Tautulli/Plex ecosystem
-
-## 📮 Support
-
-- **Issues**: [GitHub Issues](https://github.com/caleb-venner/jellypy/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/caleb-venner/jellypy/discussions)
 
 ---
