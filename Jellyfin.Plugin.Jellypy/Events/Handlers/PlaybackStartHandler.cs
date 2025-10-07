@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Jellyfin.Plugin.Jellypy.Services.Arr;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Entities.TV;
@@ -17,16 +18,22 @@ public class PlaybackStartHandler : IEventProcessor<PlaybackProgressEventArgs>
 {
     private readonly ILogger<PlaybackStartHandler> _logger;
     private readonly IScriptExecutionService _scriptExecutionService;
+    private readonly IArrIntegrationService _arrIntegrationService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PlaybackStartHandler"/> class.
     /// </summary>
     /// <param name="logger">The logger.</param>
     /// <param name="scriptExecutionService">The script execution service.</param>
-    public PlaybackStartHandler(ILogger<PlaybackStartHandler> logger, IScriptExecutionService scriptExecutionService)
+    /// <param name="arrIntegrationService">The Arr integration service.</param>
+    public PlaybackStartHandler(
+        ILogger<PlaybackStartHandler> logger,
+        IScriptExecutionService scriptExecutionService,
+        IArrIntegrationService arrIntegrationService)
     {
         _logger = logger;
         _scriptExecutionService = scriptExecutionService;
+        _arrIntegrationService = arrIntegrationService;
     }
 
     /// <inheritdoc />
@@ -103,6 +110,11 @@ public class PlaybackStartHandler : IEventProcessor<PlaybackProgressEventArgs>
             }
 
             var eventData = ExtractEventData(eventArgs);
+
+            // Execute native Sonarr/Radarr integration
+            await _arrIntegrationService.ProcessPlaybackStartAsync(eventArgs.Item).ConfigureAwait(false);
+
+            // Execute custom scripts (if configured)
             await _scriptExecutionService.ExecuteScriptsAsync(eventData).ConfigureAwait(false);
         }
         catch (Exception ex)

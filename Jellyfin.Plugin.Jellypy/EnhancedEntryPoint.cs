@@ -15,8 +15,7 @@ namespace Jellyfin.Plugin.Jellypy;
 /// <summary>
 /// Enhanced entry point that handles multiple Jellyfin event types.
 /// </summary>
-public class EnhancedEntryPoint : IHostedService,
-    IEventConsumer<PlaybackProgressEventArgs>
+public class EnhancedEntryPoint : IHostedService
 {
     private readonly ISessionManager _sessionManager;
     private readonly IServiceScopeFactory _scopeFactory;
@@ -53,12 +52,6 @@ public class EnhancedEntryPoint : IHostedService,
         _sessionManager.PlaybackProgress -= OnPlaybackProgress;
         _logger.LogInformation("Enhanced EntryPoint stopped");
         return Task.CompletedTask;
-    }
-
-    /// <inheritdoc/>
-    public async Task OnEvent(PlaybackProgressEventArgs eventArgs)
-    {
-        await HandleEventAsync<PlaybackProgressEventArgs, PlaybackStartHandler>(eventArgs).ConfigureAwait(false);
     }
 
     private void OnPlaybackStart(object sender, PlaybackProgressEventArgs eventArgs)

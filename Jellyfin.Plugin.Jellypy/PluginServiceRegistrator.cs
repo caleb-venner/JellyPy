@@ -1,6 +1,7 @@
 using Jellyfin.Plugin.Jellypy.Events;
 using Jellyfin.Plugin.Jellypy.Events.Handlers;
 using Jellyfin.Plugin.Jellypy.Services;
+using Jellyfin.Plugin.Jellypy.Services.Arr;
 using MediaBrowser.Controller;
 using MediaBrowser.Controller.Events;
 using MediaBrowser.Controller.Library;
@@ -17,24 +18,22 @@ public class PluginServiceRegistrator : IPluginServiceRegistrator
     /// <inheritdoc />
     public void RegisterServices(IServiceCollection serviceCollection, IServerApplicationHost applicationHost)
     {
-        // Register the enhanced entry point and legacy entry point
+        // Register the entry point
         serviceCollection.AddHostedService<EnhancedEntryPoint>();
-        serviceCollection.AddHostedService<EntryPoint>(); // Keep for backward compatibility
 
         // Register the script execution service and supporting services
         serviceCollection.AddSingleton<IScriptExecutionService, ScriptExecutionService>();
         serviceCollection.AddSingleton<ConditionEvaluator>();
         serviceCollection.AddSingleton<DataAttributeProcessor>();
 
+        // Register Sonarr/Radarr integration services
+        serviceCollection.AddHttpClient(); // Required for HTTP API calls
+        serviceCollection.AddSingleton<ISonarrService, SonarrService>();
+        serviceCollection.AddSingleton<IRadarrService, RadarrService>();
+        serviceCollection.AddSingleton<IArrIntegrationService, ArrIntegrationService>();
+
         // Register event handlers
         serviceCollection.AddTransient<PlaybackStartHandler>();
         serviceCollection.AddTransient<PlaybackStopHandler>();
-
-        // Register event consumers for the event system
-        serviceCollection.AddTransient<IEventConsumer<PlaybackProgressEventArgs>, EnhancedEntryPoint>();
-
-        // Keep legacy registration for backward compatibility
-        serviceCollection.AddTransient<ExecuteScript>();
-        serviceCollection.AddTransient<IEventConsumer<PlaybackProgressEventArgs>, ExecuteScript>();
     }
 }

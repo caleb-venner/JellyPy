@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Jellyfin.Plugin.Jellypy.Services.Arr;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Entities.TV;
@@ -17,16 +18,22 @@ public class PlaybackStopHandler : IEventProcessor<PlaybackStopEventArgs>
 {
     private readonly ILogger<PlaybackStopHandler> _logger;
     private readonly IScriptExecutionService _scriptExecutionService;
+    private readonly IArrIntegrationService _arrIntegrationService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PlaybackStopHandler"/> class.
     /// </summary>
     /// <param name="logger">The logger.</param>
     /// <param name="scriptExecutionService">The script execution service.</param>
-    public PlaybackStopHandler(ILogger<PlaybackStopHandler> logger, IScriptExecutionService scriptExecutionService)
+    /// <param name="arrIntegrationService">The Arr integration service.</param>
+    public PlaybackStopHandler(
+        ILogger<PlaybackStopHandler> logger,
+        IScriptExecutionService scriptExecutionService,
+        IArrIntegrationService arrIntegrationService)
     {
         _logger = logger;
         _scriptExecutionService = scriptExecutionService;
+        _arrIntegrationService = arrIntegrationService;
     }
 
     /// <inheritdoc />
@@ -106,11 +113,39 @@ public class PlaybackStopHandler : IEventProcessor<PlaybackStopEventArgs>
             }
 
             var eventData = ExtractEventData(eventArgs);
+
+            // Calculate watch percentage for movies
+            if (eventArgs.Item is Movie movie)
+            {
+                var watchPercentage = CalculateWatchPercentage(eventArgs);
+                _logger.LogDebug(
+                    "Movie playback stopped: {MovieName}, Watch Percentage: {Percentage}%",
+                    movie.Name,
+                    watchPercentage);
+
+                // Process movie with watch percentage for conditional unmonitoring
+                await _arrIntegrationService.ProcessPlaybackStopAsync(movie, watchPercentage).ConfigureAwait(false);
+            }
+
+            // Execute custom scripts (if configured)
             await _scriptExecutionService.ExecuteScriptsAsync(eventData).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error handling PlaybackStop event for item {ItemName}", eventArgs.Item?.Name);
         }
+    }
+
+    private double CalculateWatchPercentage(PlaybackStopEventArgs eventArgs)
+    {
+        if (eventArgs.Item?.RunTimeTicks == null || eventArgs.Item.RunTimeTicks == 0)
+        {
+            return 0;
+        }
+
+        var runtime = eventArgs.Item.RunTimeTicks.Value;
+        var position = eventArgs.PlaybackPositionTicks ?? 0;
+
+        return Math.Round((double)position / runtime * 100, 2);
     }
 }

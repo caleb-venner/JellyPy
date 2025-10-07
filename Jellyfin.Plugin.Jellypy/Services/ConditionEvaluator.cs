@@ -67,7 +67,9 @@ public class ConditionEvaluator
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Error evaluating condition {Field} {Operator} {Value}",
+            _logger.LogWarning(
+                ex,
+                "Error evaluating condition {Field} {Operator} {Value}",
                 condition.Field,
                 condition.Operator,
                 condition.Value);

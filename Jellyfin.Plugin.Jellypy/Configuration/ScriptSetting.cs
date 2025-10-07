@@ -114,7 +114,7 @@ public class ScriptExecution
     public string AdditionalArguments { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets environment variables to set for the script.
+    /// Gets the environment variables to set for the script.
     /// </summary>
     public Collection<EnvironmentVariable> EnvironmentVariables { get; } = new();
 
