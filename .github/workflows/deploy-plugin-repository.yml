@@ -34,7 +34,7 @@ jobs:
           cp manifest.json _site/
           echo "Manifest.json copied successfully"
           ls -la _site/
-          
+
       - name: Validate manifest.json
         run: |
           python3 -m json.tool _site/manifest.json > /dev/null
