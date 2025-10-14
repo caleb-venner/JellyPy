@@ -331,7 +331,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                     {
                         process.Kill(true);
                     }
-                    catch
+                    catch (Exception)
                     {
                         /* Ignore */
                     }
@@ -380,7 +380,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                     {
                         whichProcess.Kill(true);
                     }
-                    catch
+                    catch (Exception)
                     {
                         /* Ignore */
                     }
@@ -422,7 +422,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                     {
                         process.Kill(true);
                     }
-                    catch
+                    catch (Exception)
                     {
                         /* Ignore */
                     }
@@ -573,6 +573,10 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                 catch (InvalidOperationException)
                 {
                     // Process already exited
+                }
+                catch (Exception)
+                {
+                    /* Ignore */
                 }
 
                 return;

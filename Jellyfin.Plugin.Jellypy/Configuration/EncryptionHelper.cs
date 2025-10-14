@@ -66,7 +66,7 @@ public static class EncryptionHelper
             byte[] cipherTextBytes = memoryStream.ToArray();
             return Convert.ToBase64String(cipherTextBytes);
         }
-        catch
+        catch (Exception)
         {
             // If encryption fails, return empty string
             return string.Empty;
@@ -114,7 +114,7 @@ public static class EncryptionHelper
 
             return Encoding.UTF8.GetString(plainTextBytes);
         }
-        catch
+        catch (Exception)
         {
             // If decryption fails, return empty string (could be unencrypted legacy data)
             return string.Empty;

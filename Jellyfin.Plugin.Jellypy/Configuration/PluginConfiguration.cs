@@ -413,6 +413,16 @@ public class PluginConfiguration : BasePluginConfiguration
             return false;
         }
 
-        return value.All(c => (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'));
+        return value.All(IsHexChar);
+    }
+
+    /// <summary>
+    /// Checks if a character is a valid hexadecimal digit.
+    /// </summary>
+    /// <param name="c">The character to check.</param>
+    /// <returns>True if the character is a valid hex digit, false otherwise.</returns>
+    private static bool IsHexChar(char c)
+    {
+        return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
     }
 }
