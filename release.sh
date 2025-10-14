@@ -251,12 +251,11 @@ show_release_summary() {
     echo "Branch: $current_branch"
     echo "File: releases/jellypy_$version.zip"
     echo "Checksum: $checksum"
-    echo "GitHub Release Tag: v$version"
-    echo "GitHub Release URL: https://github.com/caleb-venner/jellypy/releases/download/v$version/jellypy_$version.zip"
-    
     if [ "$current_branch" = "beta" ]; then
+        echo "Download URL: https://raw.githubusercontent.com/caleb-venner/jellypy/beta/releases/jellypy_$version.zip"
         echo "Repository URL: https://caleb-venner.github.io/jellypy/manifest-beta.json"
     else
+        echo "Download URL: https://raw.githubusercontent.com/caleb-venner/jellypy/main/releases/jellypy_$version.zip"
         echo "Repository URL: https://caleb-venner.github.io/jellypy/manifest.json"
     fi
     
@@ -265,8 +264,8 @@ show_release_summary() {
     echo "1. Review the changes with 'git diff'"
     echo "2. Commit the changes: git add . && git commit -m 'Release $version'"
     echo "3. Push to GitHub: git push origin $current_branch"
-    echo "4. Create GitHub release with tag v$version"
-    echo "5. Upload releases/jellypy_$version.zip to the release"
+    echo "4. Plugin will be available immediately via repository URL"
+    echo "5. No GitHub release creation needed - files served from /releases directory"
     echo "=========================================="
 }
 
