@@ -8,9 +8,9 @@
     <!-- Suppress nullable reference type warnings - project doesn't use nullable reference types -->
     <NoWarn>$(NoWarn);CS8632</NoWarn>
     <!-- Plugin version information -->
-    <Version>1.1.0</Version>
-    <AssemblyVersion>1.1.0.0</AssemblyVersion>
-    <FileVersion>1.1.0.0</FileVersion>
+    <Version>1.1.1</Version>
+    <AssemblyVersion>1.1.1.0</AssemblyVersion>
+    <FileVersion>1.1.1.0</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Jellyfin.Controller" Version="10.10.6"/>
