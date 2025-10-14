@@ -114,7 +114,7 @@ create_release_zip() {
     cd Jellyfin.Plugin.Jellypy/bin/Release/net8.0
     
     # Check if required files exist
-    required_files=("Jellyfin.Plugin.Jellypy.dll" "Jellyfin.Plugin.Jellypy.deps.json")
+    required_files=("Jellyfin.Plugin.Jellypy.dll")
     for file in "${required_files[@]}"; do
         if [ ! -f "$file" ]; then
             print_error "Required file $file not found in build output"
@@ -122,12 +122,9 @@ create_release_zip() {
         fi
     done
     
-    # Create zip
-    zip -r "../../../../$zip_file" \
+    # Create zip with only the essential plugin DLL
+    zip "../../../../$zip_file" \
         Jellyfin.Plugin.Jellypy.dll \
-        Jellyfin.Plugin.Jellypy.deps.json \
-        Jellyfin.Plugin.Jellypy.pdb \
-        Jellyfin.Plugin.Jellypy.xml \
         > /dev/null
     
     cd - > /dev/null
@@ -180,9 +177,7 @@ calculate_checksum() {
     local version=$1
     local zip_file="releases/jellypy_$version.zip"
     
-    print_status "Calculating MD5 checksum..."
-    
-    # Calculate MD5 checksum
+    # Calculate MD5 checksum (without mixing output)
     local checksum=""
     if command -v md5sum >/dev/null 2>&1; then
         checksum=$(md5sum "$zip_file" | cut -d' ' -f1)
@@ -193,7 +188,6 @@ calculate_checksum() {
         exit 1
     fi
     
-    print_success "Checksum: $checksum"
     echo "$checksum"
 }
 
@@ -351,7 +345,11 @@ main() {
     build_plugin
     create_release_zip "$version"
     verify_release "$version"
+    
+    print_status "Calculating MD5 checksum..."
     local checksum=$(calculate_checksum "$version")
+    print_success "Checksum: $checksum"
+    
     update_manifest_checksum "$version" "$checksum"
     
     # Show summary

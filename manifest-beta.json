@@ -12,7 +12,7 @@
                 "changelog": "**Version 1.1.2.0 - Radarr HTTP Client Fix**\n\n**Bug Fixes:**\n• Fixed Radarr HTTP client Content-Type header issue\n• Resolved 'Misused header name' exception when calling Radarr API\n• HttpClient now properly handles JSON content headers automatically\n\n**Note:** This version includes the fix for the Radarr integration bug that was causing API communication failures.",
                 "targetAbi": "10.9.0.0",
                 "sourceUrl": "https://raw.githubusercontent.com/caleb-venner/jellypy/beta/releases/jellypy_1.1.2.0.zip",
-                "checksum": "6d070d6f8f0ef97ca8f60c5cf1e08ab8",
+                "checksum": "ad675b21bee9a2202d869b1e7861e0e0",
                 "timestamp": "2025-10-14T12:40:00Z"
             }
         ]
