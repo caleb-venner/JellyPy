@@ -49,6 +49,33 @@ update_build_version() {
     print_success "Updated build.yaml version to $new_version"
 }
 
+# Function to update version in .csproj file
+update_csproj_version() {
+    local new_version=$1
+    local csproj_file="Jellyfin.Plugin.Jellypy/Jellyfin.Plugin.Jellypy.csproj"
+    
+    if [ ! -f "$csproj_file" ]; then
+        print_warning "Could not find $csproj_file - skipping .csproj update"
+        return
+    fi
+    
+    print_status "Updating $csproj_file version to $new_version"
+    
+    # Create backup
+    cp "$csproj_file" "$csproj_file.bak"
+    
+    # Extract 3-digit version (remove .0 suffix for Version tag)
+    local short_version=$(echo "$new_version" | sed 's/\.0$//')
+    
+    # Update Version (3-digit), AssemblyVersion (4-digit), and FileVersion (4-digit)
+    sed -i.tmp "s|<Version>.*</Version>|<Version>$short_version</Version>|" "$csproj_file"
+    sed -i.tmp "s|<AssemblyVersion>.*</AssemblyVersion>|<AssemblyVersion>$new_version</AssemblyVersion>|" "$csproj_file"
+    sed -i.tmp "s|<FileVersion>.*</FileVersion>|<FileVersion>$new_version</FileVersion>|" "$csproj_file"
+    rm "$csproj_file.tmp"
+    
+    print_success "Updated $csproj_file versions (Version: $short_version, Assembly/File: $new_version)"
+}
+
 # Function to build the plugin
 build_plugin() {
     print_status "Building plugin..."
@@ -284,6 +311,10 @@ main() {
     if [ $# -eq 1 ]; then
         version=$1
         print_status "Using provided version: $version"
+        
+        # Update both build.yaml and .csproj with new version
+        update_build_version "$version"
+        update_csproj_version "$version"
     else
         version=$(get_current_version)
         print_status "Using current version from build.yaml: $version"
@@ -304,6 +335,7 @@ main() {
             
             version=$new_version
             update_build_version "$version"
+            update_csproj_version "$version"
         fi
     fi
     

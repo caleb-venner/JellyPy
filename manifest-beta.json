@@ -2,7 +2,7 @@
     {
         "guid": "a5bd541f-38dc-467e-9a9a-15fe3f3bcf5c",
         "name": "Jellypy (Beta)",
-        "description": "Jellypy automatically manages your Sonarr and Radarr monitoring based on what you watch in Jellyfin.\n\n⚠️ **BETA VERSION** - This is a testing channel with unstable releases. Use at your own risk.\n\nNative Sonarr Integration:\n• Automatically monitors next N episodes after watching\n• Smart episode buffer management with configurable minimum unwatched queue\n• Season-by-season monitoring control\n• Unmonitor watched episodes to reduce clutter\n• Automatic search triggering for newly monitored content\n\nNative Radarr Integration:\n• Automatically unmonitor movies after watching\n• Percentage-based watch detection (configurable threshold)\n• Quality cutoff checking to prevent premature unmonitoring\n• Keep movies monitored if upgrades are still possible\n\nLegacy Features:\n• Execute custom Python scripts on Jellyfin events (PlaybackStart, PlaybackStop, etc.)\n• Flexible conditional execution based on media properties\n• Custom environment variables and data attributes\n\nPerfect for maintaining an organized, automated download workflow without manual intervention.",
+        "description": "Jellypy automatically manages your Sonarr and Radarr monitoring based on what you watch in Jellyfin.    ⚠️ **BETA VERSION**",
         "overview": "Automatically manage Sonarr & Radarr monitoring based on your Jellyfin watch activity. (Beta Channel)",
         "owner": "caleb-venner",
         "category": "Notifications",
