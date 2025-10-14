@@ -195,6 +195,12 @@
                                 <div class="fieldDescription">Your Sonarr API key (found in Settings → General → Security).</div>
                             </div>
                             <div class="inputContainer">
+                                <button id="testSonarrConnection" type="button" is="emby-button" class="raised button-submit" style="margin-bottom: 10px;">
+                                    <span id="testSonarrText">Test Sonarr Connection</span>
+                                </button>
+                                <div id="sonarrTestResult" class="fieldDescription" style="display: none; font-weight: bold;"></div>
+                            </div>
+                            <div class="inputContainer">
                                 <label class="inputLabel inputLabelUnfocused" for="EpisodeDownloadBuffer">Episodes to Monitor</label>
                                 <input id="EpisodeDownloadBuffer" name="EpisodeDownloadBuffer" type="number" is="emby-input" min="1" max="20" />
                                 <div class="fieldDescription">Number of upcoming episodes to keep monitored after watching an episode (default: 5).</div>
@@ -260,6 +266,12 @@
                                 <label class="inputLabel inputLabelUnfocused" for="RadarrApiKey">Radarr API Key</label>
                                 <input id="RadarrApiKey" name="RadarrApiKey" type="password" is="emby-input" />
                                 <div class="fieldDescription">Your Radarr API key (found in Settings → General → Security).</div>
+                            </div>
+                            <div class="inputContainer">
+                                <button id="testRadarrConnection" type="button" is="emby-button" class="raised button-submit" style="margin-bottom: 10px;">
+                                    <span id="testRadarrText">Test Radarr Connection</span>
+                                </button>
+                                <div id="radarrTestResult" class="fieldDescription" style="display: none; font-weight: bold;"></div>
                             </div>
                             <div class="checkboxContainer checkboxContainer-withDescription">
                                 <label class="emby-checkbox-label">
@@ -765,6 +777,127 @@
                 });
             }
 
+            // API Key Loading Function
+            async function loadApiKeys() {
+                try {
+                    const response = await ApiClient.ajax({
+                        type: 'GET',
+                        url: ApiClient.getUrl('/Plugins/Jellypy/api-keys')
+                    });
+
+                    let apiKeys = response;
+                    if (response instanceof Response) {
+                        if (response.ok) {
+                            apiKeys = await response.json();
+                        } else {
+                            console.error('Failed to load API keys:', response.status);
+                            return;
+                        }
+                    }
+
+                    // Load decrypted API keys into the form fields
+                    document.querySelector('#SonarrApiKey').value = apiKeys.SonarrApiKey || '';
+                    document.querySelector('#RadarrApiKey').value = apiKeys.RadarrApiKey || '';
+                } catch (error) {
+                    console.error('Error loading API keys:', error);
+                }
+            }
+
+            // Connection Test Functions
+            async function testSonarrConnection() {
+                const button = document.getElementById('testSonarrConnection');
+                const textElement = document.getElementById('testSonarrText');
+                const resultElement = document.getElementById('sonarrTestResult');
+                const urlElement = document.getElementById('SonarrUrl');
+                const apiKeyElement = document.getElementById('SonarrApiKey');
+
+                const url = urlElement.value.trim();
+                const apiKey = apiKeyElement.value.trim();
+
+                if (!url || !apiKey) {
+                    showTestResult(resultElement, false, 'Please enter both URL and API Key');
+                    return;
+                }
+
+                // Disable button and show loading
+                button.disabled = true;
+                textElement.textContent = 'Testing...';
+                resultElement.style.display = 'none';
+
+                try {
+                    const response = await ApiClient.ajax({
+                        type: 'POST',
+                        url: ApiClient.getUrl('/Plugins/Jellypy/test-sonarr'),
+                        data: JSON.stringify({ Url: url, ApiKey: apiKey }),
+                        contentType: 'application/json'
+                    });
+
+                    let result = response;
+                    if (response instanceof Response) {
+                        result = await response.json();
+                    }
+
+                    showTestResult(resultElement, result.Success, result.Message);
+                } catch (error) {
+                    console.error('Sonarr test error:', error);
+                    showTestResult(resultElement, false, `Test failed: ${error.message || 'Unknown error'}`);
+                } finally {
+                    // Re-enable button
+                    button.disabled = false;
+                    textElement.textContent = 'Test Sonarr Connection';
+                }
+            }
+
+            async function testRadarrConnection() {
+                const button = document.getElementById('testRadarrConnection');
+                const textElement = document.getElementById('testRadarrText');
+                const resultElement = document.getElementById('radarrTestResult');
+                const urlElement = document.getElementById('RadarrUrl');
+                const apiKeyElement = document.getElementById('RadarrApiKey');
+
+                const url = urlElement.value.trim();
+                const apiKey = apiKeyElement.value.trim();
+
+                if (!url || !apiKey) {
+                    showTestResult(resultElement, false, 'Please enter both URL and API Key');
+                    return;
+                }
+
+                // Disable button and show loading
+                button.disabled = true;
+                textElement.textContent = 'Testing...';
+                resultElement.style.display = 'none';
+
+                try {
+                    const response = await ApiClient.ajax({
+                        type: 'POST',
+                        url: ApiClient.getUrl('/Plugins/Jellypy/test-radarr'),
+                        data: JSON.stringify({ Url: url, ApiKey: apiKey }),
+                        contentType: 'application/json'
+                    });
+
+                    let result = response;
+                    if (response instanceof Response) {
+                        result = await response.json();
+                    }
+
+                    showTestResult(resultElement, result.Success, result.Message);
+                } catch (error) {
+                    console.error('Radarr test error:', error);
+                    showTestResult(resultElement, false, `Test failed: ${error.message || 'Unknown error'}`);
+                } finally {
+                    // Re-enable button
+                    button.disabled = false;
+                    textElement.textContent = 'Test Radarr Connection';
+                }
+            }
+
+            function showTestResult(element, success, message) {
+                element.style.display = 'block';
+                element.textContent = message;
+                element.style.color = success ? '#4CAF50' : '#f44336';
+            }
+
             // Script Management Functions
             async function loadAvailableScripts() {
                 try {
@@ -917,7 +1050,7 @@
                         // Load native integration settings
                         document.querySelector('#EnableNativeSonarrIntegration').checked = config.EnableNativeSonarrIntegration !== undefined ? config.EnableNativeSonarrIntegration : true;
                         document.querySelector('#SonarrUrl').value = config.SonarrUrl || '';
-                        document.querySelector('#SonarrApiKey').value = config.SonarrApiKey || '';
+                        // API key will be loaded separately via API call
                         document.querySelector('#EpisodeDownloadBuffer').value = config.EpisodeDownloadBuffer || 5;
                         document.querySelector('#AutoSearchEpisodes').checked = config.AutoSearchEpisodes !== undefined ? config.AutoSearchEpisodes : true;
                         document.querySelector('#MonitorFutureEpisodes').checked = config.MonitorFutureEpisodes !== undefined ? config.MonitorFutureEpisodes : true;
@@ -928,7 +1061,7 @@
 
                         document.querySelector('#EnableNativeRadarrIntegration').checked = config.EnableNativeRadarrIntegration !== undefined ? config.EnableNativeRadarrIntegration : true;
                         document.querySelector('#RadarrUrl').value = config.RadarrUrl || '';
-                        document.querySelector('#RadarrApiKey').value = config.RadarrApiKey || '';
+                        // API key will be loaded separately via API call
                         document.querySelector('#UnmonitorWatchedMovies').checked = config.UnmonitorWatchedMovies !== undefined ? config.UnmonitorWatchedMovies : true;
                         document.querySelector('#UnmonitorOnlyIfWatched').checked = config.UnmonitorOnlyIfWatched !== undefined ? config.UnmonitorOnlyIfWatched : false;
                         document.querySelector('#MinimumWatchPercentage').value = config.MinimumWatchPercentage || 90;
@@ -939,6 +1072,13 @@
                             config.ScriptSettings = [];
                         }
                         renderScriptSettings();
+
+                        // Load decrypted API keys separately
+                        loadApiKeys();
+
+                        // Add test connection button event listeners
+                        document.getElementById('testSonarrConnection').addEventListener('click', testSonarrConnection);
+                        document.getElementById('testRadarrConnection').addEventListener('click', testRadarrConnection);
 
                         Dashboard.hideLoadingMsg();
                     });
@@ -962,7 +1102,7 @@
                     // Save native integration settings
                     config.EnableNativeSonarrIntegration = document.querySelector('#EnableNativeSonarrIntegration').checked;
                     config.SonarrUrl = document.querySelector('#SonarrUrl').value;
-                    config.SonarrApiKey = document.querySelector('#SonarrApiKey').value;
+                    config.SonarrApiKeyEncrypted = document.querySelector('#SonarrApiKey').value;
                     config.EpisodeDownloadBuffer = parseInt(document.querySelector('#EpisodeDownloadBuffer').value || 5, 10);
                     config.AutoSearchEpisodes = document.querySelector('#AutoSearchEpisodes').checked;
                     config.MonitorFutureEpisodes = document.querySelector('#MonitorFutureEpisodes').checked;
@@ -973,7 +1113,7 @@
 
                     config.EnableNativeRadarrIntegration = document.querySelector('#EnableNativeRadarrIntegration').checked;
                     config.RadarrUrl = document.querySelector('#RadarrUrl').value;
-                    config.RadarrApiKey = document.querySelector('#RadarrApiKey').value;
+                    config.RadarrApiKeyEncrypted = document.querySelector('#RadarrApiKey').value;
                     config.UnmonitorWatchedMovies = document.querySelector('#UnmonitorWatchedMovies').checked;
                     config.UnmonitorOnlyIfWatched = document.querySelector('#UnmonitorOnlyIfWatched').checked;
                     config.MinimumWatchPercentage = parseInt(document.querySelector('#MinimumWatchPercentage').value || 90, 10);

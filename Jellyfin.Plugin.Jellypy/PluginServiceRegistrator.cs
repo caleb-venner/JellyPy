@@ -1,3 +1,4 @@
+using Jellyfin.Plugin.Jellypy.Configuration;
 using Jellyfin.Plugin.Jellypy.Events;
 using Jellyfin.Plugin.Jellypy.Events.Handlers;
 using Jellyfin.Plugin.Jellypy.Services;
@@ -18,6 +19,9 @@ public class PluginServiceRegistrator : IPluginServiceRegistrator
     /// <inheritdoc />
     public void RegisterServices(IServiceCollection serviceCollection, IServerApplicationHost applicationHost)
     {
+        // Initialize encryption helper with server information for server-based key generation
+        EncryptionHelper.Initialize(applicationHost);
+
         // Register the entry point
         serviceCollection.AddHostedService<EnhancedEntryPoint>();
 

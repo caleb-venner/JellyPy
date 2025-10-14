@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using MediaBrowser.Model.Plugins;
@@ -9,6 +10,10 @@ namespace Jellyfin.Plugin.Jellypy.Configuration;
 /// </summary>
 public class PluginConfiguration : BasePluginConfiguration
 {
+    // Private backing fields for encrypted API keys
+    private string _sonarrApiKeyEncrypted = string.Empty;
+    private string _radarrApiKeyEncrypted = string.Empty;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="PluginConfiguration"/> class.
     /// </summary>
@@ -82,9 +87,31 @@ public class PluginConfiguration : BasePluginConfiguration
     public int ScriptTimeoutSeconds { get; set; }
 
     /// <summary>
-    /// Gets or sets the Sonarr API key used when invoking the script.
+    /// Gets or sets the encrypted Sonarr API key used when invoking the script.
     /// </summary>
-    public string SonarrApiKey { get; set; } = string.Empty;
+    public string SonarrApiKeyEncrypted
+    {
+        get => _sonarrApiKeyEncrypted;
+        set
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                _sonarrApiKeyEncrypted = string.Empty;
+                return;
+            }
+
+            // If the value appears to be plaintext, encrypt it
+            if (!IsLikelyEncrypted(value))
+            {
+                string encryptionKey = EncryptionHelper.GenerateMachineKey();
+                _sonarrApiKeyEncrypted = EncryptionHelper.Encrypt(value, encryptionKey);
+            }
+            else
+            {
+                _sonarrApiKeyEncrypted = value;
+            }
+        }
+    }
 
     /// <summary>
     /// Gets or sets the Sonarr base URL used when invoking the script.
@@ -92,9 +119,117 @@ public class PluginConfiguration : BasePluginConfiguration
     public string SonarrUrl { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the Radarr API key used when invoking the script.
+    /// Gets or sets the encrypted Radarr API key used when invoking the script.
     /// </summary>
-    public string RadarrApiKey { get; set; } = string.Empty;
+    public string RadarrApiKeyEncrypted
+    {
+        get => _radarrApiKeyEncrypted;
+        set
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                _radarrApiKeyEncrypted = string.Empty;
+                return;
+            }
+
+            // If the value appears to be plaintext, encrypt it
+            if (!IsLikelyEncrypted(value))
+            {
+                string encryptionKey = EncryptionHelper.GenerateMachineKey();
+                _radarrApiKeyEncrypted = EncryptionHelper.Encrypt(value, encryptionKey);
+            }
+            else
+            {
+                _radarrApiKeyEncrypted = value;
+            }
+        }
+    }
+
+    // Backward compatibility properties (non-serialized)
+
+    /// <summary>
+    /// Gets or sets the Sonarr API key (for backward compatibility).
+    /// This property automatically encrypts on set and decrypts on get.
+    /// </summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    [System.Xml.Serialization.XmlIgnore]
+    public string SonarrApiKey
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(SonarrApiKeyEncrypted))
+            {
+                return string.Empty;
+            }
+
+            string encryptionKey = EncryptionHelper.GenerateMachineKey();
+            string decrypted = EncryptionHelper.Decrypt(SonarrApiKeyEncrypted, encryptionKey);
+
+            // If decryption fails, treat as legacy unencrypted data
+            if (string.IsNullOrEmpty(decrypted) && !string.IsNullOrEmpty(SonarrApiKeyEncrypted))
+            {
+                // Migrate legacy plaintext to encrypted
+                SonarrApiKey = SonarrApiKeyEncrypted;
+                return SonarrApiKeyEncrypted;
+            }
+
+            return decrypted;
+        }
+
+        set
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                SonarrApiKeyEncrypted = string.Empty;
+                return;
+            }
+
+            string encryptionKey = EncryptionHelper.GenerateMachineKey();
+            SonarrApiKeyEncrypted = EncryptionHelper.Encrypt(value, encryptionKey);
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the Radarr API key (for backward compatibility).
+    /// This property automatically encrypts on set and decrypts on get.
+    /// </summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    [System.Xml.Serialization.XmlIgnore]
+    public string RadarrApiKey
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(RadarrApiKeyEncrypted))
+            {
+                return string.Empty;
+            }
+
+            string encryptionKey = EncryptionHelper.GenerateMachineKey();
+            string decrypted = EncryptionHelper.Decrypt(RadarrApiKeyEncrypted, encryptionKey);
+
+            // If decryption fails, treat as legacy unencrypted data
+            if (string.IsNullOrEmpty(decrypted) && !string.IsNullOrEmpty(RadarrApiKeyEncrypted))
+            {
+                // Migrate legacy plaintext to encrypted
+                RadarrApiKey = RadarrApiKeyEncrypted;
+                return RadarrApiKeyEncrypted;
+            }
+
+            return decrypted;
+        }
+
+        set
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                RadarrApiKeyEncrypted = string.Empty;
+                return;
+            }
+
+            string encryptionKey = EncryptionHelper.GenerateMachineKey();
+            RadarrApiKeyEncrypted = EncryptionHelper.Encrypt(value, encryptionKey);
+        }
+    }
 
     /// <summary>
     /// Gets or sets the Radarr base URL used when invoking the script.
@@ -201,4 +336,90 @@ public class PluginConfiguration : BasePluginConfiguration
     /// Gets or sets global settings for script execution.
     /// </summary>
     public GlobalScriptSettings GlobalSettings { get; set; }
+
+    /// <summary>
+    /// Ensures API keys are properly encrypted before saving.
+    /// This method should be called before serialization to handle any plaintext API keys.
+    /// </summary>
+    public void EnsureApiKeysEncrypted()
+    {
+        string encryptionKey = EncryptionHelper.GenerateMachineKey();
+
+        // Check if SonarrApiKeyEncrypted contains plaintext that should be encrypted
+        if (!string.IsNullOrEmpty(SonarrApiKeyEncrypted) && !IsLikelyEncrypted(SonarrApiKeyEncrypted))
+        {
+            // Appears to be plaintext - encrypt it
+            string plaintext = SonarrApiKeyEncrypted;
+            SonarrApiKeyEncrypted = EncryptionHelper.Encrypt(plaintext, encryptionKey);
+        }
+
+        // Check if RadarrApiKeyEncrypted contains plaintext that should be encrypted
+        if (!string.IsNullOrEmpty(RadarrApiKeyEncrypted) && !IsLikelyEncrypted(RadarrApiKeyEncrypted))
+        {
+            // Appears to be plaintext - encrypt it
+            string plaintext = RadarrApiKeyEncrypted;
+            RadarrApiKeyEncrypted = EncryptionHelper.Encrypt(plaintext, encryptionKey);
+        }
+    }
+
+    /// <summary>
+    /// Checks if a string appears to be encrypted (base64 encoded with appropriate length).
+    /// </summary>
+    /// <param name="value">The value to check.</param>
+    /// <returns>True if the value appears to be encrypted, false otherwise.</returns>
+    private static bool IsLikelyEncrypted(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return false;
+        }
+
+        // API keys are typically 32-64 hexadecimal characters
+        // If it's exactly 32 chars and all hex, it's likely a plaintext API key
+        if (value.Length == 32 && IsHexString(value))
+        {
+            return false; // Looks like a typical API key
+        }
+
+        // Encrypted values should be base64 strings with reasonable length
+        // Encrypted they'd be much longer than the original
+        if (value.Length < 64)
+        {
+            return false; // Too short to be encrypted
+        }
+
+        // Check if it looks like base64
+        try
+        {
+            byte[] data = Convert.FromBase64String(value);
+            return data.Length > 32; // Encrypted data should be longer than original API key
+        }
+        catch
+        {
+            return false; // Not valid base64, likely plaintext
+        }
+    }
+
+    /// <summary>
+    /// Checks if a string contains only hexadecimal characters.
+    /// </summary>
+    /// <param name="value">The value to check.</param>
+    /// <returns>True if the value is a hexadecimal string, false otherwise.</returns>
+    private static bool IsHexString(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return false;
+        }
+
+        foreach (char c in value)
+        {
+            if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

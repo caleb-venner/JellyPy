@@ -19,6 +19,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [1.1.0] - 2025-10-14
+
+### Added
+
+- Test Connection buttons for Sonarr and Radarr configuration
+- Real-time connection validation with server version detection
+- Automatic API key encryption using AES-256-CBC with Jellyfin server-specific keys
+
+### Security
+
+- API keys are now automatically encrypted using Jellyfin server identification
+- Server-bound encryption keys survive OS updates, machine renames, and user changes
+- Encryption keys unique per Jellyfin installation using Plugin GUID + Server ID + Static Salt
+- Backward compatibility with existing plaintext API keys (auto-migrated on first save)
+- Secure decryption for web interface display without exposing plaintext in storage
+
+### Fixed
+
+- Test Connection functionality works correctly after saving encrypted settings
+- Password fields display proper masked values instead of base64 encrypted strings
+
 ## [1.0.0] - 2025-10-07
 
 ### Initial Release

@@ -31,6 +31,14 @@ A Jellyfin plugin that automatically updates your Sonarr and Radarr monitoring b
 - Custom environment variables and data attributes
 - Conditional execution based on media properties
 
+### Security & Configuration
+
+- **Encrypted API Keys**: Automatic AES-256 encryption for Sonarr/Radarr API keys
+- **Test Connections**: Built-in connection testing for API endpoints  
+- **Server-Bound Encryption**: API keys encrypted with Jellyfin server-specific keys
+- **System-Independent**: Encryption survives OS updates, machine renames, and user changes
+- **Auto Migration**: Existing plaintext keys automatically encrypted on first save
+
 ## Requirements
 
 - **Jellyfin**: 10.10.0 or higher
@@ -67,8 +75,9 @@ A Jellyfin plugin that automatically updates your Sonarr and Radarr monitoring b
    Sonarr URL: http://localhost:8989
    Sonarr API Key: [Your API Key from Sonarr → Settings → General → Security]
    ```
+3. Click **Test Sonarr Connection** to verify your settings
 
-3. **Configuration Options:**
+4. **Configuration Options:**
 
    | Setting | Default | Description |
    |---------|---------|-------------|
@@ -89,8 +98,9 @@ A Jellyfin plugin that automatically updates your Sonarr and Radarr monitoring b
    Radarr URL: http://localhost:7878
    Radarr API Key: [Your API Key from Radarr → Settings → General → Security]
    ```
+3. Click **Test Radarr Connection** to verify your settings
 
-3. **Configuration Options:**
+4. **Configuration Options:**
 
    | Setting | Default | Description |
    |---------|---------|-------------|
