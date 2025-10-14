@@ -14,6 +14,14 @@
                 "sourceUrl": "https://github.com/caleb-venner/jellypy/releases/download/v1.0.0/jellypy_1.0.0.0.zip",
                 "checksum": "1b7c19fe9fcfd63f8b1290fc84a76cbc",
                 "timestamp": "2025-10-07T12:33:48Z"
+            },
+            {
+                "version": "1.1.1.0",
+                "changelog": "### Version 1.1.1\n\n**Patch Release - Optimized Package Size**\n\n- **Reduced download size** from ~8MB to ~300KB\n- **Removed unnecessary dependencies** - only includes plugin-specific files\n- **Server-based API key encryption** using Jellyfin SystemId for enhanced security\n- **Test connection functionality** for Sonarr and Radarr with real-time validation\n- **System-independent encryption** that survives OS updates and machine changes\n- **Clean implementation** with legacy fallback code removed\n\n**Security Improvements:**\n- AES-256-CBC encryption with PBKDF2 key derivation (10,000 iterations)\n- Three-component key generation: Plugin GUID + Server ID + Static Salt\n- Automatic encryption of API keys on save\n- Enhanced documentation with comprehensive security guidance\n\n**Note:** This patch release provides the same security features as v1.1.0 with an optimized, minimal package size.",
+                "targetAbi": "10.9.0.0",
+                "sourceUrl": "https://github.com/caleb-venner/jellypy/releases/download/v1.1.1/jellypy_1.1.1.0.zip",
+                "checksum": "316d4341fb3b389e7baf0de7abbcfdb8",
+                "timestamp": "2025-10-14T18:35:00Z"
             }
         ]
     }
