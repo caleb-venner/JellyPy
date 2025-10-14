@@ -82,28 +82,34 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
 
         var globalSettings = config.GlobalSettings ?? new GlobalScriptSettings();
         var semaphore = new SemaphoreSlim(globalSettings.MaxConcurrentExecutions, globalSettings.MaxConcurrentExecutions);
-
-        var tasks = applicableSettings.Select(async setting =>
+        try
         {
-            await semaphore.WaitAsync().ConfigureAwait(false);
-            try
+            var tasks = applicableSettings.Select(async setting =>
             {
-                if (_conditionEvaluator.EvaluateConditions(setting.Conditions, eventData))
+                await semaphore.WaitAsync().ConfigureAwait(false);
+                try
                 {
-                    await ExecuteScriptSettingAsync(setting, eventData, globalSettings).ConfigureAwait(false);
+                    if (_conditionEvaluator.EvaluateConditions(setting.Conditions, eventData))
+                    {
+                        await ExecuteScriptSettingAsync(setting, eventData, globalSettings).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        _logger.LogDebug("Conditions not met for script setting {SettingId}", setting.Id);
+                    }
                 }
-                else
+                finally
                 {
-                    _logger.LogDebug("Conditions not met for script setting {SettingId}", setting.Id);
+                    semaphore.Release();
                 }
-            }
-            finally
-            {
-                semaphore.Release();
-            }
-        });
+            });
 
-        await Task.WhenAll(tasks).ConfigureAwait(false);
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+        }
+        finally
+        {
+            semaphore.Dispose();
+        }
     }
 
     private async Task ExecuteScriptSettingAsync(ScriptSetting setting, EventData eventData, GlobalScriptSettings globalSettings)

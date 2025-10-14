@@ -12,10 +12,10 @@ namespace Jellyfin.Plugin.Jellypy.Configuration;
 public static class EncryptionHelper
 {
     private static readonly byte[] _salt =
-    {
+    [
         0x49, 0x76, 0x61, 0x6e, 0x20, 0x4d,
         0x65, 0x64, 0x76, 0x65, 0x64, 0x65, 0x76
-    };
+    ];
 
     private static IServerApplicationHost? _applicationHost;
 

@@ -231,8 +231,7 @@ public class JellyPyApiController : ControllerBase
     {
         try
         {
-            var config = Plugin.Instance?.Configuration as PluginConfiguration;
-            if (config == null)
+            if (Plugin.Instance?.Configuration is not PluginConfiguration config)
             {
                 return Ok(new ApiKeysResponse());
             }
