@@ -1,3 +1,7 @@
 *.cs text eol=lf
 *.py text eol=lf
 *.md text
+
+# Always keep the destination branch version of manifest-beta.json during merge
+# This prevents beta's manifest-beta.json from being merged into main
+manifest-beta.json merge=ours
