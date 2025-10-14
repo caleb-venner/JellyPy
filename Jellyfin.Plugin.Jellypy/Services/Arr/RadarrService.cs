@@ -153,7 +153,7 @@ public class RadarrService : IRadarrService
         var client = _httpClientFactory.CreateClient();
         client.BaseAddress = new Uri(config.RadarrUrl.TrimEnd('/'));
         client.DefaultRequestHeaders.Add("X-Api-Key", config.RadarrApiKey);
-        client.DefaultRequestHeaders.Add("Content-Type", "application/json");
+        // Content-Type is set automatically by HttpClient for JSON content
         return client;
     }
 }
