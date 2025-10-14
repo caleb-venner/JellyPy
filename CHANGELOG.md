@@ -2,8 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
@@ -59,8 +58,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - API keys are now automatically encrypted using Jellyfin server identification
 - Server-bound encryption keys survive OS updates, machine renames, and user changes
-- Encryption keys unique per Jellyfin installation using Plugin GUID + Server ID + Static Salt
-- Backward compatibility with existing plaintext API keys (auto-migrated on first save)
+- Encryption keys unique per Jellyfin installation using Plugin GUID + Server
+ID + Static Salt
+- Backward compatibility with existing plaintext API keys
+(auto-migrated on first save)
 - Secure decryption for web interface display without exposing plaintext in storage
 
 ### Fixed
@@ -104,5 +105,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [Unreleased]: https://github.com/caleb-venner/jellypy/compare/v1.1.2.0...HEAD
 [1.1.2.0]: https://github.com/caleb-venner/jellypy/compare/v1.1.0...v1.1.2.0
-[1.1.0]: https://github.com/caleb-venner/jellypy/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/caleb-venner/jellypy/releases/tag/v1.0.0
