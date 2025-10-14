@@ -6,7 +6,7 @@ namespace Jellyfin.Plugin.Jellypy.Tests;
 /// <summary>
 /// Tests for automatic API key encryption in configuration properties.
 /// </summary>
-public class AutoEncryptionTests
+public class AutoEncryptionTests : TestFixtureBase
 {
     /// <summary>
     /// Test that setting a plaintext API key automatically encrypts it.
@@ -55,16 +55,23 @@ public class AutoEncryptionTests
     {
         // Arrange
         var config = new PluginConfiguration();
-        const string plaintextKey = "test-key-12345";
+        // Use a longer plaintext to ensure the encrypted value is long enough to be detected
+        const string plaintextKey = "test-api-key-that-is-long-enough-to-produce-encrypted-value";
         
         // First encrypt manually
         string machineKey = EncryptionHelper.GenerateMachineKey();
         string encryptedKey = EncryptionHelper.Encrypt(plaintextKey, machineKey);
 
+        // Verify the encrypted key is detected as encrypted
+        Assert.True(encryptedKey.Length >= 64, "Encrypted value should be at least 64 characters");
+
         // Act - Set the already encrypted value
         config.RadarrApiKeyEncrypted = encryptedKey;
 
-        // Assert - Should not change the encrypted value
+        // Assert - Should not change the encrypted value (no double encryption)
         Assert.Equal(encryptedKey, config.RadarrApiKeyEncrypted);
+        
+        // Verify we can still decrypt it correctly
+        Assert.Equal(plaintextKey, config.RadarrApiKey);
     }
 }

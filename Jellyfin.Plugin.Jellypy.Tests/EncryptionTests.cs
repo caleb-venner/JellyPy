@@ -6,7 +6,7 @@ namespace Jellyfin.Plugin.Jellypy.Tests;
 /// <summary>
 /// Tests for API key encryption functionality.
 /// </summary>
-public class EncryptionTests
+public class EncryptionTests : TestFixtureBase
 {
     /// <summary>
     /// Test basic encryption and decryption functionality.

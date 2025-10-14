@@ -803,13 +803,21 @@
                 }
             }
 
-            // Connection Test Functions
-            async function testSonarrConnection() {
-                const button = document.getElementById('testSonarrConnection');
-                const textElement = document.getElementById('testSonarrText');
-                const resultElement = document.getElementById('sonarrTestResult');
-                const urlElement = document.getElementById('SonarrUrl');
-                const apiKeyElement = document.getElementById('SonarrApiKey');
+            // Connection Test Function
+            async function testConnection(type) {
+                const isSonarr = type === 'sonarr';
+                const buttonId = isSonarr ? 'testSonarrConnection' : 'testRadarrConnection';
+                const textId = isSonarr ? 'testSonarrText' : 'testRadarrText';
+                const resultId = isSonarr ? 'sonarrTestResult' : 'radarrTestResult';
+                const urlId = isSonarr ? 'SonarrUrl' : 'RadarrUrl';
+                const apiKeyId = isSonarr ? 'SonarrApiKey' : 'RadarrApiKey';
+                const endpoint = isSonarr ? '/Plugins/Jellypy/test-sonarr' : '/Plugins/Jellypy/test-radarr';
+
+                const button = document.getElementById(buttonId);
+                const textElement = document.getElementById(textId);
+                const resultElement = document.getElementById(resultId);
+                const urlElement = document.getElementById(urlId);
+                const apiKeyElement = document.getElementById(apiKeyId);
 
                 const url = urlElement.value.trim();
                 const apiKey = apiKeyElement.value.trim();
@@ -827,7 +835,7 @@
                 try {
                     const response = await ApiClient.ajax({
                         type: 'POST',
-                        url: ApiClient.getUrl('/Plugins/Jellypy/test-sonarr'),
+                        url: ApiClient.getUrl(endpoint),
                         data: JSON.stringify({ Url: url, ApiKey: apiKey }),
                         contentType: 'application/json'
                     });
@@ -839,57 +847,22 @@
 
                     showTestResult(resultElement, result.Success, result.Message);
                 } catch (error) {
-                    console.error('Sonarr test error:', error);
+                    console.error(type + ' test error:', error);
                     showTestResult(resultElement, false, `Test failed: ${error.message || 'Unknown error'}`);
                 } finally {
                     // Re-enable button
                     button.disabled = false;
-                    textElement.textContent = 'Test Sonarr Connection';
+                    textElement.textContent = 'Test ' + (isSonarr ? 'Sonarr' : 'Radarr') + ' Connection';
                 }
             }
 
+            // Connection Test Functions
+            async function testSonarrConnection() {
+                await testConnection('sonarr');
+            }
+
             async function testRadarrConnection() {
-                const button = document.getElementById('testRadarrConnection');
-                const textElement = document.getElementById('testRadarrText');
-                const resultElement = document.getElementById('radarrTestResult');
-                const urlElement = document.getElementById('RadarrUrl');
-                const apiKeyElement = document.getElementById('RadarrApiKey');
-
-                const url = urlElement.value.trim();
-                const apiKey = apiKeyElement.value.trim();
-
-                if (!url || !apiKey) {
-                    showTestResult(resultElement, false, 'Please enter both URL and API Key');
-                    return;
-                }
-
-                // Disable button and show loading
-                button.disabled = true;
-                textElement.textContent = 'Testing...';
-                resultElement.style.display = 'none';
-
-                try {
-                    const response = await ApiClient.ajax({
-                        type: 'POST',
-                        url: ApiClient.getUrl('/Plugins/Jellypy/test-radarr'),
-                        data: JSON.stringify({ Url: url, ApiKey: apiKey }),
-                        contentType: 'application/json'
-                    });
-
-                    let result = response;
-                    if (response instanceof Response) {
-                        result = await response.json();
-                    }
-
-                    showTestResult(resultElement, result.Success, result.Message);
-                } catch (error) {
-                    console.error('Radarr test error:', error);
-                    showTestResult(resultElement, false, `Test failed: ${error.message || 'Unknown error'}`);
-                } finally {
-                    // Re-enable button
-                    button.disabled = false;
-                    textElement.textContent = 'Test Radarr Connection';
-                }
+                await testConnection('radarr');
             }
 
             function showTestResult(element, success, message) {
