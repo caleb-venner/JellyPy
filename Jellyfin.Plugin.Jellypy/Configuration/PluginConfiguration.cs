@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using MediaBrowser.Model.Plugins;
 
 namespace Jellyfin.Plugin.Jellypy.Configuration;
@@ -412,14 +413,6 @@ public class PluginConfiguration : BasePluginConfiguration
             return false;
         }
 
-        foreach (char c in value)
-        {
-            if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')))
-            {
-                return false;
-            }
-        }
-
-        return true;
+        return value.All(c => (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'));
     }
 }

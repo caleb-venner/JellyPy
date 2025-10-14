@@ -42,30 +42,27 @@ public class JellyPyApiController : ControllerBase
             {
                 "/config/data/plugins/Jellypy/scripts",  // Docker/Unraid path
                 "/jellypy/scripts",                       // Your preferred path
-                Path.Combine(Environment.CurrentDirectory, "scripts"),
-                Path.Combine(AppContext.BaseDirectory, "scripts")
+                Path.Join(Environment.CurrentDirectory, "scripts"),
+                Path.Join(AppContext.BaseDirectory, "scripts")
             };
 
             var scripts = new List<ScriptFile>();
 
-            foreach (var directory in scriptDirectories)
+            foreach (var directory in scriptDirectories.Where(Directory.Exists))
             {
-                if (Directory.Exists(directory))
-                {
-                    _logger.LogDebug("Scanning directory for scripts: {Directory}", directory);
+                _logger.LogDebug("Scanning directory for scripts: {Directory}", directory);
 
-                    var scriptFiles = Directory.GetFiles(directory, "*.py", SearchOption.AllDirectories)
-                        .Select(file => new ScriptFile
-                        {
-                            Name = Path.GetFileName(file),
-                            Path = file,
-                            RelativePath = Path.GetRelativePath(directory, file),
-                            Directory = directory
-                        })
-                        .OrderBy(s => s.Name);
+                var scriptFiles = Directory.GetFiles(directory, "*.py", SearchOption.AllDirectories)
+                    .Select(file => new ScriptFile
+                    {
+                        Name = Path.GetFileName(file),
+                        Path = file,
+                        RelativePath = Path.GetRelativePath(directory, file),
+                        Directory = directory
+                    })
+                    .OrderBy(s => s.Name);
 
-                    scripts.AddRange(scriptFiles);
-                }
+                scripts.AddRange(scriptFiles);
             }
 
             // Remove duplicates based on file name (prefer shorter paths)

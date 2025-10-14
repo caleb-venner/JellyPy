@@ -41,15 +41,7 @@ public class ConditionEvaluator
             return true; // No conditions means always execute
         }
 
-        foreach (var condition in conditionsList)
-        {
-            if (!EvaluateCondition(condition, eventData))
-            {
-                return false; // All conditions must be true
-            }
-        }
-
-        return true;
+        return conditionsList.All(condition => EvaluateCondition(condition, eventData));
     }
 
     /// <summary>

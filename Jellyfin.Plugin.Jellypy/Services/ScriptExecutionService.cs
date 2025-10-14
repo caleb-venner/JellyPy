@@ -81,35 +81,29 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         }
 
         var globalSettings = config.GlobalSettings ?? new GlobalScriptSettings();
-        var semaphore = new SemaphoreSlim(globalSettings.MaxConcurrentExecutions, globalSettings.MaxConcurrentExecutions);
-        try
-        {
-            var tasks = applicableSettings.Select(async setting =>
-            {
-                await semaphore.WaitAsync().ConfigureAwait(false);
-                try
-                {
-                    if (_conditionEvaluator.EvaluateConditions(setting.Conditions, eventData))
-                    {
-                        await ExecuteScriptSettingAsync(setting, eventData, globalSettings).ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        _logger.LogDebug("Conditions not met for script setting {SettingId}", setting.Id);
-                    }
-                }
-                finally
-                {
-                    semaphore.Release();
-                }
-            });
+        using var semaphore = new SemaphoreSlim(globalSettings.MaxConcurrentExecutions, globalSettings.MaxConcurrentExecutions);
 
-            await Task.WhenAll(tasks).ConfigureAwait(false);
-        }
-        finally
+        var tasks = applicableSettings.Select(async setting =>
         {
-            semaphore.Dispose();
-        }
+            await semaphore.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                if (_conditionEvaluator.EvaluateConditions(setting.Conditions, eventData))
+                {
+                    await ExecuteScriptSettingAsync(setting, eventData, globalSettings).ConfigureAwait(false);
+                }
+                else
+                {
+                    _logger.LogDebug("Conditions not met for script setting {SettingId}", setting.Id);
+                }
+            }
+            finally
+            {
+                semaphore.Release();
+            }
+        });
+
+        await Task.WhenAll(tasks).ConfigureAwait(false);
     }
 
     private async Task ExecuteScriptSettingAsync(ScriptSetting setting, EventData eventData, GlobalScriptSettings globalSettings)
@@ -211,8 +205,8 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         var candidates = new[]
         {
             // 1. Bundled Python in plugin directory (future enhancement)
-            Path.Combine(pluginDirectory, "runtime", "bin", "python3"),
-            Path.Combine(pluginDirectory, "runtime", "bin", "python"),
+            Path.Join(pluginDirectory, "runtime", "bin", "python3"),
+            Path.Join(pluginDirectory, "runtime", "bin", "python"),
 
             // 2. Common Docker container locations
             "/usr/bin/python3",
@@ -231,13 +225,11 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
             "python"
         };
 
-        foreach (var candidate in candidates)
+        var pythonPath = candidates.FirstOrDefault(IsPythonExecutable);
+        if (pythonPath != null)
         {
-            if (IsPythonExecutable(candidate))
-            {
-                _logger.LogInformation("Found Python executable: {Path}", candidate);
-                return candidate;
-            }
+            _logger.LogInformation("Found Python executable: {Path}", pythonPath);
+            return pythonPath;
         }
 
         // Log detailed diagnostic info for troubleshooting
@@ -256,13 +248,11 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
     {
         var candidates = new[] { "pwsh", "powershell", "/usr/bin/pwsh", "/usr/local/bin/pwsh" };
 
-        foreach (var candidate in candidates)
+        var pwshPath = candidates.FirstOrDefault(IsExecutableAvailable);
+        if (pwshPath != null)
         {
-            if (IsExecutableAvailable(candidate))
-            {
-                _logger.LogInformation("Found PowerShell executable: {Path}", candidate);
-                return candidate;
-            }
+            _logger.LogInformation("Found PowerShell executable: {Path}", pwshPath);
+            return pwshPath;
         }
 
         _logger.LogWarning("No PowerShell executable found. Using fallback: pwsh");
@@ -276,13 +266,11 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
     {
         var candidates = new[] { "/bin/bash", "/usr/bin/bash", "bash", "/bin/sh", "sh" };
 
-        foreach (var candidate in candidates)
+        var bashPath = candidates.FirstOrDefault(IsExecutableAvailable);
+        if (bashPath != null)
         {
-            if (IsExecutableAvailable(candidate))
-            {
-                _logger.LogInformation("Found Bash executable: {Path}", candidate);
-                return candidate;
-            }
+            _logger.LogInformation("Found Bash executable: {Path}", bashPath);
+            return bashPath;
         }
 
         _logger.LogWarning("No Bash executable found. Using fallback: /bin/bash");
@@ -296,13 +284,11 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
     {
         var candidates = new[] { "node", "/usr/bin/node", "/usr/local/bin/node", "nodejs" };
 
-        foreach (var candidate in candidates)
+        var nodePath = candidates.FirstOrDefault(IsExecutableAvailable);
+        if (nodePath != null)
         {
-            if (IsExecutableAvailable(candidate))
-            {
-                _logger.LogInformation("Found Node.js executable: {Path}", candidate);
-                return candidate;
-            }
+            _logger.LogInformation("Found Node.js executable: {Path}", nodePath);
+            return nodePath;
         }
 
         _logger.LogWarning("No Node.js executable found. Using fallback: node");
