@@ -32,17 +32,22 @@ owner: "caleb-venner"
 artifacts:
 - "Jellyfin.Plugin.Jellypy.dll"
 changelog: >
-  ### Version 1.0.0
+  ### Version 1.1.1
 
-  Initial Release
+  **Patch Release - Optimized Package Size**
 
-  Features:
-  - Native Sonarr integration with automatic episode monitoring
-  - Native Radarr integration with smart movie unmonitoring
-  - Configurable watch percentage detection
-  - Quality cutoff checking for upgrade-eligible content
-  - Season-based monitoring control
-  - Dynamic episode buffer management
-  - Custom script execution support (legacy feature)
-  - Comprehensive configuration UI
+  - **Reduced download size** from ~8MB to ~300KB
+  - **Removed unnecessary dependencies** - only includes plugin-specific files
+  - **Server-based API key encryption** using Jellyfin SystemId for enhanced security
+  - **Test connection functionality** for Sonarr and Radarr with real-time validation
+  - **System-independent encryption** that survives OS updates and machine changes
+  - **Clean implementation** with legacy fallback code removed
+
+  **Security Improvements:**
+  - AES-256-CBC encryption with PBKDF2 key derivation (10,000 iterations)
+  - Three-component key generation: Plugin GUID + Server ID + Static Salt
+  - Automatic encryption of API keys on save
+  - Enhanced documentation with comprehensive security guidance
+
+  **Note:** This patch release provides the same security features as v1.1.0 with an optimized, minimal package size.
 
