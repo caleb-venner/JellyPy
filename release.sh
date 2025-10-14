@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Jellypy Plugin Release Script
-# This script automates the release process for new versions
+# Jellypy Plugin Release Script - STABLE RELEASES ONLY
+# This script automates the release process for stable versions (x.x.x.0)
+# For beta releases, use release-beta.sh
 
 set -e  # Exit on any error
 
@@ -195,16 +196,7 @@ calculate_checksum() {
 update_manifest_checksum() {
     local version=$1
     local checksum=$2
-    local manifest_file=""
-    
-    # Determine which manifest to update based on current branch
-    local current_branch=$(git branch --show-current)
-    
-    if [ "$current_branch" = "beta" ]; then
-        manifest_file="manifest-beta.json"
-    else
-        manifest_file="manifest.json"
-    fi
+    local manifest_file="manifest.json"
     
     if [ ! -f "$manifest_file" ]; then
         print_error "Manifest file $manifest_file not found"
@@ -262,29 +254,23 @@ except Exception as e:
 show_release_summary() {
     local version=$1
     local checksum=$2
-    local current_branch=$(git branch --show-current)
     
     echo ""
     echo "=========================================="
-    print_success "RELEASE SUMMARY"
+    print_success "STABLE RELEASE SUMMARY"
     echo "=========================================="
     echo "Version: $version"
-    echo "Branch: $current_branch"
+    echo "Type: STABLE"
     echo "File: releases/jellypy_$version.zip"
     echo "Checksum: $checksum"
-    if [ "$current_branch" = "beta" ]; then
-        echo "Download URL: https://raw.githubusercontent.com/caleb-venner/jellypy/beta/releases/jellypy_$version.zip"
-        echo "Repository URL: https://caleb-venner.github.io/jellypy/manifest-beta.json"
-    else
-        echo "Download URL: https://raw.githubusercontent.com/caleb-venner/jellypy/main/releases/jellypy_$version.zip"
-        echo "Repository URL: https://caleb-venner.github.io/jellypy/manifest.json"
-    fi
+    echo "Download URL: https://raw.githubusercontent.com/caleb-venner/jellypy/main/releases/jellypy_$version.zip"
+    echo "Repository URL: https://caleb-venner.github.io/jellypy/manifest.json"
     
     echo ""
     echo "Next steps:"
     echo "1. Review the changes with 'git diff'"
-    echo "2. Commit the changes: git add . && git commit -m 'Release $version'"
-    echo "3. Push to GitHub: git push origin $current_branch"
+    echo "2. Commit the changes: git add . && git commit -m 'Release v$version (stable)'"
+    echo "3. Push to GitHub: git push origin main"
     echo "4. Plugin will be available immediately via repository URL"
     echo "5. No GitHub release creation needed - files served from /releases directory"
     echo "=========================================="
@@ -292,13 +278,25 @@ show_release_summary() {
 
 # Main function
 main() {
-    print_status "Starting Jellypy release process..."
+    print_status "Starting Jellypy STABLE release process..."
     
     # Check if we're in the right directory
     if [ ! -f "build.yaml" ]; then
         print_error "build.yaml not found. Please run this script from the project root directory."
         exit 1
     fi
+    
+    # Remind user to update changelog
+    echo ""
+    print_warning "⚠️  REMINDER: Have you updated CHANGELOG.md for this release?"
+    echo -n "Continue with release? [y/N]: "
+    read -r continue_release
+    
+    if [[ ! $continue_release =~ ^[Yy]$ ]]; then
+        print_status "Release cancelled. Please update CHANGELOG.md and try again."
+        exit 0
+    fi
+    echo ""
     
     # Get version argument or current version
     local version=""
@@ -339,7 +337,14 @@ main() {
         exit 1
     fi
     
-    print_status "Creating release for version $version"
+    # Validate this is a stable version (must end in .0)
+    if [[ ! $version =~ \.0$ ]]; then
+        print_error "This script is for stable releases only (must end in .0, e.g., 1.1.2.0)"
+        print_error "For beta releases (x.x.x.1-999), use release-beta.sh instead"
+        exit 1
+    fi
+    
+    print_status "Creating STABLE release for version $version"
     
     # Execute release steps
     build_plugin

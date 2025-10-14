@@ -19,7 +19,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
-## [1.1.0] - 2025-10-14
+## [1.1.2.0] - 2025-10-14
+
+### Added
+
+- Dual-manifest release system for stable and beta channels
+- Automated release scripts (`release.sh` for stable, `release-beta.sh` for beta)
+- Beta channel manifest (`manifest-beta.json`) for pre-release testing
+- Version-based channel distinction (x.x.x.0 for stable, x.x.x.y for beta)
+- Test suite initialization with proper EncryptionHelper setup
+- TestFixtureBase class for consistent test configuration
+
+### Changed
+
+- Simplified to single-branch workflow (main branch only)
+- Release process now validates version format based on channel
+- Test suite now properly initializes encryption helper with mocked dependencies
+
+### Removed
+
+- Beta branch (replaced with beta manifest on main branch)
+- Redundant test files (ConfigMigrationTest.cs, XmlSerializationTest.cs)
+- Outdated build-release.sh script
+
+### Fixed
+
+- All unit tests now pass (9/9) after EncryptionHelper initialization fix
+- Test suite properly synchronized with current codebase
+
+## [1.1.1.0] - 2025-10-14
 
 ### Added
 
@@ -40,7 +68,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Test Connection functionality works correctly after saving encrypted settings
 - Password fields display proper masked values instead of base64 encrypted strings
 
-## [1.0.0] - 2025-10-07
+## [1.0.0.0] - 2025-10-07
 
 ### Initial Release
 
@@ -74,5 +102,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Flexible conditional execution based on media properties
   - Custom environment variables and data attributes
 
-[Unreleased]: https://github.com/caleb-venner/jellypy/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/caleb-venner/jellypy/compare/v1.1.2.0...HEAD
+[1.1.2.0]: https://github.com/caleb-venner/jellypy/compare/v1.1.0...v1.1.2.0
+[1.1.0]: https://github.com/caleb-venner/jellypy/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/caleb-venner/jellypy/releases/tag/v1.0.0

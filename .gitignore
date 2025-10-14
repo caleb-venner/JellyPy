@@ -85,3 +85,5 @@ jellypy.code-workspace
 jellyfin.ruleset
 Makefile
 Directory.Build.props
+release-beta.sh
+release.sh
