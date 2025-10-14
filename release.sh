@@ -156,6 +156,7 @@ calculate_checksum() {
     print_status "Calculating MD5 checksum..."
     
     # Calculate MD5 checksum
+    local checksum=""
     if command -v md5sum >/dev/null 2>&1; then
         checksum=$(md5sum "$zip_file" | cut -d' ' -f1)
     elif command -v md5 >/dev/null 2>&1; then
@@ -319,7 +320,7 @@ main() {
     build_plugin
     create_release_zip "$version"
     verify_release "$version"
-    checksum=$(calculate_checksum "$version")
+    local checksum=$(calculate_checksum "$version")
     update_manifest_checksum "$version" "$checksum"
     
     # Show summary
