@@ -42,12 +42,20 @@ jobs:
       - name: Build Release
         run: dotnet build Jellyfin.Plugin.Jellypy.sln --configuration Release --no-restore
 
-      - name: Publish plugin
-        run: dotnet publish Jellyfin.Plugin.Jellypy/Jellyfin.Plugin.Jellypy.csproj --configuration Release --no-build --output ./publish
+      - name: Create plugin directory
+        run: mkdir -p ./plugin-release
+
+      - name: Copy plugin files
+        run: |
+          # Copy only the plugin-specific files, not all Jellyfin framework dependencies
+          cp Jellyfin.Plugin.Jellypy/bin/Release/net8.0/Jellyfin.Plugin.Jellypy.dll ./plugin-release/
+          cp Jellyfin.Plugin.Jellypy/bin/Release/net8.0/Jellyfin.Plugin.Jellypy.deps.json ./plugin-release/
+          cp Jellyfin.Plugin.Jellypy/bin/Release/net8.0/Jellyfin.Plugin.Jellypy.pdb ./plugin-release/
+          cp Jellyfin.Plugin.Jellypy/bin/Release/net8.0/Jellyfin.Plugin.Jellypy.xml ./plugin-release/
 
       - name: Create plugin archive
         run: |
-          cd publish
+          cd plugin-release
           zip -r ../jellypy-${{ steps.version.outputs.VERSION }}.zip .
           cd ..
 
