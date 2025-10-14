@@ -1,0 +1,20 @@
+[
+    {
+        "guid": "a5bd541f-38dc-467e-9a9a-15fe3f3bcf5c",
+        "name": "Jellypy (Beta)",
+        "description": "Jellypy automatically manages your Sonarr and Radarr monitoring based on what you watch in Jellyfin.\n\n⚠️ **BETA VERSION** - This is a testing channel with unstable releases. Use at your own risk.\n\nNative Sonarr Integration:\n• Automatically monitors next N episodes after watching\n• Smart episode buffer management with configurable minimum unwatched queue\n• Season-by-season monitoring control\n• Unmonitor watched episodes to reduce clutter\n• Automatic search triggering for newly monitored content\n\nNative Radarr Integration:\n• Automatically unmonitor movies after watching\n• Percentage-based watch detection (configurable threshold)\n• Quality cutoff checking to prevent premature unmonitoring\n• Keep movies monitored if upgrades are still possible\n\nLegacy Features:\n• Execute custom Python scripts on Jellyfin events (PlaybackStart, PlaybackStop, etc.)\n• Flexible conditional execution based on media properties\n• Custom environment variables and data attributes\n\nPerfect for maintaining an organized, automated download workflow without manual intervention.",
+        "overview": "Automatically manage Sonarr & Radarr monitoring based on your Jellyfin watch activity. (Beta Channel)",
+        "owner": "caleb-venner",
+        "category": "Notifications",
+        "versions": [
+            {
+                "version": "1.1.2-beta.1",
+                "changelog": "**Version 1.1.2-beta.1 - Radarr HTTP Client Fix**\n\n**Bug Fixes:**\n• Fixed Radarr HTTP client Content-Type header issue\n• Resolved 'Misused header name' exception when calling Radarr API\n• HttpClient now properly handles JSON content headers automatically\n\n**Note:** This beta version includes the fix for the Radarr integration bug that was causing API communication failures.",
+                "targetAbi": "10.9.0.0",
+                "sourceUrl": "https://github.com/caleb-venner/jellypy/releases/download/v1.1.2-beta.1/jellypy_1.1.2-beta.1.zip",
+                "checksum": "placeholder-checksum",
+                "timestamp": "2025-10-14T12:40:00Z"
+            }
+        ]
+    }
+]

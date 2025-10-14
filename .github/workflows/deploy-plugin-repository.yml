@@ -2,8 +2,8 @@ name: Deploy Plugin Repository
 
 on:
   push:
-    branches: [ main ]
-    paths: [ 'manifest.json' ]
+    branches: [ main, beta ]
+    paths: [ 'manifest.json', 'manifest-beta.json' ]
   workflow_dispatch:  # Allows manual triggering
 
 permissions:
@@ -31,14 +31,32 @@ jobs:
       - name: Create Pages Directory
         run: |
           mkdir -p _site
-          cp manifest.json _site/
-          echo "Manifest.json copied successfully"
+          
+          # Always copy stable manifest if it exists
+          if [ -f "manifest.json" ]; then
+            cp manifest.json _site/
+            echo "Stable manifest.json copied successfully"
+          fi
+          
+          # Copy beta manifest if it exists
+          if [ -f "manifest-beta.json" ]; then
+            cp manifest-beta.json _site/
+            echo "Beta manifest-beta.json copied successfully"
+          fi
+          
           ls -la _site/
 
-      - name: Validate manifest.json
+      - name: Validate manifests
         run: |
-          python3 -m json.tool _site/manifest.json > /dev/null
-          echo "Manifest.json is valid JSON"
+          if [ -f "_site/manifest.json" ]; then
+            python3 -m json.tool _site/manifest.json > /dev/null
+            echo "Stable manifest.json is valid JSON"
+          fi
+          
+          if [ -f "_site/manifest-beta.json" ]; then
+            python3 -m json.tool _site/manifest-beta.json > /dev/null
+            echo "Beta manifest-beta.json is valid JSON"
+          fi
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
