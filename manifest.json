@@ -8,6 +8,14 @@
         "category": "Notifications",
         "versions": [
             {
+                "version": "1.1.2.0",
+                "changelog": "**Version 1.1.2.0 - Radarr HTTP Client Fix**\n\n**Bug Fixes:**\n\u2022 Fixed Radarr HTTP client Content-Type header issue\n\u2022 Resolved 'Misused header name' exception when calling Radarr API\n\u2022 HttpClient now properly handles JSON content headers automatically\n\n**Note:** This version includes the fix for the Radarr integration bug that was causing API communication failures.",
+                "targetAbi": "10.9.0.0",
+                "sourceUrl": "https://raw.githubusercontent.com/caleb-venner/jellypy/main/releases/jellypy_1.1.2.0.zip",
+                "checksum": "9b719eb08ccfd5fd21c827b50802aef0",
+                "timestamp": "2025-10-14T12:40:00Z"
+            },
+            {
                 "version": "1.1.1.0",
                 "changelog": "**Version 1.1.1 - Optimized Package Size**\n\n**Key Improvements:**\n• Reduced download size from ~8MB to ~300KB\n• Removed unnecessary dependencies - only includes plugin-specific files\n• Server-based API key encryption using Jellyfin SystemId\n• Test connection functionality for Sonarr and Radarr\n• System-independent encryption that survives OS updates\n\n**Security Enhancements:**\n• AES-256-CBC encryption with PBKDF2 key derivation (10,000 iterations)\n• Three-component key generation: Plugin GUID + Server ID + Static Salt\n• Automatic encryption of API keys on save\n• Enhanced security documentation\n\n**Note:** Provides the same security features as v1.1.0 with optimized package size.",
                 "targetAbi": "10.9.0.0",
