@@ -9,7 +9,7 @@
         "versions": [
             {
                 "version": "1.1.1.0",
-                "changelog": "**Version 1.1.1 - Optimized Package Size**\n\n🎯 **Key Improvements:**\n• Reduced download size from ~8MB to ~300KB\n• Removed unnecessary dependencies - only includes plugin-specific files\n• Server-based API key encryption using Jellyfin SystemId\n• Test connection functionality for Sonarr and Radarr\n• System-independent encryption that survives OS updates\n\n🔒 **Security Enhancements:**\n• AES-256-CBC encryption with PBKDF2 key derivation (10,000 iterations)\n• Three-component key generation: Plugin GUID + Server ID + Static Salt\n• Automatic encryption of API keys on save\n• Enhanced security documentation\n\n📝 **Note:** Provides the same security features as v1.1.0 with optimized package size.",
+                "changelog": "**Version 1.1.1 - Optimized Package Size**\n\n**Key Improvements:**\n• Reduced download size from ~8MB to ~300KB\n• Removed unnecessary dependencies - only includes plugin-specific files\n• Server-based API key encryption using Jellyfin SystemId\n• Test connection functionality for Sonarr and Radarr\n• System-independent encryption that survives OS updates\n\n**Security Enhancements:**\n• AES-256-CBC encryption with PBKDF2 key derivation (10,000 iterations)\n• Three-component key generation: Plugin GUID + Server ID + Static Salt\n• Automatic encryption of API keys on save\n• Enhanced security documentation\n\n**Note:** Provides the same security features as v1.1.0 with optimized package size.",
                 "targetAbi": "10.9.0.0",
                 "sourceUrl": "https://github.com/caleb-venner/jellypy/releases/download/v1.1.1/jellypy_1.1.1.0.zip",
                 "checksum": "316d4341fb3b389e7baf0de7abbcfdb8",
@@ -17,7 +17,7 @@
             },
             {
                 "version": "1.0.0.0",
-                "changelog": "**Version 1.0.0 - Initial Release**\n\n🚀 **Core Features:**\n• Native Sonarr integration with automatic episode monitoring\n• Native Radarr integration with smart movie unmonitoring\n• Configurable watch percentage detection\n• Quality cutoff checking for upgrade-eligible content\n• Season-based monitoring control\n• Dynamic episode buffer management\n\n⚙️ **Additional Features:**\n• Custom script execution support (legacy feature)\n• Comprehensive configuration UI\n• Full Jellyfin integration",
+                "changelog": "**Version 1.0.0 - Initial Release**\n\n**Core Features:**\n• Native Sonarr integration with automatic episode monitoring\n• Native Radarr integration with smart movie unmonitoring\n• Configurable watch percentage detection\n• Quality cutoff checking for upgrade-eligible content\n• Season-based monitoring control\n• Dynamic episode buffer management\n\n**Additional Features:**\n• Custom script execution support (legacy feature)\n• Comprehensive configuration UI\n• Full Jellyfin integration",
                 "targetAbi": "10.9.0.0",
                 "sourceUrl": "https://github.com/caleb-venner/jellypy/releases/download/v1.0.0/jellypy_1.0.0.0.zip",
                 "checksum": "1b7c19fe9fcfd63f8b1290fc84a76cbc",
