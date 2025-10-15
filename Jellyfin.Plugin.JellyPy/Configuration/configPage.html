@@ -450,7 +450,7 @@
                                             </div>
                                             <div class="collapsible-content">
                                                 <div class="fieldDescription" style="margin-bottom: 15px;">
-                                                    Configure how event data is passed to your script.
+                                                    Configure how event data is passed to your script. Data can be passed as JSON, environment variables, command line arguments, or plain strings.
                                                 </div>
                                                 <div id="dataAttributesContainer"></div>
                                                 <button type="button" class="add-item-btn" onclick="addDataAttribute()">+ Add Data Attribute</button>
@@ -912,13 +912,6 @@
                         '<input id="additional-arguments" type="text" is="emby-input" ' +
                                'value="' + escapeHtml(execution.AdditionalArguments) + '" onchange="updateExecutionProperty(\'AdditionalArguments\', this.value)" />' +
                         '<div class="fieldDescription">Extra command line arguments (optional)</div>' +
-                    '</div>' +
-                    '<div style="margin-top: 20px;">' +
-                        '<h4>Environment Variables</h4>' +
-                        '<div id="envVarsContainer">' +
-                            renderEnvironmentVariables(execution.EnvironmentVariables) +
-                        '</div>' +
-                        '<button type="button" class="add-item-btn" onclick="addEnvironmentVariable()">+ Add Environment Variable</button>' +
                     '</div>';
                 return html;
             }

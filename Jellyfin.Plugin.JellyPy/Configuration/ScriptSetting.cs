@@ -114,11 +114,6 @@ public class ScriptExecution
     public string AdditionalArguments { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets the environment variables to set for the script.
-    /// </summary>
-    public Collection<EnvironmentVariable> EnvironmentVariables { get; } = new();
-
-    /// <summary>
     /// Gets or sets the timeout in seconds for script execution.
     /// </summary>
     public int TimeoutSeconds { get; set; } = 300;
@@ -245,22 +240,6 @@ public enum ScriptExecutorType
     /// Direct binary execution.
     /// </summary>
     Binary
-}
-
-/// <summary>
-/// Represents an environment variable for script execution.
-/// </summary>
-public class EnvironmentVariable
-{
-    /// <summary>
-    /// Gets or sets the name of the environment variable.
-    /// </summary>
-    public string Name { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the value of the environment variable.
-    /// </summary>
-    public string Value { get; set; } = string.Empty;
 }
 
 /// <summary>
