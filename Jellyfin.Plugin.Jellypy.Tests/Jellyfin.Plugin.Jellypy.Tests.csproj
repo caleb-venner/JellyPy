@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Jellyfin.Plugin.Jellypy\Jellyfin.Plugin.Jellypy.csproj" />
+    <ProjectReference Include="..\Jellyfin.Plugin.JellyPy\Jellyfin.Plugin.JellyPy.csproj" />
   </ItemGroup>
 
 </Project>

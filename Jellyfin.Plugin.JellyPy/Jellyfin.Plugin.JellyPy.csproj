@@ -30,12 +30,4 @@
     <None Remove="Configuration\configPage.html"/>
     <EmbeddedResource Include="Configuration\configPage.html"/>
   </ItemGroup>
-  <ItemGroup>
-    <None Update="icon.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="thumb.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
 </Project>
