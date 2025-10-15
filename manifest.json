@@ -9,6 +9,14 @@
         "category": "General",
         "versions": [
             {
+                "version": "2.0.0.0",
+                "changelog": "**Version 2.0.0 - Major UI Overhaul & Critical Fixes**\n\n**Critical Fixes:**\n• Fixed script settings not persisting to disk\n• Resolved XML serialization bug preventing script configuration saves\n• Added encryption key initialization in constructor\n\n**UI Enhancements:**\n• Complete visual redesign with inline styling architecture\n• Added rotating triangle icons for expandable sections\n• Implemented active state highlighting with blue glow effect\n• Enhanced button sizes for improved usability (36-44px)\n• Uniformly styled collapsible sections throughout\n• Redesigned event trigger checkboxes as visual cards\n• Modernized tab navigation with inline styles\n• Converted delete buttons to circular red buttons\n\n**Code Quality:**\n• Removed redundant CSS (reduced from 280 to 75 lines)\n• Improved maintainability with inline style approach\n• Better compatibility with Jellyfin's iframe restrictions\n\n**Note:** This is a major release due to the critical persistence bug fix and complete UI architecture overhaul.",
+                "targetAbi": "10.9.0.0",
+                "sourceUrl": "https://raw.githubusercontent.com/caleb-venner/jellypy/main/releases/jellypy_2.0.0.0.zip",
+                "checksum": "PLACEHOLDER",
+                "timestamp": "2025-10-15T00:00:00Z"
+            },
+            {
                 "version": "1.1.2.0",
                 "changelog": "**Version 1.1.2.0 - Radarr HTTP Client Fix**\n\n**Bug Fixes:**\n\u2022 Fixed Radarr HTTP client Content-Type header issue\n\u2022 Resolved 'Misused header name' exception when calling Radarr API\n\u2022 HttpClient now properly handles JSON content headers automatically\n\n**Note:** This version includes the fix for the Radarr integration bug that was causing API communication failures.",
                 "targetAbi": "10.9.0.0",
