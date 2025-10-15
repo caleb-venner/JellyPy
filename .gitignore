@@ -28,6 +28,7 @@ dist/
 .DS_Store
 Thumbs.db
 desktop.ini
+._*
 
 # Environment and secrets
 *.env
@@ -80,13 +81,5 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Project-specific configuration files
-jellypy.code-workspace
-jellyfin.ruleset
-Makefile
-Directory.Build.props
-release-beta.sh
-release.sh
-.markdownlint.json
-.markdownlintignore
-.editorconfig
+# Workspace-specific files (user preferences)
+*.code-workspace

@@ -48,6 +48,14 @@ and user changes
 - **Jellyfin**: 10.10.0 or higher
 - **Sonarr**: v3 API (optional)
 - **Radarr**: v3 API (optional)
+
+## Documentation
+
+- [Plugin Distribution Guide](docs/PLUGIN_DISTRIBUTION.md) - Information for
+  plugin distributors
+
+## Installation
+
 - **.NET**: 8.0 (bundled with Jellyfin)
 
 ## 🔧 Installation
