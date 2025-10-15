@@ -836,16 +836,16 @@
                     { value: 13, name: 'ServerShutdown', label: 'Server Shutdown' }
                 ];
                 
-                return eventTypes.map(eventType => {
+                var html = '';
+                eventTypes.forEach(function(eventType) {
                     var checked = triggers.includes(eventType.value) ? 'checked' : '';
-                    return `
-                        <div class="trigger-checkbox">
-                            <input type="checkbox" id="trigger-${eventType.value}" ${checked} 
-                                   onchange="updateTrigger(${eventType.value}, this.checked)" />
-                            <label for="trigger-${eventType.value}">${eventType.label}</label>
-                        </div>
-                    `;
-                }).join('');
+                    html += '<div class="trigger-checkbox">' +
+                            '<input type="checkbox" id="trigger-' + eventType.value + '" ' + checked + ' ' +
+                                   'onchange="updateTrigger(' + eventType.value + ', this.checked)" />' +
+                            '<label for="trigger-' + eventType.value + '">' + eventType.label + '</label>' +
+                        '</div>';
+                });
+                return html;
             }
 
             function updateTrigger(eventType, checked) {
@@ -870,57 +870,57 @@
                     { value: 4, label: 'Binary' }
                 ];
                 
-                var executorOptions = executorTypes.map(type => {
+                var executorOptions = '';
+                executorTypes.forEach(function(type) {
                     var selected = execution.ExecutorType === type.value ? 'selected' : '';
-                    return `<option value="${type.value}" ${selected}>${type.label}</option>`;
-                }).join('');
+                    executorOptions += '<option value="' + type.value + '" ' + selected + '>' + type.label + '</option>';
+                });
                 
-                return `
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label class="inputLabel inputLabelUnfocused" for="executor-type">Executor Type</label>
-                            <select id="executor-type" is="emby-select" onchange="updateExecutionProperty('ExecutorType', parseInt(this.value))">
-                                ${executorOptions}
-                            </select>
-                        </div>
-                        <div class="form-col">
-                            <label class="inputLabel inputLabelUnfocused" for="timeout-seconds">Timeout (seconds)</label>
-                            <input id="timeout-seconds" type="number" is="emby-input" min="30" max="3600" 
-                                   value="${execution.TimeoutSeconds}" onchange="updateExecutionProperty('TimeoutSeconds', parseInt(this.value))" />
-                        </div>
-                    </div>
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="executable-path">Executable Path</label>
-                        <input id="executable-path" type="text" is="emby-input" 
-                               value="${escapeHtml(execution.ExecutablePath)}" onchange="updateExecutionProperty('ExecutablePath', this.value)" />
-                        <div class="fieldDescription">Path to the interpreter or executable (e.g., /usr/bin/python3, powershell, /bin/bash)</div>
-                    </div>
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="script-path">Script Path</label>
-                        <input id="script-path" type="text" is="emby-input" 
-                               value="${escapeHtml(execution.ScriptPath)}" onchange="updateExecutionProperty('ScriptPath', this.value)" />
-                        <div class="fieldDescription">Full path to your script file</div>
-                    </div>
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="working-directory">Working Directory</label>
-                        <input id="working-directory" type="text" is="emby-input" 
-                               value="${escapeHtml(execution.WorkingDirectory)}" onchange="updateExecutionProperty('WorkingDirectory', this.value)" />
-                        <div class="fieldDescription">Directory to run the script from (optional)</div>
-                    </div>
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="additional-arguments">Additional Arguments</label>
-                        <input id="additional-arguments" type="text" is="emby-input" 
-                               value="${escapeHtml(execution.AdditionalArguments)}" onchange="updateExecutionProperty('AdditionalArguments', this.value)" />
-                        <div class="fieldDescription">Extra command line arguments (optional)</div>
-                    </div>
-                    <div style="margin-top: 20px;">
-                        <h4>Environment Variables</h4>
-                        <div id="envVarsContainer">
-                            ${renderEnvironmentVariables(execution.EnvironmentVariables)}
-                        </div>
-                        <button type="button" class="add-item-btn" onclick="addEnvironmentVariable()">+ Add Environment Variable</button>
-                    </div>
-                `;
+                var html = '<div class="form-row">' +
+                        '<div class="form-col">' +
+                            '<label class="inputLabel inputLabelUnfocused" for="executor-type">Executor Type</label>' +
+                            '<select id="executor-type" is="emby-select" onchange="updateExecutionProperty(\'ExecutorType\', parseInt(this.value))">' +
+                                executorOptions +
+                            '</select>' +
+                        '</div>' +
+                        '<div class="form-col">' +
+                            '<label class="inputLabel inputLabelUnfocused" for="timeout-seconds">Timeout (seconds)</label>' +
+                            '<input id="timeout-seconds" type="number" is="emby-input" min="30" max="3600" ' +
+                                   'value="' + execution.TimeoutSeconds + '" onchange="updateExecutionProperty(\'TimeoutSeconds\', parseInt(this.value))" />' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="inputContainer">' +
+                        '<label class="inputLabel inputLabelUnfocused" for="executable-path">Executable Path</label>' +
+                        '<input id="executable-path" type="text" is="emby-input" ' +
+                               'value="' + escapeHtml(execution.ExecutablePath) + '" onchange="updateExecutionProperty(\'ExecutablePath\', this.value)" />' +
+                        '<div class="fieldDescription">Path to the interpreter or executable (e.g., /usr/bin/python3, powershell, /bin/bash)</div>' +
+                    '</div>' +
+                    '<div class="inputContainer">' +
+                        '<label class="inputLabel inputLabelUnfocused" for="script-path">Script Path</label>' +
+                        '<input id="script-path" type="text" is="emby-input" ' +
+                               'value="' + escapeHtml(execution.ScriptPath) + '" onchange="updateExecutionProperty(\'ScriptPath\', this.value)" />' +
+                        '<div class="fieldDescription">Full path to your script file</div>' +
+                    '</div>' +
+                    '<div class="inputContainer">' +
+                        '<label class="inputLabel inputLabelUnfocused" for="working-directory">Working Directory</label>' +
+                        '<input id="working-directory" type="text" is="emby-input" ' +
+                               'value="' + escapeHtml(execution.WorkingDirectory) + '" onchange="updateExecutionProperty(\'WorkingDirectory\', this.value)" />' +
+                        '<div class="fieldDescription">Directory to run the script from (optional)</div>' +
+                    '</div>' +
+                    '<div class="inputContainer">' +
+                        '<label class="inputLabel inputLabelUnfocused" for="additional-arguments">Additional Arguments</label>' +
+                        '<input id="additional-arguments" type="text" is="emby-input" ' +
+                               'value="' + escapeHtml(execution.AdditionalArguments) + '" onchange="updateExecutionProperty(\'AdditionalArguments\', this.value)" />' +
+                        '<div class="fieldDescription">Extra command line arguments (optional)</div>' +
+                    '</div>' +
+                    '<div style="margin-top: 20px;">' +
+                        '<h4>Environment Variables</h4>' +
+                        '<div id="envVarsContainer">' +
+                            renderEnvironmentVariables(execution.EnvironmentVariables) +
+                        '</div>' +
+                        '<button type="button" class="add-item-btn" onclick="addEnvironmentVariable()">+ Add Environment Variable</button>' +
+                    '</div>';
+                return html;
             }
 
             function updateExecutionProperty(property, value) {
@@ -935,37 +935,39 @@
                     return '<div style="color: #888; font-style: italic; text-align: center; padding: 20px;">No conditions configured. Script will run for all matching events.</div>';
                 }
                 
-                return conditions.map((condition, index) => `
-                    <div class="condition-item">
-                        <button type="button" class="remove-item-btn" onclick="removeCondition(${index})">&times;</button>
-                        <div class="form-row">
-                            <div class="form-col">
-                                <label class="inputLabel inputLabelUnfocused">Field</label>
-                                <input type="text" is="emby-input" value="${escapeHtml(condition.Field)}" 
-                                       onchange="updateCondition(${index}, 'Field', this.value)" 
-                                       placeholder="e.g., User.Name, Item.Type, etc." />
-                            </div>
-                            <div class="form-col-narrow">
-                                <label class="inputLabel inputLabelUnfocused">Operator</label>
-                                <select is="emby-select" onchange="updateCondition(${index}, 'Operator', parseInt(this.value))">
-                                    ${renderOperatorOptions(condition.Operator)}
-                                </select>
-                            </div>
-                            <div class="form-col">
-                                <label class="inputLabel inputLabelUnfocused">Value</label>
-                                <input type="text" is="emby-input" value="${escapeHtml(condition.Value)}" 
-                                       onchange="updateCondition(${index}, 'Value', this.value)" />
-                            </div>
-                        </div>
-                        <div class="checkboxContainer">
-                            <label class="emby-checkbox-label">
-                                <input type="checkbox" is="emby-checkbox" ${condition.CaseSensitive ? 'checked' : ''} 
-                                       onchange="updateCondition(${index}, 'CaseSensitive', this.checked)" />
-                                <span>Case Sensitive</span>
-                            </label>
-                        </div>
-                    </div>
-                `).join('');
+                var html = '';
+                conditions.forEach(function(condition, index) {
+                    html += '<div class="condition-item">';
+                    html += '<button type="button" class="remove-item-btn" onclick="removeCondition(' + index + ')">&times;</button>';
+                    html += '<div class="form-row">';
+                    html += '<div class="form-col">';
+                    html += '<label class="inputLabel inputLabelUnfocused">Field</label>';
+                    html += '<input type="text" is="emby-input" value="' + escapeHtml(condition.Field) + '" ';
+                    html += 'onchange="updateCondition(' + index + ', \'Field\', this.value)" ';
+                    html += 'placeholder="e.g., User.Name, Item.Type, etc." />';
+                    html += '</div>';
+                    html += '<div class="form-col-narrow">';
+                    html += '<label class="inputLabel inputLabelUnfocused">Operator</label>';
+                    html += '<select is="emby-select" onchange="updateCondition(' + index + ', \'Operator\', parseInt(this.value))">';
+                    html += renderOperatorOptions(condition.Operator);
+                    html += '</select>';
+                    html += '</div>';
+                    html += '<div class="form-col">';
+                    html += '<label class="inputLabel inputLabelUnfocused">Value</label>';
+                    html += '<input type="text" is="emby-input" value="' + escapeHtml(condition.Value) + '" ';
+                    html += 'onchange="updateCondition(' + index + ', \'Value\', this.value)" />';
+                    html += '</div>';
+                    html += '</div>';
+                    html += '<div class="checkboxContainer">';
+                    html += '<label class="emby-checkbox-label">';
+                    html += '<input type="checkbox" is="emby-checkbox" ' + (condition.CaseSensitive ? 'checked' : '') + ' ';
+                    html += 'onchange="updateCondition(' + index + ', \'CaseSensitive\', this.checked)" />';
+                    html += '<span>Case Sensitive</span>';
+                    html += '</label>';
+                    html += '</div>';
+                    html += '</div>';
+                });
+                return html;
             }
 
             function renderOperatorOptions(selectedOperator) {
@@ -983,10 +985,12 @@
                     { value: 10, label: 'Not In List' }
                 ];
                 
-                return operators.map(op => {
+                var html = '';
+                operators.forEach(function(op) {
                     var selected = selectedOperator === op.value ? 'selected' : '';
-                    return `<option value="${op.value}" ${selected}>${op.label}</option>`;
-                }).join('');
+                    html += '<option value="' + op.value + '" ' + selected + '>' + op.label + '</option>';
+                });
+                return html;
             }
 
             function addCondition() {
@@ -1022,45 +1026,47 @@
                     return '<div style="color: #888; font-style: italic; text-align: center; padding: 20px;">No data attributes configured. Event data will be passed as JSON.</div>';
                 }
                 
-                return dataAttributes.map((attr, index) => `
-                    <div class="data-attribute-item">
-                        <button type="button" class="remove-item-btn" onclick="removeDataAttribute(${index})">&times;</button>
-                        <div class="form-row">
-                            <div class="form-col">
-                                <label class="inputLabel inputLabelUnfocused">Attribute Name</label>
-                                <input type="text" is="emby-input" value="${escapeHtml(attr.Name)}" 
-                                       onchange="updateDataAttribute(${index}, 'Name', this.value)" 
-                                       placeholder="Variable name in script" />
-                            </div>
-                            <div class="form-col">
-                                <label class="inputLabel inputLabelUnfocused">Source Field</label>
-                                <input type="text" is="emby-input" value="${escapeHtml(attr.SourceField)}" 
-                                       onchange="updateDataAttribute(${index}, 'SourceField', this.value)" 
-                                       placeholder="e.g., User.Name, Item.Id" />
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-col">
-                                <label class="inputLabel inputLabelUnfocused">Format</label>
-                                <select is="emby-select" onchange="updateDataAttribute(${index}, 'Format', parseInt(this.value))">
-                                    ${renderFormatOptions(attr.Format)}
-                                </select>
-                            </div>
-                            <div class="form-col">
-                                <label class="inputLabel inputLabelUnfocused">Default Value</label>
-                                <input type="text" is="emby-input" value="${escapeHtml(attr.DefaultValue)}" 
-                                       onchange="updateDataAttribute(${index}, 'DefaultValue', this.value)" />
-                            </div>
-                        </div>
-                        <div class="checkboxContainer">
-                            <label class="emby-checkbox-label">
-                                <input type="checkbox" is="emby-checkbox" ${attr.Required ? 'checked' : ''} 
-                                       onchange="updateDataAttribute(${index}, 'Required', this.checked)" />
-                                <span>Required</span>
-                            </label>
-                        </div>
-                    </div>
-                `).join('');
+                var html = '';
+                dataAttributes.forEach(function(attr, index) {
+                    html += '<div class="data-attribute-item">';
+                    html += '<button type="button" class="remove-item-btn" onclick="removeDataAttribute(' + index + ')">&times;</button>';
+                    html += '<div class="form-row">';
+                    html += '<div class="form-col">';
+                    html += '<label class="inputLabel inputLabelUnfocused">Attribute Name</label>';
+                    html += '<input type="text" is="emby-input" value="' + escapeHtml(attr.Name) + '" ';
+                    html += 'onchange="updateDataAttribute(' + index + ', \'Name\', this.value)" ';
+                    html += 'placeholder="Variable name in script" />';
+                    html += '</div>';
+                    html += '<div class="form-col">';
+                    html += '<label class="inputLabel inputLabelUnfocused">Source Field</label>';
+                    html += '<input type="text" is="emby-input" value="' + escapeHtml(attr.SourceField) + '" ';
+                    html += 'onchange="updateDataAttribute(' + index + ', \'SourceField\', this.value)" ';
+                    html += 'placeholder="e.g., User.Name, Item.Id" />';
+                    html += '</div>';
+                    html += '</div>';
+                    html += '<div class="form-row">';
+                    html += '<div class="form-col">';
+                    html += '<label class="inputLabel inputLabelUnfocused">Format</label>';
+                    html += '<select is="emby-select" onchange="updateDataAttribute(' + index + ', \'Format\', parseInt(this.value))">';
+                    html += renderFormatOptions(attr.Format);
+                    html += '</select>';
+                    html += '</div>';
+                    html += '<div class="form-col">';
+                    html += '<label class="inputLabel inputLabelUnfocused">Default Value</label>';
+                    html += '<input type="text" is="emby-input" value="' + escapeHtml(attr.DefaultValue) + '" ';
+                    html += 'onchange="updateDataAttribute(' + index + ', \'DefaultValue\', this.value)" />';
+                    html += '</div>';
+                    html += '</div>';
+                    html += '<div class="checkboxContainer">';
+                    html += '<label class="emby-checkbox-label">';
+                    html += '<input type="checkbox" is="emby-checkbox" ' + (attr.Required ? 'checked' : '') + ' ';
+                    html += 'onchange="updateDataAttribute(' + index + ', \'Required\', this.checked)" />';
+                    html += '<span>Required</span>';
+                    html += '</label>';
+                    html += '</div>';
+                    html += '</div>';
+                });
+                return html;
             }
 
             function renderFormatOptions(selectedFormat) {
@@ -1071,10 +1077,12 @@
                     { value: 3, label: 'Command Argument' }
                 ];
                 
-                return formats.map(format => {
+                var html = '';
+                formats.forEach(function(format) {
                     var selected = selectedFormat === format.value ? 'selected' : '';
-                    return `<option value="${format.value}" ${selected}>${format.label}</option>`;
-                }).join('');
+                    html += '<option value="' + format.value + '" ' + selected + '>' + format.label + '</option>';
+                });
+                return html;
             }
 
             function addDataAttribute() {
@@ -1111,23 +1119,25 @@
                     return '<div style="color: #888; font-style: italic; text-align: center; padding: 20px;">No environment variables configured.</div>';
                 }
                 
-                return envVars.map((envVar, index) => `
-                    <div class="env-var-item">
-                        <button type="button" class="remove-item-btn" onclick="removeEnvironmentVariable(${index})">&times;</button>
-                        <div class="form-row">
-                            <div class="form-col">
-                                <label class="inputLabel inputLabelUnfocused">Variable Name</label>
-                                <input type="text" is="emby-input" value="${escapeHtml(envVar.Name)}" 
-                                       onchange="updateEnvironmentVariable(${index}, 'Name', this.value)" />
-                            </div>
-                            <div class="form-col">
-                                <label class="inputLabel inputLabelUnfocused">Value</label>
-                                <input type="text" is="emby-input" value="${escapeHtml(envVar.Value)}" 
-                                       onchange="updateEnvironmentVariable(${index}, 'Value', this.value)" />
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
+                var html = '';
+                envVars.forEach(function(envVar, index) {
+                    html += '<div class="env-var-item">';
+                    html += '<button type="button" class="remove-item-btn" onclick="removeEnvironmentVariable(' + index + ')">&times;</button>';
+                    html += '<div class="form-row">';
+                    html += '<div class="form-col">';
+                    html += '<label class="inputLabel inputLabelUnfocused">Variable Name</label>';
+                    html += '<input type="text" is="emby-input" value="' + escapeHtml(envVar.Name) + '" ';
+                    html += 'onchange="updateEnvironmentVariable(' + index + ', \'Name\', this.value)" />';
+                    html += '</div>';
+                    html += '<div class="form-col">';
+                    html += '<label class="inputLabel inputLabelUnfocused">Value</label>';
+                    html += '<input type="text" is="emby-input" value="' + escapeHtml(envVar.Value) + '" ';
+                    html += 'onchange="updateEnvironmentVariable(' + index + ', \'Value\', this.value)" />';
+                    html += '</div>';
+                    html += '</div>';
+                    html += '</div>';
+                });
+                return html;
             }
 
             function addEnvironmentVariable() {
