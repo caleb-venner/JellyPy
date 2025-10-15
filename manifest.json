@@ -5,7 +5,7 @@
         "description": "JellyPy automatically manages your Sonarr and Radarr monitoring based on what you watch in Jellyfin.",
         "overview": "Automatically manage Sonarr & Radarr monitoring based on your Jellyfin watch activity.",
         "owner": "caleb-venner",
-    "imageUrl": "https://raw.githubusercontent.com/caleb-venner/jellypy/main/Jellyfin.Plugin.JellyPy/thumb.png",
+        "imageUrl": "https://raw.githubusercontent.com/caleb-venner/jellypy/main/Jellyfin.Plugin.JellyPy/thumb.png",
         "category": "General",
         "versions": [
             {
