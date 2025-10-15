@@ -415,7 +415,7 @@
                                         </div>
 
                                         <!-- Event Triggers -->
-                                        <details class="collapsible-section" open>
+                                        <details class="collapsible-section">
                                             <summary class="collapsible-header">
                                                 <span class="collapsible-title">Event Triggers</span>
                                             </summary>
@@ -428,7 +428,7 @@
                                         </details>
 
                                         <!-- Execution Settings -->
-                                        <details class="collapsible-section" open>
+                                        <details class="collapsible-section">
                                             <summary class="collapsible-header">
                                                 <span class="collapsible-title">Execution Settings</span>
                                             </summary>
@@ -436,7 +436,7 @@
                                         </details>
 
                                         <!-- Execution Conditions -->
-                                        <details class="collapsible-section" open>
+                                        <details class="collapsible-section">
                                             <summary class="collapsible-header">
                                                 <span class="collapsible-title">Execution Conditions</span>
                                             </summary>
@@ -450,7 +450,7 @@
                                         </details>
 
                                         <!-- Data Attributes -->
-                                        <details class="collapsible-section" open>
+                                        <details class="collapsible-section">
                                             <summary class="collapsible-header">
                                                 <span class="collapsible-title">Data Attributes</span>
                                             </summary>
@@ -476,126 +476,134 @@
                         </div>
 
                         <!-- Sonarr Settings -->
-                        <div class="advanced-section">
-                            <h3 style="margin-top: 0;">Sonarr Configuration</h3>
-                            <div class="checkboxContainer checkboxContainer-withDescription">
-                                <label class="emby-checkbox-label">
-                                    <input id="EnableNativeSonarrIntegration" name="EnableNativeSonarrIntegration" type="checkbox" is="emby-checkbox" />
-                                    <span>Enable Sonarr Integration</span>
-                                </label>
-                                <div class="fieldDescription">Enable automatic TV show monitoring management through Sonarr.</div>
+                        <details class="collapsible-section">
+                            <summary class="collapsible-header">
+                                <span class="collapsible-title">Sonarr Configuration</span>
+                            </summary>
+                            <div class="collapsible-content">
+                                <div class="checkboxContainer checkboxContainer-withDescription">
+                                    <label class="emby-checkbox-label">
+                                        <input id="EnableNativeSonarrIntegration" name="EnableNativeSonarrIntegration" type="checkbox" is="emby-checkbox" />
+                                        <span>Enable Sonarr Integration</span>
+                                    </label>
+                                    <div class="fieldDescription">Enable automatic TV show monitoring management through Sonarr.</div>
+                                </div>
+                                <div class="inputContainer">
+                                    <label class="inputLabel inputLabelUnfocused" for="SonarrUrl">Sonarr URL</label>
+                                    <input id="SonarrUrl" name="SonarrUrl" type="text" is="emby-input" placeholder="http://localhost:8989" />
+                                    <div class="fieldDescription">The URL of your Sonarr instance (e.g., http://localhost:8989).</div>
+                                </div>
+                                <div class="inputContainer">
+                                    <label class="inputLabel inputLabelUnfocused" for="SonarrApiKey">Sonarr API Key</label>
+                                    <input id="SonarrApiKey" name="SonarrApiKey" type="password" is="emby-input" />
+                                    <div class="fieldDescription">Your Sonarr API key (found in Settings → General → Security).</div>
+                                </div>
+                                <div class="inputContainer">
+                                    <button id="testSonarrConnection" type="button" is="emby-button" class="raised button-submit" style="margin-bottom: 10px;">
+                                        <span id="testSonarrText">Test Sonarr Connection</span>
+                                    </button>
+                                    <div id="sonarrTestResult" class="fieldDescription" style="display: none; font-weight: bold;"></div>
+                                </div>
+                                <div class="inputContainer">
+                                    <label class="inputLabel inputLabelUnfocused" for="EpisodeDownloadBuffer">Episode Buffer</label>
+                                    <input id="EpisodeDownloadBuffer" name="EpisodeDownloadBuffer" type="number" is="emby-input" min="1" max="20" />
+                                    <div class="fieldDescription">Number of episodes to monitor ahead of your current position. When you watch an episode, the plugin will monitor this many episodes forward from where you are (default: 6).</div>
+                                </div>
+                                <div class="checkboxContainer checkboxContainer-withDescription">
+                                    <label class="emby-checkbox-label">
+                                        <input id="AutoSearchEpisodes" name="AutoSearchEpisodes" type="checkbox" is="emby-checkbox" />
+                                        <span>Auto-Search Episodes</span>
+                                    </label>
+                                    <div class="fieldDescription">Automatically trigger searches for newly monitored episodes in Sonarr.</div>
+                                </div>
+                                <div class="checkboxContainer checkboxContainer-withDescription">
+                                    <label class="emby-checkbox-label">
+                                        <input id="MonitorFutureEpisodes" name="MonitorFutureEpisodes" type="checkbox" is="emby-checkbox" />
+                                        <span>Monitor Future Episodes</span>
+                                    </label>
+                                    <div class="fieldDescription">Automatically monitor future episodes when they are added to Sonarr.</div>
+                                </div>
+                                <div class="checkboxContainer checkboxContainer-withDescription">
+                                    <label class="emby-checkbox-label">
+                                        <input id="SkipEpisodesWithFiles" name="SkipEpisodesWithFiles" type="checkbox" is="emby-checkbox" />
+                                        <span>Skip Episodes With Files</span>
+                                    </label>
+                                    <div class="fieldDescription">Only monitor episodes that don't have files yet. Disable to re-monitor all episodes (useful for quality upgrades).</div>
+                                </div>
+                                <div class="checkboxContainer checkboxContainer-withDescription">
+                                    <label class="emby-checkbox-label">
+                                        <input id="UnmonitorWatchedEpisodes" name="UnmonitorWatchedEpisodes" type="checkbox" is="emby-checkbox" />
+                                        <span>Unmonitor Watched Episodes</span>
+                                    </label>
+                                    <div class="fieldDescription">Unmonitor episodes after they are watched. Disable to keep all episodes monitored.</div>
+                                </div>
+                                <div class="checkboxContainer checkboxContainer-withDescription">
+                                    <label class="emby-checkbox-label">
+                                        <input id="MonitorOnlyCurrentSeason" name="MonitorOnlyCurrentSeason" type="checkbox" is="emby-checkbox" />
+                                        <span>Monitor Only Current Season</span>
+                                    </label>
+                                    <div class="fieldDescription">When enabled, only monitors episodes in the same season you're currently watching. Future seasons won't be monitored until you start watching them.</div>
+                                </div>
                             </div>
-                            <div class="inputContainer">
-                                <label class="inputLabel inputLabelUnfocused" for="SonarrUrl">Sonarr URL</label>
-                                <input id="SonarrUrl" name="SonarrUrl" type="text" is="emby-input" placeholder="http://localhost:8989" />
-                                <div class="fieldDescription">The URL of your Sonarr instance (e.g., http://localhost:8989).</div>
-                            </div>
-                            <div class="inputContainer">
-                                <label class="inputLabel inputLabelUnfocused" for="SonarrApiKey">Sonarr API Key</label>
-                                <input id="SonarrApiKey" name="SonarrApiKey" type="password" is="emby-input" />
-                                <div class="fieldDescription">Your Sonarr API key (found in Settings → General → Security).</div>
-                            </div>
-                            <div class="inputContainer">
-                                <button id="testSonarrConnection" type="button" is="emby-button" class="raised button-submit" style="margin-bottom: 10px;">
-                                    <span id="testSonarrText">Test Sonarr Connection</span>
-                                </button>
-                                <div id="sonarrTestResult" class="fieldDescription" style="display: none; font-weight: bold;"></div>
-                            </div>
-                            <div class="inputContainer">
-                                <label class="inputLabel inputLabelUnfocused" for="EpisodeDownloadBuffer">Episode Buffer</label>
-                                <input id="EpisodeDownloadBuffer" name="EpisodeDownloadBuffer" type="number" is="emby-input" min="1" max="20" />
-                                <div class="fieldDescription">Number of episodes to monitor ahead of your current position. When you watch an episode, the plugin will monitor this many episodes forward from where you are (default: 6).</div>
-                            </div>
-                            <div class="checkboxContainer checkboxContainer-withDescription">
-                                <label class="emby-checkbox-label">
-                                    <input id="AutoSearchEpisodes" name="AutoSearchEpisodes" type="checkbox" is="emby-checkbox" />
-                                    <span>Auto-Search Episodes</span>
-                                </label>
-                                <div class="fieldDescription">Automatically trigger searches for newly monitored episodes in Sonarr.</div>
-                            </div>
-                            <div class="checkboxContainer checkboxContainer-withDescription">
-                                <label class="emby-checkbox-label">
-                                    <input id="MonitorFutureEpisodes" name="MonitorFutureEpisodes" type="checkbox" is="emby-checkbox" />
-                                    <span>Monitor Future Episodes</span>
-                                </label>
-                                <div class="fieldDescription">Automatically monitor future episodes when they are added to Sonarr.</div>
-                            </div>
-                            <div class="checkboxContainer checkboxContainer-withDescription">
-                                <label class="emby-checkbox-label">
-                                    <input id="SkipEpisodesWithFiles" name="SkipEpisodesWithFiles" type="checkbox" is="emby-checkbox" />
-                                    <span>Skip Episodes With Files</span>
-                                </label>
-                                <div class="fieldDescription">Only monitor episodes that don't have files yet. Disable to re-monitor all episodes (useful for quality upgrades).</div>
-                            </div>
-                            <div class="checkboxContainer checkboxContainer-withDescription">
-                                <label class="emby-checkbox-label">
-                                    <input id="UnmonitorWatchedEpisodes" name="UnmonitorWatchedEpisodes" type="checkbox" is="emby-checkbox" />
-                                    <span>Unmonitor Watched Episodes</span>
-                                </label>
-                                <div class="fieldDescription">Unmonitor episodes after they are watched. Disable to keep all episodes monitored.</div>
-                            </div>
-                            <div class="checkboxContainer checkboxContainer-withDescription">
-                                <label class="emby-checkbox-label">
-                                    <input id="MonitorOnlyCurrentSeason" name="MonitorOnlyCurrentSeason" type="checkbox" is="emby-checkbox" />
-                                    <span>Monitor Only Current Season</span>
-                                </label>
-                                <div class="fieldDescription">When enabled, only monitors episodes in the same season you're currently watching. Future seasons won't be monitored until you start watching them.</div>
-                            </div>
-                        </div>
+                        </details>
 
                         <!-- Radarr Settings -->
-                        <div class="advanced-section" style="margin-top: 20px;">
-                            <h3 style="margin-top: 0;">Radarr Configuration</h3>
-                            <div class="checkboxContainer checkboxContainer-withDescription">
-                                <label class="emby-checkbox-label">
-                                    <input id="EnableNativeRadarrIntegration" name="EnableNativeRadarrIntegration" type="checkbox" is="emby-checkbox" />
-                                    <span>Enable Radarr Integration</span>
-                                </label>
-                                <div class="fieldDescription">Enable automatic movie monitoring management through Radarr.</div>
+                        <details class="collapsible-section">
+                            <summary class="collapsible-header">
+                                <span class="collapsible-title">Radarr Configuration</span>
+                            </summary>
+                            <div class="collapsible-content">
+                                <div class="checkboxContainer checkboxContainer-withDescription">
+                                    <label class="emby-checkbox-label">
+                                        <input id="EnableNativeRadarrIntegration" name="EnableNativeRadarrIntegration" type="checkbox" is="emby-checkbox" />
+                                        <span>Enable Radarr Integration</span>
+                                    </label>
+                                    <div class="fieldDescription">Enable automatic movie monitoring management through Radarr.</div>
+                                </div>
+                                <div class="inputContainer">
+                                    <label class="inputLabel inputLabelUnfocused" for="RadarrUrl">Radarr URL</label>
+                                    <input id="RadarrUrl" name="RadarrUrl" type="text" is="emby-input" placeholder="http://localhost:7878" />
+                                    <div class="fieldDescription">The URL of your Radarr instance (e.g., http://localhost:7878).</div>
+                                </div>
+                                <div class="inputContainer">
+                                    <label class="inputLabel inputLabelUnfocused" for="RadarrApiKey">Radarr API Key</label>
+                                    <input id="RadarrApiKey" name="RadarrApiKey" type="password" is="emby-input" />
+                                    <div class="fieldDescription">Your Radarr API key (found in Settings → General → Security).</div>
+                                </div>
+                                <div class="inputContainer">
+                                    <button id="testRadarrConnection" type="button" is="emby-button" class="raised button-submit" style="margin-bottom: 10px;">
+                                        <span id="testRadarrText">Test Radarr Connection</span>
+                                    </button>
+                                    <div id="radarrTestResult" class="fieldDescription" style="display: none; font-weight: bold;"></div>
+                                </div>
+                                <div class="checkboxContainer checkboxContainer-withDescription">
+                                    <label class="emby-checkbox-label">
+                                        <input id="UnmonitorWatchedMovies" name="UnmonitorWatchedMovies" type="checkbox" is="emby-checkbox" />
+                                        <span>Unmonitor Watched Movies</span>
+                                    </label>
+                                    <div class="fieldDescription">Automatically set movies to unmonitored in Radarr after they are watched.</div>
+                                </div>
+                                <div class="checkboxContainer checkboxContainer-withDescription">
+                                    <label class="emby-checkbox-label">
+                                        <input id="UnmonitorOnlyIfWatched" name="UnmonitorOnlyIfWatched" type="checkbox" is="emby-checkbox" />
+                                        <span>Unmonitor Only If Actually Watched</span>
+                                    </label>
+                                    <div class="fieldDescription">Only unmonitor movies if the user watched at least the configured percentage. Requires PlaybackStop event.</div>
+                                </div>
+                                <div class="inputContainer">
+                                    <label class="inputLabel inputLabelUnfocused" for="MinimumWatchPercentage">Minimum Watch Percentage</label>
+                                    <input id="MinimumWatchPercentage" name="MinimumWatchPercentage" type="number" is="emby-input" min="0" max="100" />
+                                    <div class="fieldDescription">Minimum percentage of the movie that must be watched to consider it "watched" (default: 90).</div>
+                                </div>
+                                <div class="checkboxContainer checkboxContainer-withDescription">
+                                    <label class="emby-checkbox-label">
+                                        <input id="UnmonitorAfterUpgrade" name="UnmonitorAfterUpgrade" type="checkbox" is="emby-checkbox" />
+                                        <span>Unmonitor After Quality Cutoff</span>
+                                    </label>
+                                    <div class="fieldDescription">Only unmonitor movies that have reached their quality cutoff (no upgrade possible).</div>
+                                </div>
                             </div>
-                            <div class="inputContainer">
-                                <label class="inputLabel inputLabelUnfocused" for="RadarrUrl">Radarr URL</label>
-                                <input id="RadarrUrl" name="RadarrUrl" type="text" is="emby-input" placeholder="http://localhost:7878" />
-                                <div class="fieldDescription">The URL of your Radarr instance (e.g., http://localhost:7878).</div>
-                            </div>
-                            <div class="inputContainer">
-                                <label class="inputLabel inputLabelUnfocused" for="RadarrApiKey">Radarr API Key</label>
-                                <input id="RadarrApiKey" name="RadarrApiKey" type="password" is="emby-input" />
-                                <div class="fieldDescription">Your Radarr API key (found in Settings → General → Security).</div>
-                            </div>
-                            <div class="inputContainer">
-                                <button id="testRadarrConnection" type="button" is="emby-button" class="raised button-submit" style="margin-bottom: 10px;">
-                                    <span id="testRadarrText">Test Radarr Connection</span>
-                                </button>
-                                <div id="radarrTestResult" class="fieldDescription" style="display: none; font-weight: bold;"></div>
-                            </div>
-                            <div class="checkboxContainer checkboxContainer-withDescription">
-                                <label class="emby-checkbox-label">
-                                    <input id="UnmonitorWatchedMovies" name="UnmonitorWatchedMovies" type="checkbox" is="emby-checkbox" />
-                                    <span>Unmonitor Watched Movies</span>
-                                </label>
-                                <div class="fieldDescription">Automatically set movies to unmonitored in Radarr after they are watched.</div>
-                            </div>
-                            <div class="checkboxContainer checkboxContainer-withDescription">
-                                <label class="emby-checkbox-label">
-                                    <input id="UnmonitorOnlyIfWatched" name="UnmonitorOnlyIfWatched" type="checkbox" is="emby-checkbox" />
-                                    <span>Unmonitor Only If Actually Watched</span>
-                                </label>
-                                <div class="fieldDescription">Only unmonitor movies if the user watched at least the configured percentage. Requires PlaybackStop event.</div>
-                            </div>
-                            <div class="inputContainer">
-                                <label class="inputLabel inputLabelUnfocused" for="MinimumWatchPercentage">Minimum Watch Percentage</label>
-                                <input id="MinimumWatchPercentage" name="MinimumWatchPercentage" type="number" is="emby-input" min="0" max="100" />
-                                <div class="fieldDescription">Minimum percentage of the movie that must be watched to consider it "watched" (default: 90).</div>
-                            </div>
-                            <div class="checkboxContainer checkboxContainer-withDescription">
-                                <label class="emby-checkbox-label">
-                                    <input id="UnmonitorAfterUpgrade" name="UnmonitorAfterUpgrade" type="checkbox" is="emby-checkbox" />
-                                    <span>Unmonitor After Quality Cutoff</span>
-                                </label>
-                                <div class="fieldDescription">Only unmonitor movies that have reached their quality cutoff (no upgrade possible).</div>
-                            </div>
-                        </div>
+                        </details>
                     </div>
 
                     <!-- Global Settings Tab -->
