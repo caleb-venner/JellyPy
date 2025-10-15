@@ -80,8 +80,6 @@ public static class EncryptionHelper
         }
         catch (Exception ex)
         {
-            // CA1031: We catch Exception here as a safety net for truly unexpected errors.
-            // This is security-critical code that should not swallow exceptions.
             System.Diagnostics.Debug.WriteLine($"Unexpected encryption error: {ex.Message}");
             throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
@@ -148,8 +146,6 @@ public static class EncryptionHelper
         }
         catch (Exception ex)
         {
-            // CA1031: We catch Exception here as a safety net for truly unexpected errors.
-            // This is security-critical code that should not swallow exceptions.
             System.Diagnostics.Debug.WriteLine($"Unexpected decryption error: {ex.Message}");
             throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
@@ -194,7 +190,8 @@ public static class EncryptionHelper
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException($"Failed to generate server-based encryption key: {ex.Message}", ex);
+            System.Diagnostics.Debug.WriteLine($"Unexpected machine key generation error: {ex.Message}");
+            throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
     }
 }

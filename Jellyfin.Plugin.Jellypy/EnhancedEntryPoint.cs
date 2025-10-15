@@ -105,8 +105,6 @@ public class EnhancedEntryPoint : IHostedService
         }
         catch (Exception ex)
         {
-            // CA1031: We catch Exception here as a safety net for truly unexpected errors.
-            // This is a high-level event coordinator that should not swallow exceptions.
             _logger.LogError(ex, "Unexpected error handling {EventType} event", typeof(TEventArgs).Name);
             throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }

@@ -86,8 +86,6 @@ public class JellyPyApiController : ControllerBase
         }
         catch (Exception ex)
         {
-            // CA1031: We catch Exception here as a safety net for truly unexpected errors.
-            // For API controllers, we log and rethrow to let the framework handle the response.
             _logger.LogError(ex, "Unexpected error scanning for script files");
             throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
@@ -171,8 +169,6 @@ public class JellyPyApiController : ControllerBase
         }
         catch (Exception ex)
         {
-            // CA1031: We catch Exception here as a safety net for truly unexpected errors.
-            // For API test endpoints, we log and rethrow to let the framework handle the response.
             _logger.LogError(ex, "Unexpected error testing Sonarr connection");
             throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
@@ -256,8 +252,6 @@ public class JellyPyApiController : ControllerBase
         }
         catch (Exception ex)
         {
-            // CA1031: We catch Exception here as a safety net for truly unexpected errors.
-            // For API test endpoints, we log and rethrow to let the framework handle the response.
             _logger.LogError(ex, "Unexpected error testing Radarr connection");
             throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
@@ -285,8 +279,6 @@ public class JellyPyApiController : ControllerBase
         }
         catch (Exception ex)
         {
-            // CA1031: We catch Exception here as a safety net for truly unexpected errors.
-            // For API endpoints, we log and rethrow to let the framework handle the response.
             _logger.LogError(ex, "Error getting decrypted API keys");
             throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }

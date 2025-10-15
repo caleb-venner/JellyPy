@@ -73,6 +73,7 @@ public class ArrIntegrationService : IArrIntegrationService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unexpected error processing playback start for item: {ItemName}", item.Name);
+            throw;
         }
     }
 

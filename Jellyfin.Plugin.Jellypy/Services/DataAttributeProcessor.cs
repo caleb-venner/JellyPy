@@ -69,8 +69,6 @@ public class DataAttributeProcessor
             }
             catch (Exception ex)
             {
-                // CA1031: We catch Exception here as a safety net for truly unexpected errors.
-                // This is a void method that should not swallow exceptions during attribute processing.
                 _logger.LogError(ex, "Unexpected error processing data attribute {Name}", attribute.Name);
                 throw; // Rethrow to maintain CA1031 compliance while still logging the error
             }

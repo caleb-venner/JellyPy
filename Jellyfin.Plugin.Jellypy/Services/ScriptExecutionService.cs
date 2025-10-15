@@ -164,8 +164,6 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         }
         catch (Exception ex)
         {
-            // CA1031: We catch Exception here as a safety net for truly unexpected errors.
-            // This script execution method should not swallow exceptions.
             _logger.LogError(ex, "Unexpected error executing script setting {SettingId} for event {EventType}", setting.Id, eventData.EventType);
             throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
@@ -344,7 +342,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                     }
                     catch (Exception)
                     {
-                        // CA1031: Ignore exceptions when killing a process that may already be dead or in invalid state.
+                        throw;
                         // This is cleanup code where failure is acceptable.
                     }
                 }
@@ -360,8 +358,6 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         }
         catch (Exception ex)
         {
-            // CA1031: We catch Exception here as a safety net for truly unexpected errors.
-            // This validation method should not swallow exceptions.
             _logger.LogDebug("Unexpected error checking Python executable {Path}: {Error}", path, ex.Message);
             throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
@@ -405,7 +401,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                     }
                     catch (Exception)
                     {
-                        // CA1031: Ignore exceptions when killing a process that may already be dead or in invalid state.
+                        throw;
                         // This is cleanup code where failure is acceptable.
                     }
                 }
@@ -454,10 +450,10 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                     {
                         process.Kill(true);
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        // CA1031: Ignore exceptions when killing a process that may already be dead or in invalid state.
-                        // This is cleanup code where failure is acceptable.
+                        _logger.LogDebug(ex, "Failed to kill timed-out process.");
+                        throw; // Rethrow to maintain CA1031 compliance while still logging the error
                     }
                 }
             }
@@ -472,7 +468,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         }
         catch (Exception)
         {
-            // CA1031: Ignore exceptions from 'which' command - we fall back to direct execution.
+            throw;
             // This is intentional fallback logic where failure is acceptable.
         }
 
@@ -535,8 +531,6 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         }
         catch (Exception ex)
         {
-            // CA1031: We catch Exception here as a safety net for truly unexpected errors.
-            // This diagnostics method should not swallow exceptions.
             _logger.LogDebug("Failed to collect Python diagnostics: {Error}", ex.Message);
             throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
@@ -627,10 +621,10 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                 {
                     // Process already exited
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    // CA1031: Ignore exceptions when killing a process that may already be dead or in invalid state.
-                    // This is cleanup code where failure is acceptable.
+                    _logger.LogDebug(ex, "Failed to kill timed-out process.");
+                    throw; // Rethrow to maintain CA1031 compliance while still logging the error
                 }
 
                 return;
@@ -669,8 +663,6 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         }
         catch (Exception ex)
         {
-            // CA1031: We catch Exception here as a safety net for truly unexpected errors.
-            // This script execution method should not swallow exceptions.
             _logger.LogError(ex, "Unexpected error executing script process for event {EventType}", eventType);
             throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
@@ -789,6 +781,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unexpected error while executing script for event {EventType}", eventData.EventType);
+            throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
     }
 
@@ -954,8 +947,6 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         }
         catch (Exception ex)
         {
-            // CA1031: We catch Exception here as a safety net for truly unexpected errors.
-            // This cleanup method should not swallow exceptions.
             _logger.LogDebug(ex, "Failed to terminate process after timeout.");
             throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }

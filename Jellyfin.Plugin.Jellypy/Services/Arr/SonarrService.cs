@@ -84,8 +84,6 @@ public class SonarrService : ISonarrService
         }
         catch (Exception ex)
         {
-            // CA1031: We catch Exception here as a safety net for truly unexpected errors.
-            // This method returns a nullable int to indicate success/failure, so we handle all exceptions gracefully.
             _logger.LogError(ex, "Unexpected error getting Sonarr series ID for: {SeriesName}", seriesName);
             throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
@@ -131,8 +129,6 @@ public class SonarrService : ISonarrService
         }
         catch (Exception ex)
         {
-            // CA1031: We catch Exception here as a safety net for truly unexpected errors.
-            // This method returns a nullable int to indicate success/failure, so we handle all exceptions gracefully.
             _logger.LogError(ex, "Unexpected error getting Sonarr series ID by TVDB ID: {TvdbId}", tvdbId);
             throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
@@ -178,8 +174,6 @@ public class SonarrService : ISonarrService
         }
         catch (Exception ex)
         {
-            // CA1031: We catch Exception here as a safety net for truly unexpected errors.
-            // This method returns a list to indicate success/failure, so we handle all exceptions gracefully.
             _logger.LogError(ex, "Unexpected error getting episodes for series: {SeriesId}", seriesId);
             throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
@@ -231,8 +225,6 @@ public class SonarrService : ISonarrService
         }
         catch (Exception ex)
         {
-            // CA1031: We catch Exception here as a safety net for truly unexpected errors.
-            // This method returns a boolean to indicate success/failure, so we handle all exceptions gracefully.
             _logger.LogError(ex, "Unexpected error setting episode monitored status: {EpisodeId}", episodeId);
             throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
@@ -283,8 +275,6 @@ public class SonarrService : ISonarrService
         }
         catch (Exception ex)
         {
-            // CA1031: We catch Exception here as a safety net for truly unexpected errors.
-            // This method returns a boolean to indicate success/failure, so we handle all exceptions gracefully.
             _logger.LogError(ex, "Unexpected error searching for episode: {EpisodeId}", episodeId);
             throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
@@ -379,8 +369,6 @@ public class SonarrService : ISonarrService
         }
         catch (Exception ex)
         {
-            // CA1031: We catch Exception here as a safety net for truly unexpected errors.
-            // This method returns a nullable object to indicate success/failure, so we handle all exceptions gracefully.
             _logger.LogError(ex, "Unexpected error getting series: {SeriesId}", seriesId);
             throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
@@ -434,8 +422,6 @@ public class SonarrService : ISonarrService
         }
         catch (Exception ex)
         {
-            // CA1031: We catch Exception here as a safety net for truly unexpected errors.
-            // This method returns a boolean to indicate success/failure, so we handle all exceptions gracefully.
             _logger.LogError(ex, "Unexpected error monitoring new seasons for series: {SeriesId}", seriesId);
             throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }

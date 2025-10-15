@@ -375,15 +375,8 @@ public class PluginConfiguration : BasePluginConfiguration
             return false;
         }
 
-        // API keys are typically 32-64 hexadecimal characters
-        // If it's exactly 32 chars and all hex, it's likely a plaintext API key
-        if (value.Length == 32 && IsHexString(value))
-        {
-            return false; // Looks like a typical API key
-        }
-
         // Encrypted values should be base64 strings with reasonable length
-        // Encrypted they'd be much longer than the original
+        // Encrypted data is much longer than typical API keys (32-64 chars)
         if (value.Length < 64)
         {
             return false; // Too short to be encrypted
@@ -393,36 +386,11 @@ public class PluginConfiguration : BasePluginConfiguration
         try
         {
             byte[] data = Convert.FromBase64String(value);
-            return data.Length > 32; // Encrypted data should be longer than original API key
+            return data.Length > 16; // Encrypted data should be longer than a typical API key
         }
         catch (FormatException)
         {
             return false; // Not valid base64, likely plaintext
         }
-    }
-
-    /// <summary>
-    /// Checks if a string contains only hexadecimal characters.
-    /// </summary>
-    /// <param name="value">The value to check.</param>
-    /// <returns>True if the value is a hexadecimal string, false otherwise.</returns>
-    private static bool IsHexString(string value)
-    {
-        if (string.IsNullOrEmpty(value))
-        {
-            return false;
-        }
-
-        return value.All(IsHexChar);
-    }
-
-    /// <summary>
-    /// Checks if a character is a valid hexadecimal digit.
-    /// </summary>
-    /// <param name="c">The character to check.</param>
-    /// <returns>True if the character is a valid hex digit, false otherwise.</returns>
-    private static bool IsHexChar(char c)
-    {
-        return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
     }
 }
