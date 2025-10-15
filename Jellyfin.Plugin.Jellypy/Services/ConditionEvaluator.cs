@@ -57,11 +57,31 @@ public class ConditionEvaluator
             var actualValue = GetFieldValue(condition.Field, eventData);
             return EvaluateValue(actualValue, condition.Value, condition.Operator, condition.CaseSensitive);
         }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(
+                ex,
+                "Invalid argument when evaluating condition {Field} {Operator} {Value}",
+                condition.Field,
+                condition.Operator,
+                condition.Value);
+            return false;
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(
+                ex,
+                "Invalid operation when evaluating condition {Field} {Operator} {Value}",
+                condition.Field,
+                condition.Operator,
+                condition.Value);
+            return false;
+        }
         catch (Exception ex)
         {
             _logger.LogWarning(
                 ex,
-                "Error evaluating condition {Field} {Operator} {Value}",
+                "Unexpected error evaluating condition {Field} {Operator} {Value}",
                 condition.Field,
                 condition.Operator,
                 condition.Value);

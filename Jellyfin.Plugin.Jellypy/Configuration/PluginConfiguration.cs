@@ -395,7 +395,7 @@ public class PluginConfiguration : BasePluginConfiguration
             byte[] data = Convert.FromBase64String(value);
             return data.Length > 32; // Encrypted data should be longer than original API key
         }
-        catch (Exception)
+        catch (FormatException)
         {
             return false; // Not valid base64, likely plaintext
         }

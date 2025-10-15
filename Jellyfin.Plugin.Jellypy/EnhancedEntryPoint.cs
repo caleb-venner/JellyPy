@@ -99,9 +99,13 @@ public class EnhancedEntryPoint : IHostedService
             var handler = scope.ServiceProvider.GetRequiredService<THandler>();
             await handler.HandleAsync(eventArgs).ConfigureAwait(false);
         }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Failed to resolve handler for {EventType} event", typeof(TEventArgs).Name);
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to handle {EventType} event", typeof(TEventArgs).Name);
+            _logger.LogError(ex, "Unexpected error handling {EventType} event", typeof(TEventArgs).Name);
         }
     }
 }

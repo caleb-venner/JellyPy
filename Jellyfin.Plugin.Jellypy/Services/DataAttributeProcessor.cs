@@ -59,9 +59,17 @@ public class DataAttributeProcessor
 
                 ProcessAttribute(attribute, value, arguments, environmentVariables);
             }
+            catch (ArgumentException ex)
+            {
+                _logger.LogError(ex, "Invalid argument when processing data attribute {Name}", attribute.Name);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogError(ex, "Invalid operation when processing data attribute {Name}", attribute.Name);
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing data attribute {Name}", attribute.Name);
+                _logger.LogError(ex, "Unexpected error processing data attribute {Name}", attribute.Name);
             }
         }
 
