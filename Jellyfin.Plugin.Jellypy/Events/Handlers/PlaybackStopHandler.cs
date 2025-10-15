@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Jellyfin.Plugin.Jellypy.Services.Arr;
+using Jellyfin.Plugin.JellyPy.Services.Arr;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Library;
 using Microsoft.Extensions.Logging;
 
-namespace Jellyfin.Plugin.Jellypy.Events.Handlers;
+namespace Jellyfin.Plugin.JellyPy.Events.Handlers;
 
 /// <summary>
 /// Handler for playback stop events.

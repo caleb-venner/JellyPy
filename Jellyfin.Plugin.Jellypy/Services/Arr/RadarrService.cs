@@ -5,10 +5,10 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Jellyfin.Plugin.Jellypy.Configuration;
+using Jellyfin.Plugin.JellyPy.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace Jellyfin.Plugin.Jellypy.Services.Arr;
+namespace Jellyfin.Plugin.JellyPy.Services.Arr;
 
 /// <summary>
 /// Service for interacting with Radarr API.

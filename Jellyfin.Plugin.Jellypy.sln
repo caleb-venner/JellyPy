@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jellyfin.Plugin.Jellypy", "Jellyfin.Plugin.Jellypy\Jellyfin.Plugin.Jellypy.csproj", "{D921B930-CF91-406F-ACBC-08914DCD0D34}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jellyfin.Plugin.JellyPy", "Jellyfin.Plugin.JellyPy\Jellyfin.Plugin.Jellypy.csproj", "{D921B930-CF91-406F-ACBC-08914DCD0D34}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jellyfin.Plugin.Jellypy.Tests", "Jellyfin.Plugin.Jellypy.Tests\Jellyfin.Plugin.Jellypy.Tests.csproj", "{63AFB4C4-663B-4BE5-8791-86A88344BEB9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jellyfin.Plugin.JellyPy.Tests", "Jellyfin.Plugin.Jellypy.Tests\Jellyfin.Plugin.Jellypy.Tests.csproj", "{63AFB4C4-663B-4BE5-8791-86A88344BEB9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

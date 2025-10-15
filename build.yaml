@@ -30,7 +30,7 @@ description: >
 category: "Notifications"
 owner: "caleb-venner"
 artifacts:
-- "Jellyfin.Plugin.Jellypy.dll"
+- "Jellyfin.Plugin.JellyPy.dll"
 changelog: >
   ### Version 1.1.1
 

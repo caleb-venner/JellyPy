@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Jellyfin.Plugin.Jellypy.Events;
+using Jellyfin.Plugin.JellyPy.Events;
 
-namespace Jellyfin.Plugin.Jellypy.Configuration;
+namespace Jellyfin.Plugin.JellyPy.Configuration;
 
 /// <summary>
 /// Represents a script setting configuration.

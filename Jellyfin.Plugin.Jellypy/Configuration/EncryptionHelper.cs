@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using MediaBrowser.Controller;
 
-namespace Jellyfin.Plugin.Jellypy.Configuration;
+namespace Jellyfin.Plugin.JellyPy.Configuration;
 
 /// <summary>
 /// Helper class for encrypting and decrypting sensitive configuration data.

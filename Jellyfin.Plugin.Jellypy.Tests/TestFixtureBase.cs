@@ -1,9 +1,9 @@
 using Xunit;
 using Moq;
 using MediaBrowser.Controller;
-using Jellyfin.Plugin.Jellypy.Configuration;
+using Jellyfin.Plugin.JellyPy.Configuration;
 
-namespace Jellyfin.Plugin.Jellypy.Tests;
+namespace Jellyfin.Plugin.JellyPy.Tests;
 
 /// <summary>
 /// Base class for test fixtures that require EncryptionHelper initialization.

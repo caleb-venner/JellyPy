@@ -1,4 +1,4 @@
-namespace Jellyfin.Plugin.Jellypy.Configuration;
+namespace Jellyfin.Plugin.JellyPy.Configuration;
 
 /// <summary>
 /// Global settings for script execution.

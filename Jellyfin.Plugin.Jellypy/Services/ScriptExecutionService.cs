@@ -10,11 +10,11 @@ using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Jellyfin.Plugin.Jellypy.Configuration;
-using Jellyfin.Plugin.Jellypy.Events;
+using Jellyfin.Plugin.JellyPy.Configuration;
+using Jellyfin.Plugin.JellyPy.Events;
 using Microsoft.Extensions.Logging;
 
-namespace Jellyfin.Plugin.Jellypy.Services;
+namespace Jellyfin.Plugin.JellyPy.Services;
 
 /// <summary>
 /// Service responsible for executing scripts based on events.

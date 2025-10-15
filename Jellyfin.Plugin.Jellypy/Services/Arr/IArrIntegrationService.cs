@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
 
-namespace Jellyfin.Plugin.Jellypy.Services.Arr;
+namespace Jellyfin.Plugin.JellyPy.Services.Arr;
 
 /// <summary>
 /// Service for integrating with Sonarr and Radarr APIs.

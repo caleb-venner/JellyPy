@@ -8,7 +8,7 @@ using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Entities.TV;
 using Microsoft.Extensions.Logging;
 
-namespace Jellyfin.Plugin.Jellypy.Services.Arr;
+namespace Jellyfin.Plugin.JellyPy.Services.Arr;
 
 /// <summary>
 /// Service for integrating with Sonarr and Radarr APIs.

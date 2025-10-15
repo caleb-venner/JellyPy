@@ -1,7 +1,7 @@
 using Xunit;
-using Jellyfin.Plugin.Jellypy.Configuration;
+using Jellyfin.Plugin.JellyPy.Configuration;
 
-namespace Jellyfin.Plugin.Jellypy.Tests;
+namespace Jellyfin.Plugin.JellyPy.Tests;
 
 /// <summary>
 /// Tests for API key encryption functionality.

@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Jellyfin.Plugin.Jellypy.Events;
+namespace Jellyfin.Plugin.JellyPy.Events;
 
 /// <summary>
 /// Generic event processor interface for processing various Jellyfin events.

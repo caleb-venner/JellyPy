@@ -1,6 +1,6 @@
 using System;
 
-namespace Jellyfin.Plugin.Jellypy.Events;
+namespace Jellyfin.Plugin.JellyPy.Events;
 
 /// <summary>
 /// Enumeration of supported event types for script execution.

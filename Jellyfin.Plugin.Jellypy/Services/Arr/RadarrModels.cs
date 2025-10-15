@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Jellyfin.Plugin.Jellypy.Services.Arr;
+namespace Jellyfin.Plugin.JellyPy.Services.Arr;
 
 /// <summary>
 /// Represents a Radarr movie.

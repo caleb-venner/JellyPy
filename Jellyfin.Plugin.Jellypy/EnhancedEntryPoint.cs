@@ -1,8 +1,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Jellyfin.Plugin.Jellypy.Events;
-using Jellyfin.Plugin.Jellypy.Events.Handlers;
+using Jellyfin.Plugin.JellyPy.Events;
+using Jellyfin.Plugin.JellyPy.Events.Handlers;
 using MediaBrowser.Controller.Events;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Session;
@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Jellyfin.Plugin.Jellypy;
+namespace Jellyfin.Plugin.JellyPy;
 
 /// <summary>
 /// Enhanced entry point that handles multiple Jellyfin event types.

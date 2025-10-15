@@ -1,7 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <RootNamespace>Jellyfin.Plugin.Jellypy</RootNamespace>
+  <RootNamespace>Jellyfin.Plugin.JellyPy</RootNamespace>
+  <AssemblyName>Jellyfin.Plugin.JellyPy</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
     <CodeAnalysisRuleSet>../jellyfin.ruleset</CodeAnalysisRuleSet>

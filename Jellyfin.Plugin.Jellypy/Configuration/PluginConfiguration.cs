@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using MediaBrowser.Model.Plugins;
 
-namespace Jellyfin.Plugin.Jellypy.Configuration;
+namespace Jellyfin.Plugin.JellyPy.Configuration;
 
 /// <summary>
 /// Plugin configuration.

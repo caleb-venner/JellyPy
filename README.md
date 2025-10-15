@@ -61,7 +61,7 @@ and user changes
 
 ### Manual Installation
 
-1. Download the latest `Jellyfin.Plugin.Jellypy.dll`
+1. Download the latest `Jellyfin.Plugin.JellyPy.dll`
 from [Releases](https://github.com/caleb-venner/jellypy/releases)
 2. Copy to your Jellyfin plugins directory:
    - Linux: `/var/lib/jellyfin/plugins/Jellypy/`

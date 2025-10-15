@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Jellyfin.Plugin.Jellypy.Services.Arr;
+namespace Jellyfin.Plugin.JellyPy.Services.Arr;
 
 /// <summary>
 /// Service for interacting with Sonarr API.

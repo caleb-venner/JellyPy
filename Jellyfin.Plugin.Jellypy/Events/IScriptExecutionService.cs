@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
-using Jellyfin.Plugin.Jellypy.Events;
+using Jellyfin.Plugin.JellyPy.Events;
 
-namespace Jellyfin.Plugin.Jellypy.Events;
+namespace Jellyfin.Plugin.JellyPy.Events;
 
 /// <summary>
 /// Service for executing scripts based on events.

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace Jellyfin.Plugin.Jellypy.Configuration;
+namespace Jellyfin.Plugin.JellyPy.Configuration;
 
 /// <summary>
 /// API controller for JellyPy plugin configuration endpoints.

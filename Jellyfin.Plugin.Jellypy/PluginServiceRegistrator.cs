@@ -1,15 +1,15 @@
-using Jellyfin.Plugin.Jellypy.Configuration;
-using Jellyfin.Plugin.Jellypy.Events;
-using Jellyfin.Plugin.Jellypy.Events.Handlers;
-using Jellyfin.Plugin.Jellypy.Services;
-using Jellyfin.Plugin.Jellypy.Services.Arr;
+using Jellyfin.Plugin.JellyPy.Configuration;
+using Jellyfin.Plugin.JellyPy.Events;
+using Jellyfin.Plugin.JellyPy.Events.Handlers;
+using Jellyfin.Plugin.JellyPy.Services;
+using Jellyfin.Plugin.JellyPy.Services.Arr;
 using MediaBrowser.Controller;
 using MediaBrowser.Controller.Events;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Plugins;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Jellyfin.Plugin.Jellypy;
+namespace Jellyfin.Plugin.JellyPy;
 
 /// <summary>
 /// Register plugin services for enhanced event handling.

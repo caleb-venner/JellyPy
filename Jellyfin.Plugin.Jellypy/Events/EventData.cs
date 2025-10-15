@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace Jellyfin.Plugin.Jellypy.Events;
+namespace Jellyfin.Plugin.JellyPy.Events;
 
 /// <summary>
 /// Standardized event data structure for script execution.
