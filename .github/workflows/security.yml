@@ -44,10 +44,10 @@ jobs:
           queries: security-and-quality
 
       - name: Restore dependencies
-        run: dotnet restore Jellyfin.Plugin.Jellypy.sln
+        run: dotnet restore Jellyfin.Plugin.JellyPy.sln
 
       - name: Build
-        run: dotnet build Jellyfin.Plugin.Jellypy.sln --configuration Release --no-restore
+        run: dotnet build Jellyfin.Plugin.JellyPy.sln --configuration Release --no-restore
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3

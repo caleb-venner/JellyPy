@@ -33,16 +33,16 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore Jellyfin.Plugin.Jellypy.sln
+        run: dotnet restore Jellyfin.Plugin.JellyPy.sln
 
       - name: Build (Debug)
-        run: dotnet build Jellyfin.Plugin.Jellypy.sln --configuration Debug --no-restore
+        run: dotnet build Jellyfin.Plugin.JellyPy.sln --configuration Debug --no-restore
 
       - name: Build (Release)
-        run: dotnet build Jellyfin.Plugin.Jellypy.sln --configuration Release --no-restore
+        run: dotnet build Jellyfin.Plugin.JellyPy.sln --configuration Release --no-restore
 
       - name: Publish plugin
-  run: dotnet publish Jellyfin.Plugin.JellyPy/Jellyfin.Plugin.Jellypy.csproj --configuration Release --no-build --output ./dist
+  run: dotnet publish Jellyfin.Plugin.JellyPy/Jellyfin.Plugin.JellyPy.csproj --configuration Release --no-build --output ./dist
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
