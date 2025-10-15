@@ -696,12 +696,27 @@
                 var emptyState = document.getElementById('emptyState');
                 
                 if (JellyPyConfig.scriptSettings.length === 0) {
+                    container.innerHTML = '';
+                    if (!emptyState) {
+                        emptyState = document.createElement('div');
+                        emptyState.id = 'emptyState';
+                        emptyState.className = 'empty-state';
+                        emptyState.innerHTML = 'No scripts configured yet.<br>Click "Add" to create your first script.';
+                        container.appendChild(emptyState);
+                    }
                     emptyState.style.display = 'block';
                     return;
                 }
                 
-                emptyState.style.display = 'none';
-                container.innerHTML = '';
+                if (emptyState) {
+                    emptyState.style.display = 'none';
+                }
+                
+                // Remove only script-item elements, preserve emptyState
+                var scriptItems = container.querySelectorAll('.script-item');
+                scriptItems.forEach(function(item) {
+                    item.remove();
+                });
                 
                 JellyPyConfig.scriptSettings.forEach(function(script) {
                     var statusClass = script.Enabled ? 'status-enabled' : 'status-disabled';
