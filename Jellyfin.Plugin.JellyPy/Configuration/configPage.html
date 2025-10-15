@@ -373,8 +373,89 @@
                                     Script Details
                                 </div>
                                 <div class="script-details-content" id="scriptDetailsContent">
-                                    <div class="no-script-selected">
+                                    <div class="no-script-selected" id="noScriptSelected">
                                         Select a script from the list to configure its settings
+                                    </div>
+                                    
+                                    <!-- Script Form (hidden by default) -->
+                                    <div id="scriptForm" style="display: none;">
+                                        <!-- Basic Information -->
+                                        <div class="script-form-section">
+                                            <div class="section-title-small">Basic Information</div>
+                                            <div class="form-row">
+                                                <div class="form-col">
+                                                    <label class="inputLabel inputLabelUnfocused" for="script-name">Script Name</label>
+                                                    <input id="script-name" type="text" is="emby-input" />
+                                                </div>
+                                                <div class="form-col-narrow">
+                                                    <label class="inputLabel inputLabelUnfocused" for="script-priority">Priority</label>
+                                                    <input id="script-priority" type="number" is="emby-input" min="1" max="1000" />
+                                                </div>
+                                            </div>
+                                            <div class="inputContainer">
+                                                <label class="inputLabel inputLabelUnfocused" for="script-description">Description</label>
+                                                <input id="script-description" type="text" is="emby-input" />
+                                            </div>
+                                            <div class="checkboxContainer">
+                                                <label class="emby-checkbox-label">
+                                                    <input id="script-enabled" type="checkbox" is="emby-checkbox" />
+                                                    <span>Enable this script</span>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Event Triggers -->
+                                        <div class="collapsible-section">
+                                            <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                                                <span class="collapsible-title">Event Triggers</span>
+                                                <span class="collapsible-toggle">▶</span>
+                                            </div>
+                                            <div class="collapsible-content">
+                                                <div class="fieldDescription" style="margin-bottom: 15px;">
+                                                    Select which Jellyfin events should trigger this script.
+                                                </div>
+                                                <div class="trigger-checkboxes" id="triggerCheckboxes"></div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Execution Settings -->
+                                        <div class="collapsible-section">
+                                            <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                                                <span class="collapsible-title">Execution Settings</span>
+                                                <span class="collapsible-toggle">▶</span>
+                                            </div>
+                                            <div class="collapsible-content" id="executionSettingsContent"></div>
+                                        </div>
+
+                                        <!-- Execution Conditions -->
+                                        <div class="collapsible-section">
+                                            <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                                                <span class="collapsible-title">Execution Conditions</span>
+                                                <span class="collapsible-toggle">▶</span>
+                                            </div>
+                                            <div class="collapsible-content">
+                                                <div class="fieldDescription" style="margin-bottom: 15px;">
+                                                    Add conditions to control when this script should run. All conditions must be met for the script to execute.
+                                                </div>
+                                                <div id="conditionsContainer"></div>
+                                                <button type="button" class="add-item-btn" onclick="addCondition()">+ Add Condition</button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Data Attributes -->
+                                        <div class="collapsible-section">
+                                            <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                                                <span class="collapsible-title">Data Attributes</span>
+                                                <span class="collapsible-toggle">▶</span>
+                                            </div>
+                                            <div class="collapsible-content">
+                                                <div class="fieldDescription" style="margin-bottom: 15px;">
+                                                    Configure how event data is passed to your script.
+                                                </div>
+                                                <div id="dataAttributesContainer"></div>
+                                                <button type="button" class="add-item-btn" onclick="addDataAttribute()">+ Add Data Attribute</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -598,11 +679,11 @@
                 JellyPyConfig.selectedScriptId = scriptId;
                 
                 // Update active state in list
-                document.querySelectorAll('.script-item').forEach(item => {
+                document.querySelectorAll('.script-item').forEach(function(item) {
                     item.classList.remove('active');
                 });
                 
-                var selectedItem = document.querySelector(`[data-script-id="${scriptId}"]`);
+                var selectedItem = document.querySelector('[data-script-id="' + scriptId + '"]');
                 if (selectedItem) {
                     selectedItem.classList.add('active');
                 }
@@ -620,37 +701,67 @@
                 }
                 
                 emptyState.style.display = 'none';
+                container.innerHTML = '';
                 
-                var html = '';
-                JellyPyConfig.scriptSettings.forEach(script => {
+                JellyPyConfig.scriptSettings.forEach(function(script) {
                     var statusClass = script.Enabled ? 'status-enabled' : 'status-disabled';
                     var statusText = script.Enabled ? 'Enabled' : 'Disabled';
+                    var activeClass = script.Id === JellyPyConfig.selectedScriptId ? 'active' : '';
                     
-                    html += `
-                        <div class="script-item ${script.Id === JellyPyConfig.selectedScriptId ? 'active' : ''}" 
-                             data-script-id="${script.Id}" onclick="selectScript('${script.Id}')">
-                            <div class="script-item-info">
-                                <div class="script-item-name">${escapeHtml(script.Name)}</div>
-                                <div class="script-item-desc">${escapeHtml(script.Description || 'No description')}</div>
-                            </div>
-                            <div class="script-item-status">
-                                <span class="${statusClass}">${statusText}</span>
-                                <button type="button" class="delete-script-btn" onclick="event.stopPropagation(); deleteScript('${script.Id}')">&times;</button>
-                            </div>
-                        </div>
-                    `;
+                    var scriptItem = document.createElement('div');
+                    scriptItem.className = 'script-item ' + activeClass;
+                    scriptItem.setAttribute('data-script-id', script.Id);
+                    scriptItem.onclick = function() { selectScript(script.Id); };
+                    
+                    var info = document.createElement('div');
+                    info.className = 'script-item-info';
+                    
+                    var name = document.createElement('div');
+                    name.className = 'script-item-name';
+                    name.textContent = script.Name;
+                    
+                    var desc = document.createElement('div');
+                    desc.className = 'script-item-desc';
+                    desc.textContent = script.Description || 'No description';
+                    
+                    info.appendChild(name);
+                    info.appendChild(desc);
+                    
+                    var status = document.createElement('div');
+                    status.className = 'script-item-status';
+                    
+                    var statusSpan = document.createElement('span');
+                    statusSpan.className = statusClass;
+                    statusSpan.textContent = statusText;
+                    
+                    var deleteBtn = document.createElement('button');
+                    deleteBtn.type = 'button';
+                    deleteBtn.className = 'delete-script-btn';
+                    deleteBtn.textContent = '×';
+                    deleteBtn.onclick = function(e) {
+                        e.stopPropagation();
+                        deleteScript(script.Id);
+                    };
+                    
+                    status.appendChild(statusSpan);
+                    status.appendChild(deleteBtn);
+                    
+                    scriptItem.appendChild(info);
+                    scriptItem.appendChild(status);
+                    
+                    container.appendChild(scriptItem);
                 });
-                
-                container.innerHTML = html;
             }
 
             function renderScriptDetails() {
-                var container = document.getElementById('scriptDetailsContent');
+                var noScriptDiv = document.getElementById('noScriptSelected');
+                var formDiv = document.getElementById('scriptForm');
                 var header = document.getElementById('scriptDetailsHeader');
                 
                 if (!JellyPyConfig.selectedScriptId) {
                     header.textContent = 'Script Details';
-                    container.innerHTML = '<div class="no-script-selected">Select a script from the list to configure its settings</div>';
+                    noScriptDiv.style.display = 'block';
+                    formDiv.style.display = 'none';
                     return;
                 }
                 
@@ -659,95 +770,29 @@
                     return;
                 }
                 
-                header.textContent = `${script.Name} - Details`;
+                // Show form, hide "no script" message
+                noScriptDiv.style.display = 'none';
+                formDiv.style.display = 'block';
+                header.textContent = script.Name + ' - Details';
                 
-                container.innerHTML = `
-                    <!-- Basic Information -->
-                    <div class="script-form-section">
-                        <div class="section-title-small">Basic Information</div>
-                        <div class="form-row">
-                            <div class="form-col">
-                                <label class="inputLabel inputLabelUnfocused" for="script-name">Script Name</label>
-                                <input id="script-name" type="text" is="emby-input" value="${escapeHtml(script.Name)}" onchange="updateScriptProperty('Name', this.value)" />
-                            </div>
-                            <div class="form-col-narrow">
-                                <label class="inputLabel inputLabelUnfocused" for="script-priority">Priority</label>
-                                <input id="script-priority" type="number" is="emby-input" min="1" max="1000" value="${script.Priority}" onchange="updateScriptProperty('Priority', parseInt(this.value))" />
-                            </div>
-                        </div>
-                        <div class="inputContainer">
-                            <label class="inputLabel inputLabelUnfocused" for="script-description">Description</label>
-                            <input id="script-description" type="text" is="emby-input" value="${escapeHtml(script.Description)}" onchange="updateScriptProperty('Description', this.value)" />
-                        </div>
-                        <div class="checkboxContainer">
-                            <label class="emby-checkbox-label">
-                                <input id="script-enabled" type="checkbox" is="emby-checkbox" ${script.Enabled ? 'checked' : ''} onchange="updateScriptProperty('Enabled', this.checked)" />
-                                <span>Enable this script</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Event Triggers -->
-                    <div class="collapsible-section">
-                        <div class="collapsible-header" onclick="toggleCollapsible(this)">
-                            <span class="collapsible-title">Event Triggers</span>
-                            <span class="collapsible-toggle">▶</span>
-                        </div>
-                        <div class="collapsible-content">
-                            <div class="fieldDescription" style="margin-bottom: 15px;">
-                                Select which Jellyfin events should trigger this script.
-                            </div>
-                            <div class="trigger-checkboxes" id="triggerCheckboxes">
-                                ${renderTriggerCheckboxes(script.Triggers)}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Execution Settings -->
-                    <div class="collapsible-section">
-                        <div class="collapsible-header" onclick="toggleCollapsible(this)">
-                            <span class="collapsible-title">Execution Settings</span>
-                            <span class="collapsible-toggle">▶</span>
-                        </div>
-                        <div class="collapsible-content">
-                            ${renderExecutionSettings(script.Execution)}
-                        </div>
-                    </div>
-
-                    <!-- Execution Conditions -->
-                    <div class="collapsible-section">
-                        <div class="collapsible-header" onclick="toggleCollapsible(this)">
-                            <span class="collapsible-title">Execution Conditions</span>
-                            <span class="collapsible-toggle">▶</span>
-                        </div>
-                        <div class="collapsible-content">
-                            <div class="fieldDescription" style="margin-bottom: 15px;">
-                                Add conditions to control when this script should run. All conditions must be met for the script to execute.
-                            </div>
-                            <div id="conditionsContainer">
-                                ${renderConditions(script.Conditions)}
-                            </div>
-                            <button type="button" class="add-item-btn" onclick="addCondition()">+ Add Condition</button>
-                        </div>
-                    </div>
-
-                    <!-- Data Attributes -->
-                    <div class="collapsible-section">
-                        <div class="collapsible-header" onclick="toggleCollapsible(this)">
-                            <span class="collapsible-title">Data Attributes</span>
-                            <span class="collapsible-toggle">▶</span>
-                        </div>
-                        <div class="collapsible-content">
-                            <div class="fieldDescription" style="margin-bottom: 15px;">
-                                Configure how event data is passed to your script.
-                            </div>
-                            <div id="dataAttributesContainer">
-                                ${renderDataAttributes(script.DataAttributes)}
-                            </div>
-                            <button type="button" class="add-item-btn" onclick="addDataAttribute()">+ Add Data Attribute</button>
-                        </div>
-                    </div>
-                `;
+                // Populate basic fields
+                document.getElementById('script-name').value = script.Name;
+                document.getElementById('script-name').onchange = function() { updateScriptProperty('Name', this.value); };
+                
+                document.getElementById('script-priority').value = script.Priority;
+                document.getElementById('script-priority').onchange = function() { updateScriptProperty('Priority', parseInt(this.value)); };
+                
+                document.getElementById('script-description').value = script.Description;
+                document.getElementById('script-description').onchange = function() { updateScriptProperty('Description', this.value); };
+                
+                document.getElementById('script-enabled').checked = script.Enabled;
+                document.getElementById('script-enabled').onchange = function() { updateScriptProperty('Enabled', this.checked); };
+                
+                // Populate sections using existing render functions
+                document.getElementById('triggerCheckboxes').innerHTML = renderTriggerCheckboxes(script.Triggers);
+                document.getElementById('executionSettingsContent').innerHTML = renderExecutionSettings(script.Execution);
+                document.getElementById('conditionsContainer').innerHTML = renderConditions(script.Conditions);
+                document.getElementById('dataAttributesContainer').innerHTML = renderDataAttributes(script.DataAttributes);
             }
 
             function toggleCollapsible(header) {
