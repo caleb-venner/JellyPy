@@ -418,6 +418,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         catch (Exception)
         {
             // If 'which' command fails, try direct execution
+            throw;
         }
 
         // Fallback: try direct execution
