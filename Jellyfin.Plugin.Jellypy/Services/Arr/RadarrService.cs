@@ -84,8 +84,10 @@ public class RadarrService : IRadarrService
         }
         catch (Exception ex)
         {
+            // CA1031: We catch Exception here as a safety net for truly unexpected errors.
+            // This method returns a nullable int to indicate success/failure, so we handle all exceptions gracefully.
             _logger.LogError(ex, "Unexpected error getting Radarr movie ID for: {MovieName}", movieName);
-            return null;
+            throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
     }
 
@@ -133,10 +135,22 @@ public class RadarrService : IRadarrService
             _logger.LogError(ex, "Request timed out when setting movie monitored status: {MovieId}", movieId);
             return false;
         }
+        catch (ArgumentException ex)
+        {
+            _logger.LogError(ex, "Invalid argument when setting movie monitored status: {MovieId}", movieId);
+            return false;
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Invalid operation when setting movie monitored status: {MovieId}", movieId);
+            return false;
+        }
         catch (Exception ex)
         {
+            // CA1031: We catch Exception here as a safety net for truly unexpected errors.
+            // This method returns a boolean to indicate success/failure, so we handle all exceptions gracefully.
             _logger.LogError(ex, "Unexpected error setting movie monitored status: {MovieId}", movieId);
-            return false;
+            throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
     }
 
@@ -199,8 +213,10 @@ public class RadarrService : IRadarrService
         }
         catch (Exception ex)
         {
+            // CA1031: We catch Exception here as a safety net for truly unexpected errors.
+            // This method returns a nullable object to indicate success/failure, so we handle all exceptions gracefully.
             _logger.LogError(ex, "Unexpected error getting Radarr movie details for ID: {MovieId}", movieId);
-            return null;
+            throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
     }
 

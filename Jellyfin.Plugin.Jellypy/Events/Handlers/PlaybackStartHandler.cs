@@ -119,7 +119,10 @@ public class PlaybackStartHandler : IEventProcessor<PlaybackProgressEventArgs>
         }
         catch (Exception ex)
         {
+            // CA1031: We catch Exception here as a safety net for truly unexpected errors.
+            // This is a high-level event handler that coordinates multiple services and should not swallow exceptions.
             _logger.LogError(ex, "Error handling PlaybackStart event for item {ItemName}", eventArgs.Item?.Name);
+            throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
     }
 }

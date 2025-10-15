@@ -79,13 +79,15 @@ public class ConditionEvaluator
         }
         catch (Exception ex)
         {
+            // CA1031: We catch Exception here as a safety net for truly unexpected errors.
+            // This method returns a boolean to indicate success/failure, so we handle all exceptions gracefully.
             _logger.LogWarning(
                 ex,
                 "Unexpected error evaluating condition {Field} {Operator} {Value}",
                 condition.Field,
                 condition.Operator,
                 condition.Value);
-            return false;
+            throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
     }
 

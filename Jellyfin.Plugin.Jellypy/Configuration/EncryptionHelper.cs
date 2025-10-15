@@ -78,10 +78,12 @@ public static class EncryptionHelper
             System.Diagnostics.Debug.WriteLine($"Encryption argument error: {ex.Message}");
             return string.Empty;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // If encryption fails for any other reason, return empty string
-            return string.Empty;
+            // CA1031: We catch Exception here as a safety net for truly unexpected errors.
+            // This is security-critical code that should not swallow exceptions.
+            System.Diagnostics.Debug.WriteLine($"Unexpected encryption error: {ex.Message}");
+            throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
     }
 
@@ -144,10 +146,12 @@ public static class EncryptionHelper
             System.Diagnostics.Debug.WriteLine($"Decryption argument error: {ex.Message}");
             return string.Empty;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // If decryption fails for any other reason, return empty string (could be unencrypted legacy data)
-            return string.Empty;
+            // CA1031: We catch Exception here as a safety net for truly unexpected errors.
+            // This is security-critical code that should not swallow exceptions.
+            System.Diagnostics.Debug.WriteLine($"Unexpected decryption error: {ex.Message}");
+            throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
     }
 

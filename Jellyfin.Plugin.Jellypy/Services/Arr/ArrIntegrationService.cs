@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
@@ -52,9 +54,25 @@ public class ArrIntegrationService : IArrIntegrationService
                 await ProcessMovieAsync(movie);
             }
         }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "HTTP request failed while processing playback start for item: {ItemName}", item.Name);
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "JSON parsing failed while processing playback start for item: {ItemName}", item.Name);
+        }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogError(ex, "Request timed out while processing playback start for item: {ItemName}", item.Name);
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Invalid operation while processing playback start for item: {ItemName}", item.Name);
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error processing playback start for item: {ItemName}", item.Name);
+            _logger.LogError(ex, "Unexpected error processing playback start for item: {ItemName}", item.Name);
         }
     }
 
