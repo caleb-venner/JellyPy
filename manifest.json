@@ -10,10 +10,10 @@
         "versions": [
             {
                 "version": "2.0.0.0",
-                "changelog": "**Version 2.0.0 - Major UI Overhaul & Critical Fixes**\n\n**Critical Fixes:**\n• Fixed script settings not persisting to disk\n• Resolved XML serialization bug preventing script configuration saves\n• Added encryption key initialization in constructor\n\n**UI Enhancements:**\n• Complete visual redesign with inline styling architecture\n• Added rotating triangle icons for expandable sections\n• Implemented active state highlighting with blue glow effect\n• Enhanced button sizes for improved usability (36-44px)\n• Uniformly styled collapsible sections throughout\n• Redesigned event trigger checkboxes as visual cards\n• Modernized tab navigation with inline styles\n• Converted delete buttons to circular red buttons\n\n**Code Quality:**\n• Removed redundant CSS (reduced from 280 to 75 lines)\n• Improved maintainability with inline style approach\n• Better compatibility with Jellyfin's iframe restrictions\n\n**Note:** This is a major release due to the critical persistence bug fix and complete UI architecture overhaul.",
+                "changelog": "**Version 2.0.0 - Major UI Overhaul & Critical Fixes**\n\n**Critical Fixes:**\n\u2022 Fixed script settings not persisting to disk\n\u2022 Resolved XML serialization bug preventing script configuration saves\n\u2022 Added encryption key initialization in constructor\n\n**UI Enhancements:**\n\u2022 Complete visual redesign with inline styling architecture\n\u2022 Added rotating triangle icons for expandable sections\n\u2022 Implemented active state highlighting with blue glow effect\n\u2022 Enhanced button sizes for improved usability (36-44px)\n\u2022 Uniformly styled collapsible sections throughout\n\u2022 Redesigned event trigger checkboxes as visual cards\n\u2022 Modernized tab navigation with inline styles\n\u2022 Converted delete buttons to circular red buttons\n\n**Code Quality:**\n\u2022 Removed redundant CSS (reduced from 280 to 75 lines)\n\u2022 Improved maintainability with inline style approach\n\u2022 Better compatibility with Jellyfin's iframe restrictions\n\n**Note:** This is a major release due to the critical persistence bug fix and complete UI architecture overhaul.",
                 "targetAbi": "10.9.0.0",
                 "sourceUrl": "https://raw.githubusercontent.com/caleb-venner/jellypy/main/releases/jellypy_2.0.0.0.zip",
-                "checksum": "PLACEHOLDER",
+                "checksum": "cdcbcd15571202b2cbd8798fd309586c",
                 "timestamp": "2025-10-15T00:00:00Z"
             },
             {
@@ -26,7 +26,7 @@
             },
             {
                 "version": "1.1.1.0",
-                "changelog": "**Version 1.1.1 - Optimized Package Size**\n\n**Key Improvements:**\n• Reduced download size from ~8MB to ~300KB\n• Removed unnecessary dependencies - only includes plugin-specific files\n• Server-based API key encryption using Jellyfin SystemId\n• Test connection functionality for Sonarr and Radarr\n• System-independent encryption that survives OS updates\n\n**Security Enhancements:**\n• AES-256-CBC encryption with PBKDF2 key derivation (10,000 iterations)\n• Three-component key generation: Plugin GUID + Server ID + Static Salt\n• Automatic encryption of API keys on save\n• Enhanced security documentation\n\n**Note:** Provides the same security features as v1.1.0 with optimized package size.",
+                "changelog": "**Version 1.1.1 - Optimized Package Size**\n\n**Key Improvements:**\n\u2022 Reduced download size from ~8MB to ~300KB\n\u2022 Removed unnecessary dependencies - only includes plugin-specific files\n\u2022 Server-based API key encryption using Jellyfin SystemId\n\u2022 Test connection functionality for Sonarr and Radarr\n\u2022 System-independent encryption that survives OS updates\n\n**Security Enhancements:**\n\u2022 AES-256-CBC encryption with PBKDF2 key derivation (10,000 iterations)\n\u2022 Three-component key generation: Plugin GUID + Server ID + Static Salt\n\u2022 Automatic encryption of API keys on save\n\u2022 Enhanced security documentation\n\n**Note:** Provides the same security features as v1.1.0 with optimized package size.",
                 "targetAbi": "10.9.0.0",
                 "sourceUrl": "https://raw.githubusercontent.com/caleb-venner/jellypy/main/releases/jellypy_1.1.1.0.zip",
                 "checksum": "316d4341fb3b389e7baf0de7abbcfdb8",
@@ -34,7 +34,7 @@
             },
             {
                 "version": "1.0.0.0",
-                "changelog": "**Version 1.0.0 - Initial Release**\n\n**Core Features:**\n• Native Sonarr integration with automatic episode monitoring\n• Native Radarr integration with smart movie unmonitoring\n• Configurable watch percentage detection\n• Quality cutoff checking for upgrade-eligible content\n• Season-based monitoring control\n• Dynamic episode buffer management\n\n**Additional Features:**\n• Custom script execution support (legacy feature)\n• Comprehensive configuration UI\n• Full Jellyfin integration",
+                "changelog": "**Version 1.0.0 - Initial Release**\n\n**Core Features:**\n\u2022 Native Sonarr integration with automatic episode monitoring\n\u2022 Native Radarr integration with smart movie unmonitoring\n\u2022 Configurable watch percentage detection\n\u2022 Quality cutoff checking for upgrade-eligible content\n\u2022 Season-based monitoring control\n\u2022 Dynamic episode buffer management\n\n**Additional Features:**\n\u2022 Custom script execution support (legacy feature)\n\u2022 Comprehensive configuration UI\n\u2022 Full Jellyfin integration",
                 "targetAbi": "10.9.0.0",
                 "sourceUrl": "https://raw.githubusercontent.com/caleb-venner/jellypy/main/releases/jellypy_1.0.0.0.zip",
                 "checksum": "1b7c19fe9fcfd63f8b1290fc84a76cbc",
