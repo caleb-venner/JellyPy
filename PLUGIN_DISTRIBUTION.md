@@ -1,11 +1,11 @@
-# Jellypy Plugin Repository
+# JellyPy Plugin Repository
 
-This repository provides the Jellypy plugin for Jellyfin
+This repository provides the JellyPy plugin for Jellyfin
 through a third-party plugin catalog.
 
-## About Jellypy
+## About JellyPy
 
-Jellypy automatically manages your Sonarr and Radarr
+JellyPy automatically manages your Sonarr and Radarr
 monitoring based on what you watch in Jellyfin.
 
 ### Features
@@ -24,10 +24,10 @@ monitoring based on what you watch in Jellyfin.
 **Dashboard** → **Plugins** → **Repositories**
 2. Click **Add Repository**
 3. Enter the following details:
-   - **Repository Name**: `Jellypy`
+   - **Repository Name**: `JellyPy`
    - **Repository URL**: `https://YOUR_HOSTED_DOMAIN/manifest.json`
 4. Click **Save**
-5. Go to **Catalog** tab and install **Jellypy**
+5. Go to **Catalog** tab and install **JellyPy**
 
 ### Option 2: Manual Installation
 
@@ -40,7 +40,7 @@ monitoring based on what you watch in Jellyfin.
    - **macOS**: `/var/lib/jellyfin/plugins/Jellypy/`
 4. Restart Jellyfin
 5. Configure the plugin
-in **Administration** → **Dashboard** → **Plugins** → **Jellypy**
+in **Administration** → **Dashboard** → **Plugins** → **JellyPy**
 
 ## Configuration
 

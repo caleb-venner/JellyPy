@@ -37,14 +37,13 @@ public class PluginConfiguration : BasePluginConfiguration
         // Native integration settings - enabled by default
         EnableNativeSonarrIntegration = true;
         EnableNativeRadarrIntegration = true;
-        EpisodeDownloadBuffer = 5;
+        EpisodeDownloadBuffer = 6;
         AutoSearchEpisodes = true;
         MonitorFutureEpisodes = true;
         UnmonitorWatchedMovies = true;
         SkipEpisodesWithFiles = true;
         UnmonitorWatchedEpisodes = true;
         MonitorOnlyCurrentSeason = false;
-        MinimumEpisodeBuffer = 2;
         UnmonitorOnlyIfWatched = false;
         MinimumWatchPercentage = 90;
         UnmonitorAfterUpgrade = false;
@@ -252,8 +251,9 @@ public class PluginConfiguration : BasePluginConfiguration
     public bool EnableNativeRadarrIntegration { get; set; }
 
     /// <summary>
-    /// Gets or sets the number of next episodes to download when watching a TV show.
-    /// Default is 5 episodes.
+    /// Gets or sets the number of next episodes to monitor and download when watching a TV show.
+    /// This matches the EPISODE_BUFFER setting from the legacy download script.
+    /// Default is 6 episodes.
     /// </summary>
     public int EpisodeDownloadBuffer { get; set; }
 
@@ -296,13 +296,6 @@ public class PluginConfiguration : BasePluginConfiguration
     /// Default is false (monitors episodes across all future seasons).
     /// </summary>
     public bool MonitorOnlyCurrentSeason { get; set; }
-
-    /// <summary>
-    /// Gets or sets the minimum number of unwatched episodes to maintain in the queue.
-    /// If unwatched count drops below this value, additional episodes will be monitored.
-    /// Default is 2 episodes.
-    /// </summary>
-    public int MinimumEpisodeBuffer { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether to only unmonitor movies after they've been watched.

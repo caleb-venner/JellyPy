@@ -1,4 +1,4 @@
-# Jellypy - Jellyfin Plugin for Sonarr & Radarr Integration
+# JellyPy - Jellyfin Plugin for Sonarr & Radarr Integration
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![.NET](https://img.shields.io/badge/.NET-8.0-purple)](https://dotnet.microsoft.com/)
@@ -56,7 +56,7 @@ and user changes
 
 1. Open Jellyfin Dashboard → Plugins → Repositories
 2. Add repository: `https://raw.githubusercontent.com/caleb-venner/jellypy/main/manifest.json`
-3. Go to Catalog → Search "Jellypy"
+3. Go to Catalog → Search "JellyPy"
 4. Click Install → Restart Jellyfin
 
 ### Manual Installation
@@ -73,7 +73,7 @@ from [Releases](https://github.com/caleb-venner/jellypy/releases)
 
 ### Sonarr Setup
 
-1. Navigate to **Dashboard → Plugins → Jellypy → Settings → Native Integration**
+1. Navigate to **Dashboard → Plugins → JellyPy → Settings → Native Integration**
 2. Configure Sonarr:
 
    ```text
@@ -98,7 +98,7 @@ from [Releases](https://github.com/caleb-venner/jellypy/releases)
 
 ### Radarr Setup
 
-1. Navigate to **Dashboard → Plugins → Jellypy → Settings → Native Integration**
+1. Navigate to **Dashboard → Plugins → JellyPy → Settings → Native Integration**
 2. Configure Radarr:
 
    ```text
@@ -205,7 +205,7 @@ Result:
 1. **Check Jellyfin Logs**:
 
    ```text
-   Dashboard → Logs → Filter: "Jellypy"
+   Dashboard → Logs → Filter: "JellyPy"
    ```
 
    Look for configuration errors or API connection issues
@@ -237,7 +237,7 @@ Result:
 Enable verbose logging:
 
 ```text
-Dashboard → Plugins → Jellypy → Global Settings
+Dashboard → Plugins → JellyPy → Global Settings
 Enable Verbose Logging: ✓
 ```
 

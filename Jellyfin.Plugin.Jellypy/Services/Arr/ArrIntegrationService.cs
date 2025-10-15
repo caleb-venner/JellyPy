@@ -165,28 +165,8 @@ public class ArrIntegrationService : IArrIntegrationService
                 currentEp.EpisodeNumber);
         }
 
-        // Calculate episode buffer with minimum enforcement
-        var episodeBuffer = config.EpisodeDownloadBuffer;
-
-        // Count unwatched episodes (episodes without files)
-        var unwatchedCount = orderedEpisodes
-            .Skip(currentEpisodeIndex + 1)
-            .Count(e => !e.HasFile);
-
-        // If we have fewer unwatched episodes than the minimum, increase the buffer
-        if (unwatchedCount < config.MinimumEpisodeBuffer)
-        {
-            var additionalBuffer = config.MinimumEpisodeBuffer - unwatchedCount;
-            episodeBuffer = Math.Max(episodeBuffer, episodeBuffer + additionalBuffer);
-            _logger.LogInformation(
-                "Adjusting episode buffer from {Original} to {Adjusted} (unwatched: {Unwatched}, minimum: {Minimum})",
-                config.EpisodeDownloadBuffer,
-                episodeBuffer,
-                unwatchedCount,
-                config.MinimumEpisodeBuffer);
-        }
-
         // Get the next episodes based on configuration
+        var episodeBuffer = config.EpisodeDownloadBuffer;
         var nextEpisodesQuery = orderedEpisodes.Skip(currentEpisodeIndex + 1);
 
         // Filter by current season only if enabled
@@ -203,9 +183,10 @@ public class ArrIntegrationService : IArrIntegrationService
             .ToList();
 
         _logger.LogInformation(
-            "Found {Count} next episodes to process for {SeriesName}",
+            "Found {Count} next episodes to process for {SeriesName} (buffer: {Buffer})",
             nextEpisodes.Count,
-            seriesName);
+            seriesName,
+            episodeBuffer);
 
         // Process each next episode
         foreach (var nextEpisode in nextEpisodes)

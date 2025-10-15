@@ -124,8 +124,10 @@ create_release_zip() {
     done
     
     # Create zip with only the essential plugin DLL
+    # Include the plugin DLL and the repository thumb image so installs show the plugin icon
     zip "../../../../$zip_file" \
         Jellyfin.Plugin.Jellypy.dll \
+        "Jellyfin.Plugin.Jellypy/thumb.png" \
         > /dev/null
     
     cd - > /dev/null

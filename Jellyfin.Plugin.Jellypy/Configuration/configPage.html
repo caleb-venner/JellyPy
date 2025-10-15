@@ -23,88 +23,6 @@
             font-size: 1.2em;
             font-weight: bold;
         }
-        .script-setting-item {
-            border: 1px solid #555;
-            border-radius: 4px;
-            padding: 15px;
-            margin-bottom: 15px;
-            background: rgba(255, 255, 255, 0.02);
-        }
-        .script-setting-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .script-setting-name {
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-        .script-setting-controls {
-            display: flex;
-            gap: 10px;
-        }
-        .expandable-section {
-            margin-top: 10px;
-        }
-        .expandable-header {
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 4px;
-            margin-bottom: 10px;
-        }
-        .expandable-header:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-        .expandable-content {
-            display: none;
-            padding: 10px;
-            border-left: 2px solid #555;
-            margin-left: 10px;
-        }
-        .expandable-content.expanded {
-            display: block;
-        }
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        .form-grid-full {
-            grid-column: 1 / -1;
-        }
-        .condition-item, .attribute-item {
-            border: 1px solid #666;
-            border-radius: 4px;
-            padding: 10px;
-            margin-bottom: 10px;
-            background: rgba(255, 255, 255, 0.03);
-        }
-        .item-controls {
-            display: flex;
-            gap: 5px;
-            margin-top: 10px;
-        }
-        .trigger-checkboxes {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .hidden {
-            display: none !important;
-        }
-        .small-button {
-            font-size: 0.8em;
-            padding: 4px 8px;
-        }
-        .danger-button {
-            background-color: #d32f2f !important;
-        }
         .tab-container {
             margin-bottom: 20px;
         }
@@ -135,6 +53,279 @@
         .tab-content.active {
             display: block;
         }
+        
+        /* Script Settings Styles */
+        .script-settings-container {
+            display: flex;
+            gap: 20px;
+            min-height: 500px;
+        }
+        
+        .script-list {
+            flex: 0 0 300px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .script-list-header {
+            padding: 15px;
+            border-bottom: 1px solid #444;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .script-list-title {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .add-script-btn {
+            background: #00a4dc;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        
+        .add-script-btn:hover {
+            background: #0084b4;
+        }
+        
+        .script-items {
+            max-height: 450px;
+            overflow-y: auto;
+        }
+        
+        .script-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #333;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .script-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .script-item.active {
+            background: rgba(0, 164, 220, 0.2);
+            border-left: 3px solid #00a4dc;
+        }
+        
+        .script-item-info {
+            flex: 1;
+        }
+        
+        .script-item-name {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .script-item-desc {
+            font-size: 0.85em;
+            color: #aaa;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .script-item-status {
+            margin-left: 10px;
+        }
+        
+        .status-enabled {
+            color: #4CAF50;
+            font-size: 0.8em;
+        }
+        
+        .status-disabled {
+            color: #888;
+            font-size: 0.8em;
+        }
+        
+        .delete-script-btn {
+            background: #d32f2f;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8em;
+            margin-left: 8px;
+        }
+        
+        .delete-script-btn:hover {
+            background: #b71c1c;
+        }
+        
+        .script-details {
+            flex: 1;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .script-details-header {
+            padding: 15px;
+            border-bottom: 1px solid #444;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .script-details-content {
+            padding: 20px;
+            max-height: 450px;
+            overflow-y: auto;
+        }
+        
+        .no-script-selected {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #888;
+            font-style: italic;
+        }
+        
+        .script-form-section {
+            margin-bottom: 25px;
+        }
+        
+        .section-title-small {
+            font-size: 1em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #00a4dc;
+            border-bottom: 1px solid #555;
+            padding-bottom: 5px;
+        }
+        
+        .collapsible-section {
+            border: 1px solid #555;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        
+        .collapsible-header {
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #555;
+        }
+        
+        .collapsible-header:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .collapsible-title {
+            font-weight: bold;
+        }
+        
+        .collapsible-toggle {
+            transition: transform 0.2s ease;
+        }
+        
+        .collapsible-toggle.expanded {
+            transform: rotate(90deg);
+        }
+        
+        .collapsible-content {
+            padding: 15px;
+            display: none;
+        }
+        
+        .collapsible-content.expanded {
+            display: block;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-col {
+            flex: 1;
+        }
+        
+        .form-col-narrow {
+            flex: 0 0 120px;
+        }
+        
+        .condition-item, .data-attribute-item, .env-var-item {
+            border: 1px solid #555;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .remove-item-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #d32f2f;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .remove-item-btn:hover {
+            background: #b71c1c;
+        }
+        
+        .add-item-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        
+        .add-item-btn:hover {
+            background: #45a049;
+        }
+        
+        .trigger-checkboxes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .trigger-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+            padding: 40px 20px;
+        }
     </style>
 </head>
 <body>
@@ -156,14 +347,37 @@
                     <div id="advanced-tab" class="tab-content active" style="display: block;">
                         <div class="section-header">
                             <div class="section-title">Script Settings</div>
-                            <button type="button" is="emby-button" class="emby-button" onclick="addScriptSetting()">Add Script Setting</button>
                         </div>
-                        <div id="script-settings-container">
-                            <!-- Script settings will be dynamically generated here -->
+                        <div class="fieldDescription" style="margin-bottom: 20px;">
+                            Configure custom scripts to run in response to Jellyfin events. Scripts can be triggered by playback events, library changes, user actions, and more.
                         </div>
-                        <div class="fieldDescription" style="margin-top: 20px;">
-                            Create custom script configurations with specific triggers, conditions, and data attributes.
-                            Each setting can respond to different Jellyfin events and pass selected data to your scripts.
+                        
+                        <div class="script-settings-container">
+                            <!-- Script List -->
+                            <div class="script-list">
+                                <div class="script-list-header">
+                                    <div class="script-list-title">Scripts</div>
+                                    <button type="button" class="add-script-btn" onclick="addNewScript()">+ Add</button>
+                                </div>
+                                <div class="script-items" id="scriptItems">
+                                    <div class="empty-state" id="emptyState">
+                                        No scripts configured yet.<br>
+                                        Click "Add" to create your first script.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Script Details -->
+                            <div class="script-details">
+                                <div class="script-details-header" id="scriptDetailsHeader">
+                                    Script Details
+                                </div>
+                                <div class="script-details-content" id="scriptDetailsContent">
+                                    <div class="no-script-selected">
+                                        Select a script from the list to configure its settings
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -201,9 +415,9 @@
                                 <div id="sonarrTestResult" class="fieldDescription" style="display: none; font-weight: bold;"></div>
                             </div>
                             <div class="inputContainer">
-                                <label class="inputLabel inputLabelUnfocused" for="EpisodeDownloadBuffer">Episodes to Monitor</label>
+                                <label class="inputLabel inputLabelUnfocused" for="EpisodeDownloadBuffer">Episode Buffer</label>
                                 <input id="EpisodeDownloadBuffer" name="EpisodeDownloadBuffer" type="number" is="emby-input" min="1" max="20" />
-                                <div class="fieldDescription">Number of upcoming episodes to keep monitored after watching an episode (default: 5).</div>
+                                <div class="fieldDescription">Number of episodes to monitor ahead of your current position. When you watch an episode, the plugin will monitor this many episodes forward from where you are (default: 6).</div>
                             </div>
                             <div class="checkboxContainer checkboxContainer-withDescription">
                                 <label class="emby-checkbox-label">
@@ -239,11 +453,6 @@
                                     <span>Monitor Only Current Season</span>
                                 </label>
                                 <div class="fieldDescription">When enabled, only monitors episodes in the same season you're currently watching. Future seasons won't be monitored until you start watching them.</div>
-                            </div>
-                            <div class="inputContainer">
-                                <label class="inputLabel inputLabelUnfocused" for="MinimumEpisodeBuffer">Minimum Episode Buffer</label>
-                                <input id="MinimumEpisodeBuffer" name="MinimumEpisodeBuffer" type="number" is="emby-input" min="1" max="10" />
-                                <div class="fieldDescription">Minimum number of unwatched episodes to maintain. If you have fewer than this, the buffer will be increased (default: 2).</div>
                             </div>
                         </div>
 
@@ -341,27 +550,566 @@
             var JellyPyConfig = {
                 pluginUniqueId: 'a5bd541f-38dc-467e-9a9a-15fe3f3bcf5c',
                 currentConfig: null,
-                eventTypes: [
-                    'PlaybackStart', 'PlaybackStop', 'PlaybackPause', 'PlaybackResume', 'PlaybackProgress',
-                    'ItemAdded', 'ItemUpdated', 'UserCreated', 'UserDeleted'
-                ],
-                executorTypes: [
-                    'Python', 'PowerShell', 'Bash', 'NodeJs', 'Binary'
-                ],
-                conditionOperators: [
-                    'Equals', 'NotEquals', 'Contains', 'NotContains', 'StartsWith', 'EndsWith',
-                    'Regex', 'GreaterThan', 'LessThan', 'In', 'NotIn'
-                ],
-                dataAttributeFormats: [
-                    'String', 'Json', 'Environment', 'Argument'
-                ],
-                availableFields: [
-                    'EventType', 'Timestamp', 'UserId', 'UserName', 'SessionId', 'ItemId', 'ItemName',
-                    'ItemType', 'ItemPath', 'LibraryId', 'LibraryName', 'PlaybackPositionTicks',
-                    'IsPaused', 'ClientName', 'DeviceName', 'DeviceId', 'SeriesName', 'SeasonNumber',
-                    'EpisodeNumber', 'Year', 'Genres', 'ContentRating'
-                ]
+                selectedScriptId: null,
+                scriptSettings: []
             };
+
+            // Script Management Functions
+            function addNewScript() {
+                var newScript = {
+                    Id: generateGuid(),
+                    Name: 'New Script',
+                    Description: '',
+                    Enabled: true,
+                    Triggers: [],
+                    Conditions: [],
+                    Execution: {
+                        ExecutorType: 0, // Python
+                        ExecutablePath: '/usr/bin/python3',
+                        ScriptPath: '',
+                        WorkingDirectory: '',
+                        AdditionalArguments: '',
+                        EnvironmentVariables: [],
+                        TimeoutSeconds: 300
+                    },
+                    DataAttributes: [],
+                    Priority: 100
+                };
+                
+                JellyPyConfig.scriptSettings.push(newScript);
+                renderScriptList();
+                selectScript(newScript.Id);
+            }
+
+            function deleteScript(scriptId) {
+                if (confirm('Are you sure you want to delete this script?')) {
+                    JellyPyConfig.scriptSettings = JellyPyConfig.scriptSettings.filter(s => s.Id !== scriptId);
+                    
+                    if (JellyPyConfig.selectedScriptId === scriptId) {
+                        JellyPyConfig.selectedScriptId = null;
+                        renderScriptDetails();
+                    }
+                    
+                    renderScriptList();
+                }
+            }
+
+            function selectScript(scriptId) {
+                JellyPyConfig.selectedScriptId = scriptId;
+                
+                // Update active state in list
+                document.querySelectorAll('.script-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                var selectedItem = document.querySelector(`[data-script-id="${scriptId}"]`);
+                if (selectedItem) {
+                    selectedItem.classList.add('active');
+                }
+                
+                renderScriptDetails();
+            }
+
+            function renderScriptList() {
+                var container = document.getElementById('scriptItems');
+                var emptyState = document.getElementById('emptyState');
+                
+                if (JellyPyConfig.scriptSettings.length === 0) {
+                    emptyState.style.display = 'block';
+                    return;
+                }
+                
+                emptyState.style.display = 'none';
+                
+                var html = '';
+                JellyPyConfig.scriptSettings.forEach(script => {
+                    var statusClass = script.Enabled ? 'status-enabled' : 'status-disabled';
+                    var statusText = script.Enabled ? 'Enabled' : 'Disabled';
+                    
+                    html += `
+                        <div class="script-item ${script.Id === JellyPyConfig.selectedScriptId ? 'active' : ''}" 
+                             data-script-id="${script.Id}" onclick="selectScript('${script.Id}')">
+                            <div class="script-item-info">
+                                <div class="script-item-name">${escapeHtml(script.Name)}</div>
+                                <div class="script-item-desc">${escapeHtml(script.Description || 'No description')}</div>
+                            </div>
+                            <div class="script-item-status">
+                                <span class="${statusClass}">${statusText}</span>
+                                <button type="button" class="delete-script-btn" onclick="event.stopPropagation(); deleteScript('${script.Id}')">&times;</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+            }
+
+            function renderScriptDetails() {
+                var container = document.getElementById('scriptDetailsContent');
+                var header = document.getElementById('scriptDetailsHeader');
+                
+                if (!JellyPyConfig.selectedScriptId) {
+                    header.textContent = 'Script Details';
+                    container.innerHTML = '<div class="no-script-selected">Select a script from the list to configure its settings</div>';
+                    return;
+                }
+                
+                var script = JellyPyConfig.scriptSettings.find(s => s.Id === JellyPyConfig.selectedScriptId);
+                if (!script) {
+                    return;
+                }
+                
+                header.textContent = `${script.Name} - Details`;
+                
+                container.innerHTML = `
+                    <!-- Basic Information -->
+                    <div class="script-form-section">
+                        <div class="section-title-small">Basic Information</div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label class="inputLabel inputLabelUnfocused" for="script-name">Script Name</label>
+                                <input id="script-name" type="text" is="emby-input" value="${escapeHtml(script.Name)}" onchange="updateScriptProperty('Name', this.value)" />
+                            </div>
+                            <div class="form-col-narrow">
+                                <label class="inputLabel inputLabelUnfocused" for="script-priority">Priority</label>
+                                <input id="script-priority" type="number" is="emby-input" min="1" max="1000" value="${script.Priority}" onchange="updateScriptProperty('Priority', parseInt(this.value))" />
+                            </div>
+                        </div>
+                        <div class="inputContainer">
+                            <label class="inputLabel inputLabelUnfocused" for="script-description">Description</label>
+                            <input id="script-description" type="text" is="emby-input" value="${escapeHtml(script.Description)}" onchange="updateScriptProperty('Description', this.value)" />
+                        </div>
+                        <div class="checkboxContainer">
+                            <label class="emby-checkbox-label">
+                                <input id="script-enabled" type="checkbox" is="emby-checkbox" ${script.Enabled ? 'checked' : ''} onchange="updateScriptProperty('Enabled', this.checked)" />
+                                <span>Enable this script</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Event Triggers -->
+                    <div class="collapsible-section">
+                        <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                            <span class="collapsible-title">Event Triggers</span>
+                            <span class="collapsible-toggle">▶</span>
+                        </div>
+                        <div class="collapsible-content">
+                            <div class="fieldDescription" style="margin-bottom: 15px;">
+                                Select which Jellyfin events should trigger this script.
+                            </div>
+                            <div class="trigger-checkboxes" id="triggerCheckboxes">
+                                ${renderTriggerCheckboxes(script.Triggers)}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Execution Settings -->
+                    <div class="collapsible-section">
+                        <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                            <span class="collapsible-title">Execution Settings</span>
+                            <span class="collapsible-toggle">▶</span>
+                        </div>
+                        <div class="collapsible-content">
+                            ${renderExecutionSettings(script.Execution)}
+                        </div>
+                    </div>
+
+                    <!-- Execution Conditions -->
+                    <div class="collapsible-section">
+                        <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                            <span class="collapsible-title">Execution Conditions</span>
+                            <span class="collapsible-toggle">▶</span>
+                        </div>
+                        <div class="collapsible-content">
+                            <div class="fieldDescription" style="margin-bottom: 15px;">
+                                Add conditions to control when this script should run. All conditions must be met for the script to execute.
+                            </div>
+                            <div id="conditionsContainer">
+                                ${renderConditions(script.Conditions)}
+                            </div>
+                            <button type="button" class="add-item-btn" onclick="addCondition()">+ Add Condition</button>
+                        </div>
+                    </div>
+
+                    <!-- Data Attributes -->
+                    <div class="collapsible-section">
+                        <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                            <span class="collapsible-title">Data Attributes</span>
+                            <span class="collapsible-toggle">▶</span>
+                        </div>
+                        <div class="collapsible-content">
+                            <div class="fieldDescription" style="margin-bottom: 15px;">
+                                Configure how event data is passed to your script.
+                            </div>
+                            <div id="dataAttributesContainer">
+                                ${renderDataAttributes(script.DataAttributes)}
+                            </div>
+                            <button type="button" class="add-item-btn" onclick="addDataAttribute()">+ Add Data Attribute</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function toggleCollapsible(header) {
+                var content = header.nextElementSibling;
+                var toggle = header.querySelector('.collapsible-toggle');
+                
+                if (content.classList.contains('expanded')) {
+                    content.classList.remove('expanded');
+                    toggle.classList.remove('expanded');
+                } else {
+                    content.classList.add('expanded');
+                    toggle.classList.add('expanded');
+                }
+            }
+
+            function updateScriptProperty(property, value) {
+                var script = JellyPyConfig.scriptSettings.find(s => s.Id === JellyPyConfig.selectedScriptId);
+                if (script) {
+                    script[property] = value;
+                    if (property === 'Name' || property === 'Enabled') {
+                        renderScriptList();
+                    }
+                }
+            }
+
+            function renderTriggerCheckboxes(triggers) {
+                var eventTypes = [
+                    { value: 0, name: 'PlaybackStart', label: 'Playback Start' },
+                    { value: 1, name: 'PlaybackStop', label: 'Playback Stop' },
+                    { value: 2, name: 'PlaybackPause', label: 'Playback Pause' },
+                    { value: 3, name: 'PlaybackResume', label: 'Playback Resume' },
+                    { value: 4, name: 'ItemAdded', label: 'Item Added' },
+                    { value: 5, name: 'ItemUpdated', label: 'Item Updated' },
+                    { value: 6, name: 'ItemRemoved', label: 'Item Removed' },
+                    { value: 7, name: 'UserCreated', label: 'User Created' },
+                    { value: 8, name: 'UserUpdated', label: 'User Updated' },
+                    { value: 9, name: 'UserDeleted', label: 'User Deleted' },
+                    { value: 10, name: 'SessionStart', label: 'Session Start' },
+                    { value: 11, name: 'SessionEnd', label: 'Session End' },
+                    { value: 12, name: 'ServerStartup', label: 'Server Startup' },
+                    { value: 13, name: 'ServerShutdown', label: 'Server Shutdown' }
+                ];
+                
+                return eventTypes.map(eventType => {
+                    var checked = triggers.includes(eventType.value) ? 'checked' : '';
+                    return `
+                        <div class="trigger-checkbox">
+                            <input type="checkbox" id="trigger-${eventType.value}" ${checked} 
+                                   onchange="updateTrigger(${eventType.value}, this.checked)" />
+                            <label for="trigger-${eventType.value}">${eventType.label}</label>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            function updateTrigger(eventType, checked) {
+                var script = JellyPyConfig.scriptSettings.find(s => s.Id === JellyPyConfig.selectedScriptId);
+                if (!script) return;
+                
+                if (checked) {
+                    if (!script.Triggers.includes(eventType)) {
+                        script.Triggers.push(eventType);
+                    }
+                } else {
+                    script.Triggers = script.Triggers.filter(t => t !== eventType);
+                }
+            }
+
+            function renderExecutionSettings(execution) {
+                var executorTypes = [
+                    { value: 0, label: 'Python' },
+                    { value: 1, label: 'PowerShell' },
+                    { value: 2, label: 'Bash' },
+                    { value: 3, label: 'Node.js' },
+                    { value: 4, label: 'Binary' }
+                ];
+                
+                var executorOptions = executorTypes.map(type => {
+                    var selected = execution.ExecutorType === type.value ? 'selected' : '';
+                    return `<option value="${type.value}" ${selected}>${type.label}</option>`;
+                }).join('');
+                
+                return `
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label class="inputLabel inputLabelUnfocused" for="executor-type">Executor Type</label>
+                            <select id="executor-type" is="emby-select" onchange="updateExecutionProperty('ExecutorType', parseInt(this.value))">
+                                ${executorOptions}
+                            </select>
+                        </div>
+                        <div class="form-col">
+                            <label class="inputLabel inputLabelUnfocused" for="timeout-seconds">Timeout (seconds)</label>
+                            <input id="timeout-seconds" type="number" is="emby-input" min="30" max="3600" 
+                                   value="${execution.TimeoutSeconds}" onchange="updateExecutionProperty('TimeoutSeconds', parseInt(this.value))" />
+                        </div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="executable-path">Executable Path</label>
+                        <input id="executable-path" type="text" is="emby-input" 
+                               value="${escapeHtml(execution.ExecutablePath)}" onchange="updateExecutionProperty('ExecutablePath', this.value)" />
+                        <div class="fieldDescription">Path to the interpreter or executable (e.g., /usr/bin/python3, powershell, /bin/bash)</div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="script-path">Script Path</label>
+                        <input id="script-path" type="text" is="emby-input" 
+                               value="${escapeHtml(execution.ScriptPath)}" onchange="updateExecutionProperty('ScriptPath', this.value)" />
+                        <div class="fieldDescription">Full path to your script file</div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="working-directory">Working Directory</label>
+                        <input id="working-directory" type="text" is="emby-input" 
+                               value="${escapeHtml(execution.WorkingDirectory)}" onchange="updateExecutionProperty('WorkingDirectory', this.value)" />
+                        <div class="fieldDescription">Directory to run the script from (optional)</div>
+                    </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="additional-arguments">Additional Arguments</label>
+                        <input id="additional-arguments" type="text" is="emby-input" 
+                               value="${escapeHtml(execution.AdditionalArguments)}" onchange="updateExecutionProperty('AdditionalArguments', this.value)" />
+                        <div class="fieldDescription">Extra command line arguments (optional)</div>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <h4>Environment Variables</h4>
+                        <div id="envVarsContainer">
+                            ${renderEnvironmentVariables(execution.EnvironmentVariables)}
+                        </div>
+                        <button type="button" class="add-item-btn" onclick="addEnvironmentVariable()">+ Add Environment Variable</button>
+                    </div>
+                `;
+            }
+
+            function updateExecutionProperty(property, value) {
+                var script = JellyPyConfig.scriptSettings.find(s => s.Id === JellyPyConfig.selectedScriptId);
+                if (script) {
+                    script.Execution[property] = value;
+                }
+            }
+
+            function renderConditions(conditions) {
+                if (conditions.length === 0) {
+                    return '<div style="color: #888; font-style: italic; text-align: center; padding: 20px;">No conditions configured. Script will run for all matching events.</div>';
+                }
+                
+                return conditions.map((condition, index) => `
+                    <div class="condition-item">
+                        <button type="button" class="remove-item-btn" onclick="removeCondition(${index})">&times;</button>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label class="inputLabel inputLabelUnfocused">Field</label>
+                                <input type="text" is="emby-input" value="${escapeHtml(condition.Field)}" 
+                                       onchange="updateCondition(${index}, 'Field', this.value)" 
+                                       placeholder="e.g., User.Name, Item.Type, etc." />
+                            </div>
+                            <div class="form-col-narrow">
+                                <label class="inputLabel inputLabelUnfocused">Operator</label>
+                                <select is="emby-select" onchange="updateCondition(${index}, 'Operator', parseInt(this.value))">
+                                    ${renderOperatorOptions(condition.Operator)}
+                                </select>
+                            </div>
+                            <div class="form-col">
+                                <label class="inputLabel inputLabelUnfocused">Value</label>
+                                <input type="text" is="emby-input" value="${escapeHtml(condition.Value)}" 
+                                       onchange="updateCondition(${index}, 'Value', this.value)" />
+                            </div>
+                        </div>
+                        <div class="checkboxContainer">
+                            <label class="emby-checkbox-label">
+                                <input type="checkbox" is="emby-checkbox" ${condition.CaseSensitive ? 'checked' : ''} 
+                                       onchange="updateCondition(${index}, 'CaseSensitive', this.checked)" />
+                                <span>Case Sensitive</span>
+                            </label>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            function renderOperatorOptions(selectedOperator) {
+                var operators = [
+                    { value: 0, label: 'Equals' },
+                    { value: 1, label: 'Not Equals' },
+                    { value: 2, label: 'Contains' },
+                    { value: 3, label: 'Not Contains' },
+                    { value: 4, label: 'Starts With' },
+                    { value: 5, label: 'Ends With' },
+                    { value: 6, label: 'Regex' },
+                    { value: 7, label: 'Greater Than' },
+                    { value: 8, label: 'Less Than' },
+                    { value: 9, label: 'In List' },
+                    { value: 10, label: 'Not In List' }
+                ];
+                
+                return operators.map(op => {
+                    var selected = selectedOperator === op.value ? 'selected' : '';
+                    return `<option value="${op.value}" ${selected}>${op.label}</option>`;
+                }).join('');
+            }
+
+            function addCondition() {
+                var script = JellyPyConfig.scriptSettings.find(s => s.Id === JellyPyConfig.selectedScriptId);
+                if (script) {
+                    script.Conditions.push({
+                        Field: '',
+                        Operator: 0, // Equals
+                        Value: '',
+                        CaseSensitive: false
+                    });
+                    renderScriptDetails();
+                }
+            }
+
+            function removeCondition(index) {
+                var script = JellyPyConfig.scriptSettings.find(s => s.Id === JellyPyConfig.selectedScriptId);
+                if (script) {
+                    script.Conditions.splice(index, 1);
+                    renderScriptDetails();
+                }
+            }
+
+            function updateCondition(index, property, value) {
+                var script = JellyPyConfig.scriptSettings.find(s => s.Id === JellyPyConfig.selectedScriptId);
+                if (script && script.Conditions[index]) {
+                    script.Conditions[index][property] = value;
+                }
+            }
+
+            function renderDataAttributes(dataAttributes) {
+                if (dataAttributes.length === 0) {
+                    return '<div style="color: #888; font-style: italic; text-align: center; padding: 20px;">No data attributes configured. Event data will be passed as JSON.</div>';
+                }
+                
+                return dataAttributes.map((attr, index) => `
+                    <div class="data-attribute-item">
+                        <button type="button" class="remove-item-btn" onclick="removeDataAttribute(${index})">&times;</button>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label class="inputLabel inputLabelUnfocused">Attribute Name</label>
+                                <input type="text" is="emby-input" value="${escapeHtml(attr.Name)}" 
+                                       onchange="updateDataAttribute(${index}, 'Name', this.value)" 
+                                       placeholder="Variable name in script" />
+                            </div>
+                            <div class="form-col">
+                                <label class="inputLabel inputLabelUnfocused">Source Field</label>
+                                <input type="text" is="emby-input" value="${escapeHtml(attr.SourceField)}" 
+                                       onchange="updateDataAttribute(${index}, 'SourceField', this.value)" 
+                                       placeholder="e.g., User.Name, Item.Id" />
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label class="inputLabel inputLabelUnfocused">Format</label>
+                                <select is="emby-select" onchange="updateDataAttribute(${index}, 'Format', parseInt(this.value))">
+                                    ${renderFormatOptions(attr.Format)}
+                                </select>
+                            </div>
+                            <div class="form-col">
+                                <label class="inputLabel inputLabelUnfocused">Default Value</label>
+                                <input type="text" is="emby-input" value="${escapeHtml(attr.DefaultValue)}" 
+                                       onchange="updateDataAttribute(${index}, 'DefaultValue', this.value)" />
+                            </div>
+                        </div>
+                        <div class="checkboxContainer">
+                            <label class="emby-checkbox-label">
+                                <input type="checkbox" is="emby-checkbox" ${attr.Required ? 'checked' : ''} 
+                                       onchange="updateDataAttribute(${index}, 'Required', this.checked)" />
+                                <span>Required</span>
+                            </label>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            function renderFormatOptions(selectedFormat) {
+                var formats = [
+                    { value: 0, label: 'String' },
+                    { value: 1, label: 'JSON' },
+                    { value: 2, label: 'Environment Variable' },
+                    { value: 3, label: 'Command Argument' }
+                ];
+                
+                return formats.map(format => {
+                    var selected = selectedFormat === format.value ? 'selected' : '';
+                    return `<option value="${format.value}" ${selected}>${format.label}</option>`;
+                }).join('');
+            }
+
+            function addDataAttribute() {
+                var script = JellyPyConfig.scriptSettings.find(s => s.Id === JellyPyConfig.selectedScriptId);
+                if (script) {
+                    script.DataAttributes.push({
+                        Name: '',
+                        SourceField: '',
+                        Format: 0, // String
+                        Required: false,
+                        DefaultValue: ''
+                    });
+                    renderScriptDetails();
+                }
+            }
+
+            function removeDataAttribute(index) {
+                var script = JellyPyConfig.scriptSettings.find(s => s.Id === JellyPyConfig.selectedScriptId);
+                if (script) {
+                    script.DataAttributes.splice(index, 1);
+                    renderScriptDetails();
+                }
+            }
+
+            function updateDataAttribute(index, property, value) {
+                var script = JellyPyConfig.scriptSettings.find(s => s.Id === JellyPyConfig.selectedScriptId);
+                if (script && script.DataAttributes[index]) {
+                    script.DataAttributes[index][property] = value;
+                }
+            }
+
+            function renderEnvironmentVariables(envVars) {
+                if (envVars.length === 0) {
+                    return '<div style="color: #888; font-style: italic; text-align: center; padding: 20px;">No environment variables configured.</div>';
+                }
+                
+                return envVars.map((envVar, index) => `
+                    <div class="env-var-item">
+                        <button type="button" class="remove-item-btn" onclick="removeEnvironmentVariable(${index})">&times;</button>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label class="inputLabel inputLabelUnfocused">Variable Name</label>
+                                <input type="text" is="emby-input" value="${escapeHtml(envVar.Name)}" 
+                                       onchange="updateEnvironmentVariable(${index}, 'Name', this.value)" />
+                            </div>
+                            <div class="form-col">
+                                <label class="inputLabel inputLabelUnfocused">Value</label>
+                                <input type="text" is="emby-input" value="${escapeHtml(envVar.Value)}" 
+                                       onchange="updateEnvironmentVariable(${index}, 'Value', this.value)" />
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            function addEnvironmentVariable() {
+                var script = JellyPyConfig.scriptSettings.find(s => s.Id === JellyPyConfig.selectedScriptId);
+                if (script) {
+                    script.Execution.EnvironmentVariables.push({
+                        Name: '',
+                        Value: ''
+                    });
+                    renderScriptDetails();
+                }
+            }
+
+            function removeEnvironmentVariable(index) {
+                var script = JellyPyConfig.scriptSettings.find(s => s.Id === JellyPyConfig.selectedScriptId);
+                if (script) {
+                    script.Execution.EnvironmentVariables.splice(index, 1);
+                    renderScriptDetails();
+                }
+            }
+
+            function updateEnvironmentVariable(index, property, value) {
+                var script = JellyPyConfig.scriptSettings.find(s => s.Id === JellyPyConfig.selectedScriptId);
+                if (script && script.Execution.EnvironmentVariables[index]) {
+                    script.Execution.EnvironmentVariables[index][property] = value;
+                }
+            }
 
             // Tab Management
             function switchTab(tabName) {
@@ -388,382 +1136,7 @@
                 }
             }
 
-            // Script Settings Management
-            function addScriptSetting() {
-                var newSetting = {
-                    Id: generateGuid(),
-                    Name: '',
-                    Description: '',
-                    Enabled: true,
-                    Triggers: [],
-                    Conditions: [],
-                    Execution: {
-                        ExecutorType: 'Python',
-                        ExecutablePath: '/usr/bin/python3',
-                        ScriptPath: '',
-                        WorkingDirectory: '',
-                        AdditionalArguments: '',
-                        EnvironmentVariables: {},
-                        TimeoutSeconds: 300
-                    },
-                    DataAttributes: [],
-                    Priority: 100
-                };
-
-                JellyPyConfig.currentConfig.ScriptSettings.push(newSetting);
-                renderScriptSettings();
-            }
-
-            function deleteScriptSetting(index) {
-                if (confirm('Are you sure you want to delete this script setting?')) {
-                    JellyPyConfig.currentConfig.ScriptSettings.splice(index, 1);
-                    renderScriptSettings();
-                }
-            }
-
-            function moveScriptSetting(index, direction) {
-                var settings = JellyPyConfig.currentConfig.ScriptSettings;
-                var newIndex = index + direction;
-
-                if (newIndex < 0 || newIndex >= settings.length) return;
-
-                var temp = settings[index];
-                settings[index] = settings[newIndex];
-                settings[newIndex] = temp;
-
-                renderScriptSettings();
-            }
-
-            function renderScriptSettings() {
-                var container = document.getElementById('script-settings-container');
-                container.innerHTML = '';
-
-                if (!JellyPyConfig.currentConfig.ScriptSettings || JellyPyConfig.currentConfig.ScriptSettings.length === 0) {
-                    container.innerHTML = '<div class="fieldDescription">No script settings configured. Click "Add Script Setting" to create your first custom script configuration.</div>';
-                    return;
-                }
-
-                JellyPyConfig.currentConfig.ScriptSettings.forEach(function(setting, index) {
-                    var settingHtml = createScriptSettingHtml(setting, index);
-                    container.appendChild(settingHtml);
-                });
-
-                // Populate script dropdowns after HTML is rendered
-                JellyPyConfig.currentConfig.ScriptSettings.forEach(function(setting, index) {
-                    var selectElement = document.getElementById('scriptSelect-' + index);
-                    if (selectElement) {
-                        populateScriptDropdown(selectElement, setting.Execution.ScriptPath);
-                    }
-                });
-            }
-
-            function createScriptSettingHtml(setting, index) {
-                var div = document.createElement('div');
-                div.className = 'script-setting-item';
-
-                // Build HTML using string concatenation instead of template literals
-                var html = '<div class="script-setting-header">' +
-                    '<div>' +
-                        '<div class="script-setting-name">' + escapeHtml(setting.Name || 'Unnamed Script Setting') + '</div>' +
-                        '<div class="fieldDescription">' + escapeHtml(setting.Description || 'No description') + '</div>' +
-                    '</div>' +
-                    '<div class="script-setting-controls">' +
-                        '<button type="button" is="emby-button" class="emby-button small-button" onclick="moveScriptSetting(' + index + ', -1)" ' + (index === 0 ? 'disabled' : '') + '>↑</button>' +
-                        '<button type="button" is="emby-button" class="emby-button small-button" onclick="moveScriptSetting(' + index + ', 1)" ' + (index === JellyPyConfig.currentConfig.ScriptSettings.length - 1 ? 'disabled' : '') + '>↓</button>' +
-                        '<button type="button" is="emby-button" class="emby-button small-button" onclick="toggleScriptSetting(' + index + ')">' + (setting.Enabled ? 'Disable' : 'Enable') + '</button>' +
-                        '<button type="button" is="emby-button" class="emby-button small-button danger-button" onclick="deleteScriptSetting(' + index + ')">Delete</button>' +
-                    '</div>' +
-                '</div>' +
-
-                '<!-- Basic Configuration -->' +
-                '<div class="form-grid">' +
-                    '<div class="inputContainer">' +
-                        '<label class="inputLabel inputLabelUnfocused">Name</label>' +
-                        '<input type="text" is="emby-input" value="' + escapeHtml(setting.Name) + '" onchange="updateScriptSetting(' + index + ', \'Name\', this.value)" />' +
-                    '</div>' +
-                    '<div class="inputContainer">' +
-                        '<label class="inputLabel inputLabelUnfocused">Priority</label>' +
-                        '<input type="number" is="emby-input" value="' + setting.Priority + '" min="0" onchange="updateScriptSetting(' + index + ', \'Priority\', parseInt(this.value))" />' +
-                    '</div>' +
-                    '<div class="inputContainer form-grid-full">' +
-                        '<label class="inputLabel inputLabelUnfocused">Description</label>' +
-                        '<input type="text" is="emby-input" value="' + escapeHtml(setting.Description) + '" onchange="updateScriptSetting(' + index + ', \'Description\', this.value)" />' +
-                    '</div>' +
-                '</div>' +
-
-                '<!-- Event Triggers -->' +
-                '<div class="expandable-section">' +
-                    '<div class="expandable-header" onclick="toggleExpandable(this)">' +
-                        '<span>▶</span>' +
-                        '<span>Event Triggers (' + setting.Triggers.length + ' selected)</span>' +
-                    '</div>' +
-                    '<div class="expandable-content">' +
-                        '<div class="trigger-checkboxes" id="triggers-' + index + '">' +
-                            JellyPyConfig.eventTypes.map(function(eventType) {
-                                return '<label class="emby-checkbox-label">' +
-                                    '<input type="checkbox" is="emby-checkbox" ' + (setting.Triggers.includes(eventType) ? 'checked' : '') +
-                                    ' onchange="updateTriggers(' + index + ', \'' + eventType + '\', this.checked)" />' +
-                                    '<span>' + eventType + '</span>' +
-                                '</label>';
-                            }).join('') +
-                        '</div>' +
-                    '</div>' +
-                '</div>' +
-
-                '<!-- Execution Configuration -->' +
-                '<div class="expandable-section">' +
-                    '<div class="expandable-header" onclick="toggleExpandable(this)">' +
-                        '<span>▶</span>' +
-                        '<span>Script Execution</span>' +
-                    '</div>' +
-                    '<div class="expandable-content">' +
-                        '<div class="form-grid">' +
-                            '<div class="inputContainer">' +
-                                '<label class="inputLabel inputLabelUnfocused">Executor Type</label>' +
-                                '<select is="emby-select" onchange="updateScriptExecution(' + index + ', \'ExecutorType\', this.value)">' +
-                                    JellyPyConfig.executorTypes.map(function(type) {
-                                        return '<option value="' + type + '" ' + (setting.Execution.ExecutorType === type ? 'selected' : '') + '>' + type + '</option>';
-                                    }).join('') +
-                                '</select>' +
-                            '</div>' +
-                            '<div class="inputContainer">' +
-                                '<label class="inputLabel inputLabelUnfocused">Timeout (seconds)</label>' +
-                                '<input type="number" is="emby-input" value="' + setting.Execution.TimeoutSeconds + '" min="30" onchange="updateScriptExecution(' + index + ', \'TimeoutSeconds\', parseInt(this.value))" />' +
-                            '</div>' +
-                            '<div class="inputContainer form-grid-full">' +
-                                '<label class="inputLabel inputLabelUnfocused">Executable Path</label>' +
-                                '<input type="text" is="emby-input" value="' + escapeHtml(setting.Execution.ExecutablePath) + '" onchange="updateScriptExecution(' + index + ', \'ExecutablePath\', this.value)" />' +
-                            '</div>' +
-                            '<div class="inputContainer form-grid-full">' +
-                                '<label class="inputLabel inputLabelUnfocused">Script</label>' +
-                                '<div style="display: flex; gap: 8px; align-items: center;">' +
-                                    '<select is="emby-select" style="flex: 1;" onchange="updateScriptExecution(' + index + ', \'ScriptPath\', this.value)" id="scriptSelect-' + index + '">' +
-                                        '<option value="">Select a script...</option>' +
-                                    '</select>' +
-                                    '<button type="button" is="emby-button" class="emby-button small-button" onclick="refreshScripts(' + index + ')">🔄</button>' +
-                                    '<button type="button" is="emby-button" class="emby-button small-button" onclick="toggleCustomScriptPath(' + index + ')">✏️</button>' +
-                                '</div>' +
-                                '<input type="text" is="emby-input" value="' + escapeHtml(setting.Execution.ScriptPath) + '" onchange="updateScriptExecution(' + index + ', \'ScriptPath\', this.value)" style="margin-top: 8px; display: none;" id="customScriptPath-' + index + '" placeholder="Enter custom script path..." />' +
-                            '</div>' +
-                            '<div class="inputContainer form-grid-full">' +
-                                '<label class="inputLabel inputLabelUnfocused">Working Directory</label>' +
-                                '<input type="text" is="emby-input" value="' + escapeHtml(setting.Execution.WorkingDirectory) + '" onchange="updateScriptExecution(' + index + ', \'WorkingDirectory\', this.value)" />' +
-                            '</div>' +
-                            '<div class="inputContainer form-grid-full">' +
-                                '<label class="inputLabel inputLabelUnfocused">Additional Arguments</label>' +
-                                '<input type="text" is="emby-input" value="' + escapeHtml(setting.Execution.AdditionalArguments) + '" onchange="updateScriptExecution(' + index + ', \'AdditionalArguments\', this.value)" />' +
-                            '</div>' +
-                        '</div>' +
-                    '</div>' +
-                '</div>' +
-
-                '<!-- Execution Conditions -->' +
-                '<div class="expandable-section">' +
-                    '<div class="expandable-header" onclick="toggleExpandable(this)">' +
-                        '<span>▶</span>' +
-                        '<span>Execution Conditions (' + setting.Conditions.length + ')</span>' +
-                    '</div>' +
-                    '<div class="expandable-content">' +
-                        '<div id="conditions-' + index + '">' +
-                            setting.Conditions.map(function(condition, condIndex) { return createConditionHtml(condition, index, condIndex); }).join('') +
-                        '</div>' +
-                        '<button type="button" is="emby-button" class="emby-button small-button" onclick="addCondition(' + index + ')">Add Condition</button>' +
-                    '</div>' +
-                '</div>' +
-
-                '<!-- Data Attributes -->' +
-                '<div class="expandable-section">' +
-                    '<div class="expandable-header" onclick="toggleExpandable(this)">' +
-                        '<span>▶</span>' +
-                        '<span>Data Attributes (' + setting.DataAttributes.length + ')</span>' +
-                    '</div>' +
-                    '<div class="expandable-content">' +
-                        '<div id="attributes-' + index + '">' +
-                            setting.DataAttributes.map(function(attr, attrIndex) { return createDataAttributeHtml(attr, index, attrIndex); }).join('') +
-                        '</div>' +
-                        '<button type="button" is="emby-button" class="emby-button small-button" onclick="addDataAttribute(' + index + ')">Add Data Attribute</button>' +
-                    '</div>' +
-                '</div>';
-
-                div.innerHTML = html;
-                return div;
-            }
-
-            function createConditionHtml(condition, settingIndex, conditionIndex) {
-                var fieldOptions = JellyPyConfig.availableFields.map(function(field) {
-                    return '<option value="' + field + '" ' + (condition.Field === field ? 'selected' : '') + '>' + field + '</option>';
-                }).join('');
-
-                var operatorOptions = JellyPyConfig.conditionOperators.map(function(op) {
-                    return '<option value="' + op + '" ' + (condition.Operator === op ? 'selected' : '') + '>' + op + '</option>';
-                }).join('');
-
-                return '<div class="condition-item">' +
-                    '<div class="form-grid">' +
-                        '<div class="inputContainer">' +
-                            '<label class="inputLabel inputLabelUnfocused">Field</label>' +
-                            '<select is="emby-select" onchange="updateCondition(' + settingIndex + ', ' + conditionIndex + ', \'Field\', this.value)">' +
-                                '<option value="">Select field...</option>' +
-                                fieldOptions +
-                            '</select>' +
-                        '</div>' +
-                        '<div class="inputContainer">' +
-                            '<label class="inputLabel inputLabelUnfocused">Operator</label>' +
-                            '<select is="emby-select" onchange="updateCondition(' + settingIndex + ', ' + conditionIndex + ', \'Operator\', this.value)">' +
-                                operatorOptions +
-                            '</select>' +
-                        '</div>' +
-                        '<div class="inputContainer">' +
-                            '<label class="inputLabel inputLabelUnfocused">Value</label>' +
-                            '<input type="text" is="emby-input" value="' + escapeHtml(condition.Value) + '"' +
-                                   ' onchange="updateCondition(' + settingIndex + ', ' + conditionIndex + ', \'Value\', this.value)" />' +
-                        '</div>' +
-                        '<div class="inputContainer">' +
-                            '<label class="emby-checkbox-label">' +
-                                '<input type="checkbox" is="emby-checkbox" ' + (condition.CaseSensitive ? 'checked' : '') +
-                                       ' onchange="updateCondition(' + settingIndex + ', ' + conditionIndex + ', \'CaseSensitive\', this.checked)" />' +
-                                '<span>Case sensitive</span>' +
-                            '</label>' +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="item-controls">' +
-                        '<button type="button" is="emby-button" class="emby-button small-button danger-button" onclick="removeCondition(' + settingIndex + ', ' + conditionIndex + ')">Remove</button>' +
-                    '</div>' +
-                '</div>';
-            }
-
-            function createDataAttributeHtml(attribute, settingIndex, attributeIndex) {
-                var fieldOptions = JellyPyConfig.availableFields.map(function(field) {
-                    return '<option value="' + field + '" ' + (attribute.SourceField === field ? 'selected' : '') + '>' + field + '</option>';
-                }).join('');
-
-                var formatOptions = JellyPyConfig.dataAttributeFormats.map(function(format) {
-                    return '<option value="' + format + '" ' + (attribute.Format === format ? 'selected' : '') + '>' + format + '</option>';
-                }).join('');
-
-                return '<div class="attribute-item">' +
-                    '<div class="form-grid">' +
-                        '<div class="inputContainer">' +
-                            '<label class="inputLabel inputLabelUnfocused">Name</label>' +
-                            '<input type="text" is="emby-input" value="' + escapeHtml(attribute.Name) + '"' +
-                                   ' onchange="updateDataAttribute(' + settingIndex + ', ' + attributeIndex + ', \'Name\', this.value)" />' +
-                        '</div>' +
-                        '<div class="inputContainer">' +
-                            '<label class="inputLabel inputLabelUnfocused">Source Field</label>' +
-                            '<select is="emby-select" onchange="updateDataAttribute(' + settingIndex + ', ' + attributeIndex + ', \'SourceField\', this.value)">' +
-                                '<option value="">Select field...</option>' +
-                                fieldOptions +
-                            '</select>' +
-                        '</div>' +
-                        '<div class="inputContainer">' +
-                            '<label class="inputLabel inputLabelUnfocused">Format</label>' +
-                            '<select is="emby-select" onchange="updateDataAttribute(' + settingIndex + ', ' + attributeIndex + ', \'Format\', this.value)">' +
-                                formatOptions +
-                            '</select>' +
-                        '</div>' +
-                        '<div class="inputContainer">' +
-                            '<label class="emby-checkbox-label">' +
-                                '<input type="checkbox" is="emby-checkbox" ' + (attribute.Required ? 'checked' : '') +
-                                       ' onchange="updateDataAttribute(' + settingIndex + ', ' + attributeIndex + ', \'Required\', this.checked)" />' +
-                                '<span>Required</span>' +
-                            '</label>' +
-                        '</div>' +
-                        '<div class="inputContainer form-grid-full">' +
-                            '<label class="inputLabel inputLabelUnfocused">Default Value</label>' +
-                            '<input type="text" is="emby-input" value="' + escapeHtml(attribute.DefaultValue || '') + '"' +
-                                   ' onchange="updateDataAttribute(' + settingIndex + ', ' + attributeIndex + ', \'DefaultValue\', this.value)" />' +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="item-controls">' +
-                        '<button type="button" is="emby-button" class="emby-button small-button danger-button" onclick="removeDataAttribute(' + settingIndex + ', ' + attributeIndex + ')">Remove</button>' +
-                    '</div>' +
-                '</div>';
-            }
-
-            // Update functions
-            function updateScriptSetting(index, property, value) {
-                JellyPyConfig.currentConfig.ScriptSettings[index][property] = value;
-            }
-
-            function updateScriptExecution(index, property, value) {
-                JellyPyConfig.currentConfig.ScriptSettings[index].Execution[property] = value;
-            }
-
-            function updateTriggers(index, eventType, checked) {
-                var triggers = JellyPyConfig.currentConfig.ScriptSettings[index].Triggers;
-                if (checked && !triggers.includes(eventType)) {
-                    triggers.push(eventType);
-                } else if (!checked && triggers.includes(eventType)) {
-                    var idx = triggers.indexOf(eventType);
-                    triggers.splice(idx, 1);
-                }
-                // Update the trigger count display
-                renderScriptSettings();
-            }
-
-            function toggleScriptSetting(index) {
-                var setting = JellyPyConfig.currentConfig.ScriptSettings[index];
-                setting.Enabled = !setting.Enabled;
-                renderScriptSettings();
-            }
-
-            // Condition management
-            function addCondition(settingIndex) {
-                var newCondition = {
-                    Field: '',
-                    Operator: 'Equals',
-                    Value: '',
-                    CaseSensitive: false
-                };
-                JellyPyConfig.currentConfig.ScriptSettings[settingIndex].Conditions.push(newCondition);
-                renderScriptSettings();
-            }
-
-            function removeCondition(settingIndex, conditionIndex) {
-                JellyPyConfig.currentConfig.ScriptSettings[settingIndex].Conditions.splice(conditionIndex, 1);
-                renderScriptSettings();
-            }
-
-            function updateCondition(settingIndex, conditionIndex, property, value) {
-                JellyPyConfig.currentConfig.ScriptSettings[settingIndex].Conditions[conditionIndex][property] = value;
-            }
-
-            // Data attribute management
-            function addDataAttribute(settingIndex) {
-                var newAttribute = {
-                    Name: '',
-                    SourceField: '',
-                    Format: 'String',
-                    Required: false,
-                    DefaultValue: ''
-                };
-                JellyPyConfig.currentConfig.ScriptSettings[settingIndex].DataAttributes.push(newAttribute);
-                renderScriptSettings();
-            }
-
-            function removeDataAttribute(settingIndex, attributeIndex) {
-                JellyPyConfig.currentConfig.ScriptSettings[settingIndex].DataAttributes.splice(attributeIndex, 1);
-                renderScriptSettings();
-            }
-
-            function updateDataAttribute(settingIndex, attributeIndex, property, value) {
-                JellyPyConfig.currentConfig.ScriptSettings[settingIndex].DataAttributes[attributeIndex][property] = value;
-            }
-
             // Utility functions
-            function toggleExpandable(header) {
-                var content = header.nextElementSibling;
-                var arrow = header.querySelector('span:first-child');
-
-                if (content.classList.contains('expanded')) {
-                    content.classList.remove('expanded');
-                    arrow.textContent = '▶';
-                } else {
-                    content.classList.add('expanded');
-                    arrow.textContent = '▼';
-                }
-            }
-
             function escapeHtml(text) {
                 if (text === null || text === undefined) return '';
                 return text.toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -871,141 +1244,6 @@
                 element.style.color = success ? '#4CAF50' : '#f44336';
             }
 
-            // Script Management Functions
-            async function loadAvailableScripts() {
-                try {
-                    const response = await ApiClient.ajax({
-                        type: 'GET',
-                        url: ApiClient.getUrl('/Plugins/Jellypy/scripts')
-                    });
-
-                    console.log('Raw API Response:', response);
-                    console.log('Response type:', typeof response);
-                    console.log('Is Response object:', response instanceof Response);
-
-                    // Parse JSON from Response object if needed
-                    let data = response;
-                    if (response instanceof Response) {
-                        if (response.ok) {
-                            data = await response.json();
-                            console.log('Parsed JSON data:', data);
-                        } else {
-                            console.error('API request failed:', response.status, response.statusText);
-                            return [];
-                        }
-                    }
-
-                    // Handle different response formats
-                    let scripts = data;
-
-                    // If response is wrapped in an object, try to extract the array
-                    if (data && typeof data === 'object' && !Array.isArray(data)) {
-                        // Check common wrapper properties
-                        if (Array.isArray(data.Items)) {
-                            scripts = data.Items;
-                        } else if (Array.isArray(data.items)) {
-                            scripts = data.items;
-                        } else if (Array.isArray(data.data)) {
-                            scripts = data.data;
-                        } else if (Array.isArray(data.scripts)) {
-                            scripts = data.scripts;
-                        }
-                    }
-
-                    // Ensure we have an array
-                    if (!Array.isArray(scripts)) {
-                        console.warn('Expected array but got:', scripts);
-                        return [];
-                    }
-
-                    console.log('Final processed scripts:', scripts);
-                    return scripts;
-                } catch (error) {
-                    console.error('Failed to load scripts:', error);
-                    return [];
-                }
-            }
-
-            async function populateScriptDropdown(selectElement, currentValue) {
-                const scripts = await loadAvailableScripts();
-
-                console.log('Populating dropdown with scripts:', scripts);
-
-                // Ensure scripts is an array
-                if (!Array.isArray(scripts)) {
-                    console.error('Scripts is not an array:', scripts);
-                    return;
-                }
-
-                // Clear existing options except the first one
-                while (selectElement.children.length > 1) {
-                    selectElement.removeChild(selectElement.lastChild);
-                }
-
-                // Add script options
-                scripts.forEach(function(script) {
-                    console.log('Processing script:', script);
-                    const option = document.createElement('option');
-                    option.value = script.Path;
-                    option.textContent = script.Name + ' (' + script.RelativePath + ')';
-                    if (script.Path === currentValue) {
-                        option.selected = true;
-                    }
-                    selectElement.appendChild(option);
-                });
-
-                // If current value doesn't match any script, add it as custom option
-                if (currentValue && !scripts.some(s => s.Path === currentValue)) {
-                    const customOption = document.createElement('option');
-                    customOption.value = currentValue;
-                    customOption.textContent = 'Custom: ' + currentValue;
-                    customOption.selected = true;
-                    selectElement.appendChild(customOption);
-                }
-
-                console.log('Dropdown populated with', scripts.length, 'scripts');
-            }
-
-            function refreshScripts(scriptIndex) {
-                const selectElement = document.getElementById('scriptSelect-' + scriptIndex);
-                const currentValue = selectElement.value;
-                populateScriptDropdown(selectElement, currentValue);
-            }
-
-            function toggleCustomScriptPath(scriptIndex) {
-                const selectElement = document.getElementById('scriptSelect-' + scriptIndex);
-                const customInput = document.getElementById('customScriptPath-' + scriptIndex);
-
-                if (customInput.style.display === 'none') {
-                    // Show custom input
-                    customInput.style.display = 'block';
-                    customInput.value = selectElement.value;
-                    customInput.focus();
-                } else {
-                    // Hide custom input and update select
-                    customInput.style.display = 'none';
-                    const customValue = customInput.value;
-                    if (customValue) {
-                        // Add custom value to dropdown if not exists
-                        let optionExists = false;
-                        for (let i = 0; i < selectElement.children.length; i++) {
-                            if (selectElement.children[i].value === customValue) {
-                                selectElement.children[i].selected = true;
-                                optionExists = true;
-                                break;
-                            }
-                        }
-                        if (!optionExists) {
-                            const customOption = document.createElement('option');
-                            customOption.value = customValue;
-                            customOption.textContent = 'Custom: ' + customValue;
-                            customOption.selected = true;
-                            selectElement.appendChild(customOption);
-                        }
-                    }
-                }
-            }
-
             // Page initialization
             document.querySelector('#JellyPyConfigPage')
                 .addEventListener('pageshow', function() {
@@ -1024,13 +1262,12 @@
                         document.querySelector('#EnableNativeSonarrIntegration').checked = config.EnableNativeSonarrIntegration !== undefined ? config.EnableNativeSonarrIntegration : true;
                         document.querySelector('#SonarrUrl').value = config.SonarrUrl || '';
                         // API key will be loaded separately via API call
-                        document.querySelector('#EpisodeDownloadBuffer').value = config.EpisodeDownloadBuffer || 5;
+                        document.querySelector('#EpisodeDownloadBuffer').value = config.EpisodeDownloadBuffer || 6;
                         document.querySelector('#AutoSearchEpisodes').checked = config.AutoSearchEpisodes !== undefined ? config.AutoSearchEpisodes : true;
                         document.querySelector('#MonitorFutureEpisodes').checked = config.MonitorFutureEpisodes !== undefined ? config.MonitorFutureEpisodes : true;
                         document.querySelector('#SkipEpisodesWithFiles').checked = config.SkipEpisodesWithFiles !== undefined ? config.SkipEpisodesWithFiles : true;
                         document.querySelector('#UnmonitorWatchedEpisodes').checked = config.UnmonitorWatchedEpisodes !== undefined ? config.UnmonitorWatchedEpisodes : true;
                         document.querySelector('#MonitorOnlyCurrentSeason').checked = config.MonitorOnlyCurrentSeason !== undefined ? config.MonitorOnlyCurrentSeason : false;
-                        document.querySelector('#MinimumEpisodeBuffer').value = config.MinimumEpisodeBuffer || 2;
 
                         document.querySelector('#EnableNativeRadarrIntegration').checked = config.EnableNativeRadarrIntegration !== undefined ? config.EnableNativeRadarrIntegration : true;
                         document.querySelector('#RadarrUrl').value = config.RadarrUrl || '';
@@ -1040,11 +1277,9 @@
                         document.querySelector('#MinimumWatchPercentage').value = config.MinimumWatchPercentage || 90;
                         document.querySelector('#UnmonitorAfterUpgrade').checked = config.UnmonitorAfterUpgrade !== undefined ? config.UnmonitorAfterUpgrade : false;
 
-                        // Initialize script settings
-                        if (!config.ScriptSettings) {
-                            config.ScriptSettings = [];
-                        }
-                        renderScriptSettings();
+                        // Initialize script settings placeholder
+                        JellyPyConfig.scriptSettings = config.ScriptSettings || [];
+                        renderScriptList();
 
                         // Load decrypted API keys separately
                         loadApiKeys();
@@ -1076,13 +1311,12 @@
                     config.EnableNativeSonarrIntegration = document.querySelector('#EnableNativeSonarrIntegration').checked;
                     config.SonarrUrl = document.querySelector('#SonarrUrl').value;
                     config.SonarrApiKeyEncrypted = document.querySelector('#SonarrApiKey').value;
-                    config.EpisodeDownloadBuffer = parseInt(document.querySelector('#EpisodeDownloadBuffer').value || 5, 10);
+                    config.EpisodeDownloadBuffer = parseInt(document.querySelector('#EpisodeDownloadBuffer').value || 6, 10);
                     config.AutoSearchEpisodes = document.querySelector('#AutoSearchEpisodes').checked;
                     config.MonitorFutureEpisodes = document.querySelector('#MonitorFutureEpisodes').checked;
                     config.SkipEpisodesWithFiles = document.querySelector('#SkipEpisodesWithFiles').checked;
                     config.UnmonitorWatchedEpisodes = document.querySelector('#UnmonitorWatchedEpisodes').checked;
                     config.MonitorOnlyCurrentSeason = document.querySelector('#MonitorOnlyCurrentSeason').checked;
-                    config.MinimumEpisodeBuffer = parseInt(document.querySelector('#MinimumEpisodeBuffer').value || 2, 10);
 
                     config.EnableNativeRadarrIntegration = document.querySelector('#EnableNativeRadarrIntegration').checked;
                     config.RadarrUrl = document.querySelector('#RadarrUrl').value;
@@ -1091,6 +1325,9 @@
                     config.UnmonitorOnlyIfWatched = document.querySelector('#UnmonitorOnlyIfWatched').checked;
                     config.MinimumWatchPercentage = parseInt(document.querySelector('#MinimumWatchPercentage').value || 90, 10);
                     config.UnmonitorAfterUpgrade = document.querySelector('#UnmonitorAfterUpgrade').checked;
+
+                    // Save script settings
+                    config.ScriptSettings = JellyPyConfig.scriptSettings;
 
                     ApiClient.updatePluginConfiguration(JellyPyConfig.pluginUniqueId, config).then(function (result) {
                         Dashboard.processPluginConfigurationUpdateResult(result);

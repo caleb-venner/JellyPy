@@ -1,7 +1,7 @@
-# Copilot Instructions for Jellypy Plugin Development
+# Copilot Instructions for JellyPy Plugin Development
 
 ## Project Overview
-Jellypy is a Jellyfin plugin that automatically manages Sonarr and Radarr monitoring based on what users watch in Jellyfin. It provides native integration with both services and includes legacy Python script execution support.
+JellyPy is a Jellyfin plugin that automatically manages Sonarr and Radarr monitoring based on what users watch in Jellyfin. It provides native integration with both services and includes legacy Python script execution support.
 
 ## Core Development Guidelines
 
