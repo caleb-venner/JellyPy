@@ -221,6 +221,27 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #555;
+            list-style: none;
+            user-select: none;
+        }
+        
+        .collapsible-header::-webkit-details-marker {
+            display: none;
+        }
+        
+        .collapsible-header::marker {
+            display: none;
+        }
+        
+        .collapsible-header::before {
+            content: '▼';
+            margin-right: 8px;
+            transition: transform 0.2s ease;
+            display: inline-block;
+        }
+        
+        details:not([open]) .collapsible-header::before {
+            transform: rotate(-90deg);
         }
         
         .collapsible-header:hover {
@@ -231,21 +252,8 @@
             font-weight: bold;
         }
         
-        .collapsible-toggle {
-            transition: transform 0.2s ease;
-        }
-        
-        .collapsible-toggle.expanded {
-            transform: rotate(90deg);
-        }
-        
         .collapsible-content {
             padding: 15px;
-            display: none;
-        }
-        
-        .collapsible-content.expanded {
-            display: block;
         }
         
         .form-row {
@@ -405,57 +413,53 @@
                                         </div>
 
                                         <!-- Event Triggers -->
-                                        <div class="collapsible-section">
-                                            <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                                        <details class="collapsible-section" open>
+                                            <summary class="collapsible-header">
                                                 <span class="collapsible-title">Event Triggers</span>
-                                                <span class="collapsible-toggle expanded">▼</span>
-                                            </div>
-                                            <div class="collapsible-content expanded">
+                                            </summary>
+                                            <div class="collapsible-content">
                                                 <div class="fieldDescription" style="margin-bottom: 15px;">
                                                     Select which Jellyfin events should trigger this script.
                                                 </div>
                                                 <div class="trigger-checkboxes" id="triggerCheckboxes"></div>
                                             </div>
-                                        </div>
+                                        </details>
 
                                         <!-- Execution Settings -->
-                                        <div class="collapsible-section">
-                                            <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                                        <details class="collapsible-section" open>
+                                            <summary class="collapsible-header">
                                                 <span class="collapsible-title">Execution Settings</span>
-                                                <span class="collapsible-toggle expanded">▼</span>
-                                            </div>
-                                            <div class="collapsible-content expanded" id="executionSettingsContent"></div>
-                                        </div>
+                                            </summary>
+                                            <div class="collapsible-content" id="executionSettingsContent"></div>
+                                        </details>
 
                                         <!-- Execution Conditions -->
-                                        <div class="collapsible-section">
-                                            <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                                        <details class="collapsible-section" open>
+                                            <summary class="collapsible-header">
                                                 <span class="collapsible-title">Execution Conditions</span>
-                                                <span class="collapsible-toggle expanded">▼</span>
-                                            </div>
-                                            <div class="collapsible-content expanded">
+                                            </summary>
+                                            <div class="collapsible-content">
                                                 <div class="fieldDescription" style="margin-bottom: 15px;">
                                                     Add conditions to control when this script should run. All conditions must be met for the script to execute.
                                                 </div>
                                                 <div id="conditionsContainer"></div>
                                                 <button type="button" class="add-item-btn" onclick="addCondition()">+ Add Condition</button>
                                             </div>
-                                        </div>
+                                        </details>
 
                                         <!-- Data Attributes -->
-                                        <div class="collapsible-section">
-                                            <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                                        <details class="collapsible-section" open>
+                                            <summary class="collapsible-header">
                                                 <span class="collapsible-title">Data Attributes</span>
-                                                <span class="collapsible-toggle expanded">▼</span>
-                                            </div>
-                                            <div class="collapsible-content expanded">
+                                            </summary>
+                                            <div class="collapsible-content">
                                                 <div class="fieldDescription" style="margin-bottom: 15px;">
                                                     Configure how event data is passed to your script. Data can be passed as JSON, environment variables, command line arguments, or plain strings.
                                                 </div>
                                                 <div id="dataAttributesContainer"></div>
                                                 <button type="button" class="add-item-btn" onclick="addDataAttribute()">+ Add Data Attribute</button>
                                             </div>
-                                        </div>
+                                        </details>
                                     </div>
                                 </div>
                             </div>
@@ -808,21 +812,6 @@
                 document.getElementById('executionSettingsContent').innerHTML = renderExecutionSettings(script.Execution);
                 document.getElementById('conditionsContainer').innerHTML = renderConditions(script.Conditions);
                 document.getElementById('dataAttributesContainer').innerHTML = renderDataAttributes(script.DataAttributes);
-            }
-
-            function toggleCollapsible(header) {
-                var content = header.nextElementSibling;
-                var toggle = header.querySelector('.collapsible-toggle');
-                
-                if (content.classList.contains('expanded')) {
-                    content.classList.remove('expanded');
-                    toggle.classList.remove('expanded');
-                    toggle.textContent = '▶';
-                } else {
-                    content.classList.add('expanded');
-                    toggle.classList.add('expanded');
-                    toggle.textContent = '▼';
-                }
             }
 
             function updateScriptProperty(property, value) {
@@ -1352,14 +1341,6 @@
                         // Add test connection button event listeners
                         document.getElementById('testSonarrConnection').addEventListener('click', testSonarrConnection);
                         document.getElementById('testRadarrConnection').addEventListener('click', testRadarrConnection);
-
-                        // Setup collapsible section event handlers using event delegation
-                        document.addEventListener('click', function(e) {
-                            var header = e.target.closest('.collapsible-header');
-                            if (header) {
-                                toggleCollapsible(header);
-                            }
-                        });
 
                         Dashboard.hideLoadingMsg();
                     });
