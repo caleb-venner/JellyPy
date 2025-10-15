@@ -5,7 +5,7 @@
   <AssemblyName>Jellyfin.Plugin.JellyPy</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
-    <CodeAnalysisRuleSet>../jellyfin.ruleset</CodeAnalysisRuleSet>
+  <CodeAnalysisRuleSet>../JellyPy.ruleset</CodeAnalysisRuleSet>
     <!-- Suppress nullable reference type warnings - project doesn't use nullable reference types -->
     <NoWarn>$(NoWarn);CS8632</NoWarn>
     <!-- Plugin version information -->
