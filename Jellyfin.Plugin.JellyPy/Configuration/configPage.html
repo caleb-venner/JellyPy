@@ -210,11 +210,11 @@
         .collapsible-section {
             border: 1px solid #555;
             border-radius: 4px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         
         .collapsible-header {
-            padding: 12px 15px;
+            padding: 15px 18px;
             background: rgba(255, 255, 255, 0.05);
             cursor: pointer;
             display: flex;
@@ -235,9 +235,10 @@
         
         .collapsible-header::before {
             content: '▼';
-            margin-right: 8px;
+            margin-right: 12px;
             transition: transform 0.2s ease;
             display: inline-block;
+            font-size: 14px;
         }
         
         details:not([open]) .collapsible-header::before {
@@ -250,6 +251,7 @@
         
         .collapsible-title {
             font-weight: bold;
+            font-size: 16px;
         }
         
         .collapsible-content {
