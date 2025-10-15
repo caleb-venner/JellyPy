@@ -195,7 +195,8 @@
         }
         
         .script-form-section {
-            margin-bottom: 25px;
+            margin-bottom: 35px;
+            padding-bottom: 10px;
         }
         
         .section-title-small {
@@ -672,7 +673,8 @@
                 
                 JellyPyConfig.scriptSettings.push(newScript);
                 renderScriptList();
-                selectScript(newScript.Id);
+                // Don't auto-select the new script - let user click it
+                // This prevents form state issues and jumbling
             }
 
             function deleteScript(scriptId) {
