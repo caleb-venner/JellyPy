@@ -4,7 +4,8 @@
 [![.NET](https://img.shields.io/badge/.NET-8.0-purple)](https://dotnet.microsoft.com/)
 [![Jellyfin](https://img.shields.io/badge/Jellyfin-10.9+-aa5cc3)](https://jellyfin.org/)
 
-A Jellyfin plugin that automatically updates your Sonarr and Radarr monitoring based on what you watch. Keep your media organised and automatic without manual intervention.
+A Jellyfin plugin that automatically updates your Sonarr and Radarr monitoring
+based on what you watch. Keep your media organised and automatic without manual intervention.
 
 ## Features
 
@@ -20,8 +21,10 @@ A Jellyfin plugin that automatically updates your Sonarr and Radarr monitoring b
 ### Native Radarr Integration
 
 - **Automatic Movie Unmonitoring**: Unmonitor movies after watching
-- **Percentage-Based Logic**: Only unmonitor if watched past configurable threshold (default 90%)
-- **Quality Cutoff Checking**: Only unmonitor movies that have reached their quality target
+- **Percentage-Based Logic**: Only unmonitor if watched past configurable
+threshold (default 90%)
+- **Quality Cutoff Checking**: Only unmonitor movies that have reached their
+quality target
 - **Upgrade Prevention**: Keep monitoring movies that can still be upgraded
 
 ### Custom Script Execution
@@ -36,7 +39,8 @@ A Jellyfin plugin that automatically updates your Sonarr and Radarr monitoring b
 - **Encrypted API Keys**: Automatic AES-256 encryption for Sonarr/Radarr API keys
 - **Test Connections**: Built-in connection testing for API endpoints  
 - **Server-Bound Encryption**: API keys encrypted with Jellyfin server-specific keys
-- **System-Independent**: Encryption survives OS updates, machine renames, and user changes
+- **System-Independent**: Encryption survives OS updates, machine renames,
+and user changes
 - **Auto Migration**: Existing plaintext keys automatically encrypted on first save
 
 ## Requirements
@@ -57,7 +61,8 @@ A Jellyfin plugin that automatically updates your Sonarr and Radarr monitoring b
 
 ### Manual Installation
 
-1. Download the latest `Jellyfin.Plugin.Jellypy.dll` from [Releases](https://github.com/caleb-venner/jellypy/releases)
+1. Download the latest `Jellyfin.Plugin.Jellypy.dll`
+from [Releases](https://github.com/caleb-venner/jellypy/releases)
 2. Copy to your Jellyfin plugins directory:
    - Linux: `/var/lib/jellyfin/plugins/Jellypy/`
    - Windows: `C:\ProgramData\Jellyfin\Server\plugins\Jellypy\`
@@ -70,11 +75,13 @@ A Jellyfin plugin that automatically updates your Sonarr and Radarr monitoring b
 
 1. Navigate to **Dashboard → Plugins → Jellypy → Settings → Native Integration**
 2. Configure Sonarr:
-   ```
+
+   ```text
    Enable Sonarr Integration: ✓
    Sonarr URL: http://localhost:8989
    Sonarr API Key: [Your API Key from Sonarr → Settings → General → Security]
    ```
+
 3. Click **Test Sonarr Connection** to verify your settings
 
 4. **Configuration Options:**
@@ -93,11 +100,13 @@ A Jellyfin plugin that automatically updates your Sonarr and Radarr monitoring b
 
 1. Navigate to **Dashboard → Plugins → Jellypy → Settings → Native Integration**
 2. Configure Radarr:
-   ```
+
+   ```text
    Enable Radarr Integration: ✓
    Radarr URL: http://localhost:7878
    Radarr API Key: [Your API Key from Radarr → Settings → General → Security]
    ```
+
 3. Click **Test Radarr Connection** to verify your settings
 
 4. **Configuration Options:**
@@ -114,6 +123,7 @@ A Jellyfin plugin that automatically updates your Sonarr and Radarr monitoring b
 ### TV Shows (Sonarr)
 
 **When you watch an episode:**
+
 1. Current episode is unmonitored (if enabled)
 2. Plugin calculates next episodes to monitor based on:
    - Episode buffer setting
@@ -125,18 +135,20 @@ A Jellyfin plugin that automatically updates your Sonarr and Radarr monitoring b
 5. Future episodes are set to auto-monitor (if enabled)
 
 **Example Workflow:**
-```
+
+```text
 You watch: The Office S03E05
 Result:
-  - S03E05 unmonitored
-  - S03E06, S03E07, S03E08, S03E09, S03E10 monitored
-  - Searches triggered for episodes without files
-  - Future episodes set to auto-monitor when released
+   - S03E05 unmonitored
+   - S03E06, S03E07, S03E08, S03E09, S03E10 monitored
+   - Searches triggered for episodes without files
+   - Future episodes set to auto-monitor when released
 ```
 
 ### Movies (Radarr)
 
 **When you finish watching a movie:**
+
 1. Plugin calculates watch percentage (position ÷ runtime)
 2. Checks if percentage meets threshold (default 90%)
 3. If "Unmonitor After Quality Cutoff" enabled:
@@ -146,15 +158,16 @@ Result:
 4. Unmonitors movie in Radarr if all checks pass
 
 **Example Workflow:**
-```
+
+```text
 You watch: The Matrix (1999) - 85% complete
 Result: Movie stays monitored (below 90% threshold)
 
 You watch: The Matrix (1999) - 95% complete
 Result:
-  - Check quality: 1080p Bluray vs cutoff (1080p)
-  - Quality met → Movie unmonitored
-  - Prevents unnecessary upgrade searches
+   - Check quality: 1080p Bluray vs cutoff (1080p)
+   - Quality met → Movie unmonitored
+   - Prevents unnecessary upgrade searches
 ```
 
 ## 🔍 Use Cases
@@ -190,9 +203,11 @@ Result:
 ### Plugin Not Working
 
 1. **Check Jellyfin Logs**:
-   ```
+
+   ```text
    Dashboard → Logs → Filter: "Jellypy"
    ```
+
    Look for configuration errors or API connection issues
 
 2. **Verify API Keys**:
@@ -220,7 +235,8 @@ Result:
 ### Getting More Information
 
 Enable verbose logging:
-```
+
+```text
 Dashboard → Plugins → Jellypy → Global Settings
 Enable Verbose Logging: ✓
 ```
@@ -252,8 +268,11 @@ Contributions welcome! Please:
 
 ## 📝 License
 
-This project is licensed under the GNU General Public License v3.0 - see [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU General Public
+License v3.0 - see [LICENSE](LICENSE) file for details.
 
-**Why GPLv3?** Jellyfin is licensed under GPLv3, and to ensure compatibility and maintain the free and open-source nature of the ecosystem, this plugin uses the same license.
+**Why GPLv3?** Jellyfin is licensed under GPLv3, and to
+ensure compatibility and maintain the free and open-source
+nature of the ecosystem, this plugin uses the same license.
 
 ---

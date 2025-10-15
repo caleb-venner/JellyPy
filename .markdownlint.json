@@ -2,5 +2,8 @@
   "MD024": {
     "siblings_only": true
   },
-  "MD053": false
+  "MD053": false,
+  "MD013": {
+    "line_length": 100
+  }
 }

@@ -66,9 +66,21 @@ public static class EncryptionHelper
             byte[] cipherTextBytes = memoryStream.ToArray();
             return Convert.ToBase64String(cipherTextBytes);
         }
+        catch (CryptographicException ex)
+        {
+            // Cryptographic operation failed
+            System.Diagnostics.Debug.WriteLine($"Encryption failed: {ex.Message}");
+            return string.Empty;
+        }
+        catch (ArgumentException ex)
+        {
+            // Invalid argument (e.g., key size)
+            System.Diagnostics.Debug.WriteLine($"Encryption argument error: {ex.Message}");
+            return string.Empty;
+        }
         catch (Exception)
         {
-            // If encryption fails, return empty string
+            // If encryption fails for any other reason, return empty string
             return string.Empty;
         }
     }
@@ -114,9 +126,27 @@ public static class EncryptionHelper
 
             return Encoding.UTF8.GetString(plainTextBytes);
         }
+        catch (FormatException ex)
+        {
+            // Invalid Base64 string
+            System.Diagnostics.Debug.WriteLine($"Decryption format error: {ex.Message}");
+            return string.Empty;
+        }
+        catch (CryptographicException ex)
+        {
+            // Decryption failed (wrong key, corrupted data, etc.)
+            System.Diagnostics.Debug.WriteLine($"Decryption failed: {ex.Message}");
+            return string.Empty;
+        }
+        catch (ArgumentException ex)
+        {
+            // Invalid argument (e.g., IV size)
+            System.Diagnostics.Debug.WriteLine($"Decryption argument error: {ex.Message}");
+            return string.Empty;
+        }
         catch (Exception)
         {
-            // If decryption fails, return empty string (could be unencrypted legacy data)
+            // If decryption fails for any other reason, return empty string (could be unencrypted legacy data)
             return string.Empty;
         }
     }
@@ -149,6 +179,14 @@ public static class EncryptionHelper
             using var sha256 = SHA256.Create();
             byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(serverKey));
             return Convert.ToBase64String(hashBytes);
+        }
+        catch (CryptographicException ex)
+        {
+            throw new InvalidOperationException($"Failed to generate server-based encryption key (cryptographic error): {ex.Message}", ex);
+        }
+        catch (ArgumentException ex)
+        {
+            throw new InvalidOperationException($"Failed to generate server-based encryption key (argument error): {ex.Message}", ex);
         }
         catch (Exception ex)
         {

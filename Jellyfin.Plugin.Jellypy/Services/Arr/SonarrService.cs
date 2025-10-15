@@ -62,9 +62,29 @@ public class SonarrService : ISonarrService
             _logger.LogWarning("No series found in Sonarr for: {SeriesName}", seriesName);
             return null;
         }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "HTTP request failed when getting Sonarr series ID for: {SeriesName}", seriesName);
+            return null;
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to deserialize Sonarr API response for series: {SeriesName}", seriesName);
+            return null;
+        }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogError(ex, "Request timed out when getting Sonarr series ID for: {SeriesName}", seriesName);
+            return null;
+        }
+        catch (UriFormatException ex)
+        {
+            _logger.LogError(ex, "Invalid Sonarr URL format when getting series ID for: {SeriesName}", seriesName);
+            return null;
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting Sonarr series ID for: {SeriesName}", seriesName);
+            _logger.LogError(ex, "Unexpected error getting Sonarr series ID for: {SeriesName}", seriesName);
             return null;
         }
     }
@@ -92,9 +112,24 @@ public class SonarrService : ISonarrService
             var series = await response.Content.ReadFromJsonAsync<List<SonarrSeries>>();
             return series?.FirstOrDefault()?.Id;
         }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "HTTP request failed when getting Sonarr series ID by TVDB ID: {TvdbId}", tvdbId);
+            return null;
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to deserialize Sonarr API response for TVDB ID: {TvdbId}", tvdbId);
+            return null;
+        }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogError(ex, "Request timed out when getting Sonarr series ID by TVDB ID: {TvdbId}", tvdbId);
+            return null;
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting Sonarr series ID by TVDB ID: {TvdbId}", tvdbId);
+            _logger.LogError(ex, "Unexpected error getting Sonarr series ID by TVDB ID: {TvdbId}", tvdbId);
             return null;
         }
     }
@@ -122,9 +157,24 @@ public class SonarrService : ISonarrService
             var episodes = await response.Content.ReadFromJsonAsync<List<SonarrEpisode>>();
             return episodes ?? new List<SonarrEpisode>();
         }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "HTTP request failed when getting episodes for series: {SeriesId}", seriesId);
+            return new List<SonarrEpisode>();
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to deserialize Sonarr API response for series episodes: {SeriesId}", seriesId);
+            return new List<SonarrEpisode>();
+        }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogError(ex, "Request timed out when getting episodes for series: {SeriesId}", seriesId);
+            return new List<SonarrEpisode>();
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting episodes for series: {SeriesId}", seriesId);
+            _logger.LogError(ex, "Unexpected error getting episodes for series: {SeriesId}", seriesId);
             return new List<SonarrEpisode>();
         }
     }
@@ -158,9 +208,24 @@ public class SonarrService : ISonarrService
             _logger.LogError("Failed to set episode monitored status. Status code: {StatusCode}", response.StatusCode);
             return false;
         }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "HTTP request failed when setting episode monitored status: {EpisodeId}", episodeId);
+            return false;
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to serialize/deserialize Sonarr API request for episode: {EpisodeId}", episodeId);
+            return false;
+        }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogError(ex, "Request timed out when setting episode monitored status: {EpisodeId}", episodeId);
+            return false;
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error setting episode monitored status: {EpisodeId}", episodeId);
+            _logger.LogError(ex, "Unexpected error setting episode monitored status: {EpisodeId}", episodeId);
             return false;
         }
     }
@@ -193,9 +258,24 @@ public class SonarrService : ISonarrService
             _logger.LogError("Failed to trigger episode search. Status code: {StatusCode}", response.StatusCode);
             return false;
         }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "HTTP request failed when searching for episode: {EpisodeId}", episodeId);
+            return false;
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to serialize/deserialize Sonarr API request for episode search: {EpisodeId}", episodeId);
+            return false;
+        }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogError(ex, "Request timed out when searching for episode: {EpisodeId}", episodeId);
+            return false;
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error searching for episode: {EpisodeId}", episodeId);
+            _logger.LogError(ex, "Unexpected error searching for episode: {EpisodeId}", episodeId);
             return false;
         }
     }
@@ -229,9 +309,24 @@ public class SonarrService : ISonarrService
             _logger.LogError("Failed to enable future episode monitoring. Status code: {StatusCode}", response.StatusCode);
             return false;
         }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "HTTP request failed when monitoring future episodes for series: {SeriesId}", seriesId);
+            return false;
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to serialize/deserialize Sonarr API request for future monitoring: {SeriesId}", seriesId);
+            return false;
+        }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogError(ex, "Request timed out when monitoring future episodes for series: {SeriesId}", seriesId);
+            return false;
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error monitoring future episodes for series: {SeriesId}", seriesId);
+            _logger.LogError(ex, "Unexpected error monitoring future episodes for series: {SeriesId}", seriesId);
             return false;
         }
     }
@@ -257,9 +352,24 @@ public class SonarrService : ISonarrService
 
             return await response.Content.ReadFromJsonAsync<SonarrSeries>();
         }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "HTTP request failed when getting series: {SeriesId}", seriesId);
+            return null;
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to deserialize Sonarr API response for series: {SeriesId}", seriesId);
+            return null;
+        }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogError(ex, "Request timed out when getting series: {SeriesId}", seriesId);
+            return null;
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting series: {SeriesId}", seriesId);
+            _logger.LogError(ex, "Unexpected error getting series: {SeriesId}", seriesId);
             return null;
         }
     }
@@ -295,9 +405,24 @@ public class SonarrService : ISonarrService
 
             return false;
         }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "HTTP request failed when monitoring new seasons for series: {SeriesId}", seriesId);
+            return false;
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to serialize/deserialize Sonarr API request for new season monitoring: {SeriesId}", seriesId);
+            return false;
+        }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogError(ex, "Request timed out when monitoring new seasons for series: {SeriesId}", seriesId);
+            return false;
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error monitoring new seasons for series: {SeriesId}", seriesId);
+            _logger.LogError(ex, "Unexpected error monitoring new seasons for series: {SeriesId}", seriesId);
             return false;
         }
     }

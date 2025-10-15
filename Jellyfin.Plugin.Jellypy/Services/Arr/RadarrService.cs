@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Jellyfin.Plugin.Jellypy.Configuration;
 using Microsoft.Extensions.Logging;
@@ -61,9 +62,29 @@ public class RadarrService : IRadarrService
             _logger.LogWarning("No movie found in Radarr for: {MovieName}", movieName);
             return null;
         }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "HTTP request failed when getting Radarr movie ID for: {MovieName}", movieName);
+            return null;
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to deserialize Radarr API response for movie: {MovieName}", movieName);
+            return null;
+        }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogError(ex, "Request timed out when getting Radarr movie ID for: {MovieName}", movieName);
+            return null;
+        }
+        catch (UriFormatException ex)
+        {
+            _logger.LogError(ex, "Invalid Radarr URL format when getting movie ID for: {MovieName}", movieName);
+            return null;
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting Radarr movie ID for: {MovieName}", movieName);
+            _logger.LogError(ex, "Unexpected error getting Radarr movie ID for: {MovieName}", movieName);
             return null;
         }
     }
@@ -97,9 +118,24 @@ public class RadarrService : IRadarrService
             _logger.LogError("Failed to set movie monitored status. Status code: {StatusCode}", response.StatusCode);
             return false;
         }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "HTTP request failed when setting movie monitored status: {MovieId}", movieId);
+            return false;
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to serialize/deserialize Radarr API request for movie: {MovieId}", movieId);
+            return false;
+        }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogError(ex, "Request timed out when setting movie monitored status: {MovieId}", movieId);
+            return false;
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error setting movie monitored status: {MovieId}", movieId);
+            _logger.LogError(ex, "Unexpected error setting movie monitored status: {MovieId}", movieId);
             return false;
         }
     }
@@ -141,9 +177,29 @@ public class RadarrService : IRadarrService
             _logger.LogWarning("No movie details found in Radarr for ID: {MovieId}", movieId);
             return null;
         }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "HTTP request failed when getting Radarr movie details for ID: {MovieId}", movieId);
+            return null;
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to deserialize Radarr API response for movie ID: {MovieId}", movieId);
+            return null;
+        }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogError(ex, "Request timed out when getting Radarr movie details for ID: {MovieId}", movieId);
+            return null;
+        }
+        catch (UriFormatException ex)
+        {
+            _logger.LogError(ex, "Invalid Radarr URL format when getting movie details for ID: {MovieId}", movieId);
+            return null;
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting Radarr movie details for ID: {MovieId}", movieId);
+            _logger.LogError(ex, "Unexpected error getting Radarr movie details for ID: {MovieId}", movieId);
             return null;
         }
     }

@@ -74,9 +74,19 @@ public class JellyPyApiController : ControllerBase
             _logger.LogInformation("Found {Count} script files", uniqueScripts.Count);
             return Ok(uniqueScripts);
         }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogError(ex, "Access denied when scanning for script files");
+            return StatusCode(500, "Access denied when scanning for script files");
+        }
+        catch (IOException ex)
+        {
+            _logger.LogError(ex, "I/O error when scanning for script files");
+            return StatusCode(500, "I/O error when scanning for script files");
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error scanning for script files");
+            _logger.LogError(ex, "Unexpected error scanning for script files");
             return StatusCode(500, "Error scanning for script files");
         }
     }
@@ -139,9 +149,27 @@ public class JellyPyApiController : ControllerBase
                 Message = $"Connection failed: {ex.Message}"
             });
         }
+        catch (JsonException ex)
+        {
+            _logger.LogWarning(ex, "Failed to parse Sonarr API response");
+            return Ok(new ConnectionTestResult
+            {
+                Success = false,
+                Message = "Failed to parse Sonarr API response"
+            });
+        }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogWarning(ex, "Sonarr connection test timed out");
+            return Ok(new ConnectionTestResult
+            {
+                Success = false,
+                Message = "Connection timed out"
+            });
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error testing Sonarr connection");
+            _logger.LogError(ex, "Unexpected error testing Sonarr connection");
             return Ok(new ConnectionTestResult
             {
                 Success = false,
@@ -208,9 +236,27 @@ public class JellyPyApiController : ControllerBase
                 Message = $"Connection failed: {ex.Message}"
             });
         }
+        catch (JsonException ex)
+        {
+            _logger.LogWarning(ex, "Failed to parse Radarr API response");
+            return Ok(new ConnectionTestResult
+            {
+                Success = false,
+                Message = "Failed to parse Radarr API response"
+            });
+        }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogWarning(ex, "Radarr connection test timed out");
+            return Ok(new ConnectionTestResult
+            {
+                Success = false,
+                Message = "Connection timed out"
+            });
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error testing Radarr connection");
+            _logger.LogError(ex, "Unexpected error testing Radarr connection");
             return Ok(new ConnectionTestResult
             {
                 Success = false,

@@ -1,0 +1,17 @@
+# Ignore node modules and build artifacts
+node_modules/
+.releases/
+releases/
+bin/
+obj/
+pub/
+*.zip
+*.dll
+*.exe
+# Ignore VSCode and OS files
+.vscode/
+.DS_Store
+# Ignore example and external scripts
+examples/
+config/data/plugins/Jellypy/scripts/
+/scripts/

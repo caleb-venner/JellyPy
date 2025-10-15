@@ -154,9 +154,17 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
 
             await ExecuteProcessAsync(startInfo, setting.Execution.TimeoutSeconds, eventData.EventType).ConfigureAwait(false);
         }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Invalid operation when executing script setting {SettingId} for event {EventType}", setting.Id, eventData.EventType);
+        }
+        catch (System.ComponentModel.Win32Exception ex)
+        {
+            _logger.LogError(ex, "Failed to start process for script setting {SettingId} for event {EventType}", setting.Id, eventData.EventType);
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error executing script setting {SettingId} for event {EventType}", setting.Id, eventData.EventType);
+            _logger.LogError(ex, "Unexpected error executing script setting {SettingId} for event {EventType}", setting.Id, eventData.EventType);
         }
     }
 
@@ -338,9 +346,17 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                 }
             }
         }
-        catch (Exception ex)
+        catch (InvalidOperationException ex)
         {
             _logger.LogDebug("Failed to check Python executable {Path}: {Error}", path, ex.Message);
+        }
+        catch (System.ComponentModel.Win32Exception ex)
+        {
+            _logger.LogDebug("Python executable not found at {Path}: {Error}", path, ex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug("Unexpected error checking Python executable {Path}: {Error}", path, ex.Message);
         }
 
         return false;
@@ -387,6 +403,14 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                 }
             }
         }
+        catch (InvalidOperationException)
+        {
+            // If 'which' command fails, try direct execution
+        }
+        catch (System.ComponentModel.Win32Exception)
+        {
+            // If 'which' command fails, try direct execution
+        }
         catch (Exception)
         {
             // If 'which' command fails, try direct execution
@@ -428,6 +452,14 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                     }
                 }
             }
+        }
+        catch (InvalidOperationException)
+        {
+            // Ignore
+        }
+        catch (System.ComponentModel.Win32Exception)
+        {
+            // Ignore
         }
         catch (Exception)
         {
@@ -482,6 +514,14 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                 _logger.LogInformation("PATH contains {Count} directories", paths.Length);
                 _logger.LogDebug("PATH directories: {Paths}", string.Join(", ", paths.Take(10)));
             }
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogDebug("Failed to collect Python diagnostics (invalid operation): {Error}", ex.Message);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogDebug("Failed to collect Python diagnostics (access denied): {Error}", ex.Message);
         }
         catch (Exception ex)
         {
@@ -601,9 +641,21 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                     stdOut);
             }
         }
+        catch (OperationCanceledException ex)
+        {
+            _logger.LogError(ex, "Script execution was cancelled for event {EventType}", eventType);
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Invalid operation when executing script process for event {EventType}", eventType);
+        }
+        catch (System.ComponentModel.Win32Exception ex)
+        {
+            _logger.LogError(ex, "Failed to start script process for event {EventType}", eventType);
+        }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error executing script process for event {EventType}", eventType);
+            _logger.LogError(ex, "Unexpected error executing script process for event {EventType}", eventType);
         }
     }
 
@@ -704,6 +756,18 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
             var error = await stdErrTask.ConfigureAwait(false);
 
             LogScriptResults(eventData, process.ExitCode, output, error);
+        }
+        catch (OperationCanceledException ex)
+        {
+            _logger.LogError(ex, "Script execution was cancelled for event {EventType}", eventData.EventType);
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "Invalid operation while executing script for event {EventType}", eventData.EventType);
+        }
+        catch (System.ComponentModel.Win32Exception ex)
+        {
+            _logger.LogError(ex, "Failed to start script process for event {EventType}", eventData.EventType);
         }
         catch (Exception ex)
         {
@@ -862,6 +926,14 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
             {
                 process.Kill(entireProcessTree: true);
             }
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogDebug(ex, "Failed to terminate process after timeout (invalid operation).");
+        }
+        catch (System.ComponentModel.Win32Exception ex)
+        {
+            _logger.LogDebug(ex, "Failed to terminate process after timeout (Win32 error).");
         }
         catch (Exception ex)
         {

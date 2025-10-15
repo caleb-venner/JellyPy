@@ -1,10 +1,12 @@
 # Jellypy Plugin Repository
 
-This repository provides the Jellypy plugin for Jellyfin through a third-party plugin catalog.
+This repository provides the Jellypy plugin for Jellyfin
+through a third-party plugin catalog.
 
 ## About Jellypy
 
-Jellypy automatically manages your Sonarr and Radarr monitoring based on what you watch in Jellyfin.
+Jellypy automatically manages your Sonarr and Radarr
+monitoring based on what you watch in Jellyfin.
 
 ### Features
 
@@ -18,7 +20,8 @@ Jellypy automatically manages your Sonarr and Radarr monitoring based on what yo
 
 ### Option 1: Add Repository to Jellyfin
 
-1. In Jellyfin, go to **Administration** → **Dashboard** → **Plugins** → **Repositories**
+1. In Jellyfin, go to **Administration** →
+**Dashboard** → **Plugins** → **Repositories**
 2. Click **Add Repository**
 3. Enter the following details:
    - **Repository Name**: `Jellypy`
@@ -28,18 +31,21 @@ Jellypy automatically manages your Sonarr and Radarr monitoring based on what yo
 
 ### Option 2: Manual Installation
 
-1. Download the latest `jellypy_x.x.x.x.zip` from [Releases](https://github.com/caleb-venner/jellypy/releases)
+1. Download the latest `jellypy_x.x.x.x.zip` from
+ [Releases](https://github.com/caleb-venner/jellypy/releases)
 2. Extract the zip file
 3. Copy the `.dll` files to your Jellyfin plugins directory:
    - **Linux**: `/var/lib/jellyfin/plugins/Jellypy/`
    - **Windows**: `C:\ProgramData\Jellyfin\Server\plugins\Jellypy\`
    - **macOS**: `/var/lib/jellyfin/plugins/Jellypy/`
 4. Restart Jellyfin
-5. Configure the plugin in **Administration** → **Dashboard** → **Plugins** → **Jellypy**
+5. Configure the plugin
+in **Administration** → **Dashboard** → **Plugins** → **Jellypy**
 
 ## Configuration
 
-After installation, configure your Sonarr and Radarr connections in the plugin settings:
+After installation, configure your Sonarr and Radarr connections
+ in the plugin settings:
 
 1. **Sonarr Settings**: API URL, API Key, monitoring preferences
 2. **Radarr Settings**: API URL, API Key, unmonitoring preferences
@@ -53,4 +59,6 @@ After installation, configure your Sonarr and Radarr connections in the plugin s
 
 ## License
 
-This plugin is licensed under GPLv3 - see the [LICENSE](https://github.com/caleb-venner/jellypy/blob/main/LICENSE) file for details.
+This plugin is licensed under GPLv3 - see
+the [LICENSE](https://github.com/caleb-venner/jellypy/blob/main/LICENSE)
+file for details.
