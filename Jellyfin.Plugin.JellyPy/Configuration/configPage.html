@@ -4,57 +4,25 @@
     <meta charset="utf-8">
     <title>JellyPy</title>
     <style>
-        .advanced-section {
-            margin-top: 30px;
-            border: 1px solid #333;
-            border-radius: 4px;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.1);
-        }
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #555;
-        }
+        /* Essential layout styles */
         .section-title {
             font-size: 1.2em;
             font-weight: bold;
         }
+        
         .tab-container {
             margin-bottom: 20px;
         }
-        .tab-buttons {
-            display: flex;
-            border-bottom: 1px solid #555;
-            margin-bottom: 20px;
-        }
-        .tab-button {
-            padding: 10px 20px;
-            background: none;
-            border: none;
-            border-bottom: 2px solid transparent;
-            color: #ccc;
-            cursor: pointer;
-            font-size: 1em;
-        }
-        .tab-button.active {
-            color: #fff;
-            border-bottom-color: #00a4dc;
-        }
-        .tab-button:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
+        
         .tab-content {
             display: none;
         }
+        
         .tab-content.active {
             display: block;
         }
         
-        /* Script Settings Styles */
+        /* Script Settings Container */
         .script-settings-container {
             display: flex;
             gap: 20px;
@@ -78,90 +46,12 @@
         
         .script-list-title {
             font-weight: bold;
-            font-size: 1.1em;
-        }
-        
-        .add-script-btn {
-            background: #00a4dc;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 0.9em;
-        }
-        
-        .add-script-btn:hover {
-            background: #0084b4;
+            font-size: 1.3em;
         }
         
         .script-items {
             max-height: 450px;
             overflow-y: auto;
-        }
-        
-        .script-item {
-            padding: 12px 15px;
-            border-bottom: 1px solid #333;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .script-item:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-        
-        .script-item.active {
-            background: rgba(0, 164, 220, 0.2);
-            border-left: 3px solid #00a4dc;
-        }
-        
-        .script-item-info {
-            flex: 1;
-        }
-        
-        .script-item-name {
-            font-weight: bold;
-            margin-bottom: 4px;
-        }
-        
-        .script-item-desc {
-            font-size: 0.85em;
-            color: #aaa;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        
-        .script-item-status {
-            margin-left: 10px;
-        }
-        
-        .status-enabled {
-            color: #4CAF50;
-            font-size: 0.8em;
-        }
-        
-        .status-disabled {
-            color: #888;
-            font-size: 0.8em;
-        }
-        
-        .delete-script-btn {
-            background: #d32f2f;
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 0.8em;
-            margin-left: 8px;
-        }
-        
-        .delete-script-btn:hover {
-            background: #b71c1c;
         }
         
         .script-details {
@@ -172,93 +62,13 @@
             overflow: hidden;
         }
         
-        .script-details-header {
-            padding: 15px;
-            border-bottom: 1px solid #444;
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-        
         .script-details-content {
             padding: 20px;
             max-height: 450px;
             overflow-y: auto;
         }
         
-        .no-script-selected {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: #888;
-            font-style: italic;
-        }
-        
-        .script-form-section {
-            margin-bottom: 35px;
-            padding-bottom: 10px;
-        }
-        
-        .section-title-small {
-            font-size: 1em;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #00a4dc;
-            border-bottom: 1px solid #555;
-            padding-bottom: 5px;
-        }
-        
-        .collapsible-section {
-            border: 1px solid #555;
-            border-radius: 4px;
-            margin-bottom: 20px;
-        }
-        
-        .collapsible-header {
-            padding: 15px 18px;
-            background: rgba(255, 255, 255, 0.05);
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #555;
-            list-style: none;
-            user-select: none;
-        }
-        
-        .collapsible-header::-webkit-details-marker {
-            display: none;
-        }
-        
-        .collapsible-header::marker {
-            display: none;
-        }
-        
-        .collapsible-header::before {
-            content: '▼';
-            margin-right: 12px;
-            transition: transform 0.2s ease;
-            display: inline-block;
-            font-size: 14px;
-        }
-        
-        details:not([open]) .collapsible-header::before {
-            transform: rotate(-90deg);
-        }
-        
-        .collapsible-header:hover {
-            background: rgba(255, 255, 255, 0.08);
-        }
-        
-        .collapsible-title {
-            font-weight: bold;
-            font-size: 16px;
-        }
-        
-        .collapsible-content {
-            padding: 15px;
-        }
-        
+        /* Form layout helpers */
         .form-row {
             display: flex;
             gap: 15px;
@@ -271,64 +81,6 @@
         
         .form-col-narrow {
             flex: 0 0 120px;
-        }
-        
-        .condition-item, .data-attribute-item, .env-var-item {
-            border: 1px solid #555;
-            border-radius: 4px;
-            padding: 12px;
-            margin-bottom: 10px;
-            background: rgba(0, 0, 0, 0.1);
-            position: relative;
-        }
-        
-        .remove-item-btn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: #d32f2f;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .remove-item-btn:hover {
-            background: #b71c1c;
-        }
-        
-        .add-item-btn {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 0.9em;
-            margin-top: 10px;
-        }
-        
-        .add-item-btn:hover {
-            background: #45a049;
-        }
-        
-        .trigger-checkboxes {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .trigger-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
         
         .empty-state {
@@ -347,10 +99,10 @@
 
                     <!-- Tab Navigation -->
                     <div class="tab-container">
-                        <div class="tab-buttons">
-                            <button type="button" class="tab-button active" onclick="switchTab('advanced')">Script Settings</button>
-                            <button type="button" class="tab-button" onclick="switchTab('native')">Native Integration</button>
-                            <button type="button" class="tab-button" onclick="switchTab('global')">Global Settings</button>
+                        <div class="tab-buttons" style="display: flex; border-bottom: 1px solid #555; margin-bottom: 20px;">
+                            <button type="button" class="tab-button active" onclick="switchTab('advanced')" style="padding: 12px 24px; background: none; border: none; border-bottom: 3px solid #00a4dc; color: #fff; cursor: pointer; font-size: 15px; font-weight: 600;">Script Settings</button>
+                            <button type="button" class="tab-button" onclick="switchTab('native')" style="padding: 12px 24px; background: none; border: none; border-bottom: 3px solid transparent; color: #ccc; cursor: pointer; font-size: 15px; font-weight: 600;">Native Integration</button>
+                            <button type="button" class="tab-button" onclick="switchTab('global')" style="padding: 12px 24px; background: none; border: none; border-bottom: 3px solid transparent; color: #ccc; cursor: pointer; font-size: 15px; font-weight: 600;">Global Settings</button>
                         </div>
                     </div>
 
@@ -368,7 +120,7 @@
                             <div class="script-list">
                                 <div class="script-list-header">
                                     <div class="script-list-title">Scripts</div>
-                                    <button type="button" class="add-script-btn" onclick="addNewScript()">+ Add</button>
+                                    <button type="button" class="add-script-btn" onclick="addNewScript()" style="background: #00a4dc; color: white; border: none; padding: 8px 16px; border-radius: 3px; cursor: pointer; font-size: 14px; font-weight: 600; min-height: 36px;">+ Add</button>
                                 </div>
                                 <div class="script-items" id="scriptItems">
                                     <div class="empty-state" id="emptyState">
@@ -380,47 +132,47 @@
                             
                             <!-- Script Details -->
                             <div class="script-details">
-                                <div class="script-details-header" id="scriptDetailsHeader">
-                                    Script Details
-                                </div>
                                 <div class="script-details-content" id="scriptDetailsContent">
-                                    <div class="no-script-selected" id="noScriptSelected">
-                                        Select a script from the list to configure its settings
+                                    <div class="no-script-selected" id="noScriptSelected" style="display: none;">
                                     </div>
                                     
                                     <!-- Script Form (hidden by default) -->
                                     <div id="scriptForm" style="display: none;">
                                         <!-- Basic Information -->
-                                        <div class="script-form-section">
-                                            <div class="section-title-small">Basic Information</div>
-                                            <div class="form-row">
-                                                <div class="form-col">
-                                                    <label class="inputLabel inputLabelUnfocused" for="script-name">Script Name</label>
-                                                    <input id="script-name" type="text" is="emby-input" />
+                                        <details open style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
+                                            <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
+                                                Basic Information
+                                            </summary>
+                                            <div style="padding: 15px;">
+                                                <div class="form-row">
+                                                    <div class="form-col">
+                                                        <label class="inputLabel inputLabelUnfocused" for="script-name">Script Name</label>
+                                                        <input id="script-name" type="text" is="emby-input" />
+                                                    </div>
+                                                    <div class="form-col-narrow">
+                                                        <label class="inputLabel inputLabelUnfocused" for="script-priority">Priority</label>
+                                                        <input id="script-priority" type="number" is="emby-input" min="1" max="1000" />
+                                                    </div>
                                                 </div>
-                                                <div class="form-col-narrow">
-                                                    <label class="inputLabel inputLabelUnfocused" for="script-priority">Priority</label>
-                                                    <input id="script-priority" type="number" is="emby-input" min="1" max="1000" />
+                                                <div class="inputContainer">
+                                                    <label class="inputLabel inputLabelUnfocused" for="script-description">Description</label>
+                                                    <input id="script-description" type="text" is="emby-input" />
+                                                </div>
+                                                <div class="checkboxContainer">
+                                                    <label class="emby-checkbox-label">
+                                                        <input id="script-enabled" type="checkbox" is="emby-checkbox" />
+                                                        <span>Enable this script</span>
+                                                    </label>
                                                 </div>
                                             </div>
-                                            <div class="inputContainer">
-                                                <label class="inputLabel inputLabelUnfocused" for="script-description">Description</label>
-                                                <input id="script-description" type="text" is="emby-input" />
-                                            </div>
-                                            <div class="checkboxContainer">
-                                                <label class="emby-checkbox-label">
-                                                    <input id="script-enabled" type="checkbox" is="emby-checkbox" />
-                                                    <span>Enable this script</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                        </details>
 
                                         <!-- Event Triggers -->
-                                        <details class="collapsible-section">
-                                            <summary class="collapsible-header">
-                                                <span class="collapsible-title">Event Triggers</span>
+                                        <details style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
+                                            <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
+                                                Event Triggers
                                             </summary>
-                                            <div class="collapsible-content">
+                                            <div style="padding: 15px;">
                                                 <div class="fieldDescription" style="margin-bottom: 15px;">
                                                     Select which Jellyfin events should trigger this script.
                                                 </div>
@@ -429,38 +181,38 @@
                                         </details>
 
                                         <!-- Execution Settings -->
-                                        <details class="collapsible-section">
-                                            <summary class="collapsible-header">
-                                                <span class="collapsible-title">Execution Settings</span>
+                                        <details style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
+                                            <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
+                                                Execution Settings
                                             </summary>
-                                            <div class="collapsible-content" id="executionSettingsContent"></div>
+                                            <div style="padding: 15px;" id="executionSettingsContent"></div>
                                         </details>
 
                                         <!-- Execution Conditions -->
-                                        <details class="collapsible-section">
-                                            <summary class="collapsible-header">
-                                                <span class="collapsible-title">Execution Conditions</span>
+                                        <details style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
+                                            <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
+                                                Execution Conditions
                                             </summary>
-                                            <div class="collapsible-content">
+                                            <div style="padding: 15px;">
                                                 <div class="fieldDescription" style="margin-bottom: 15px;">
                                                     Add conditions to control when this script should run. All conditions must be met for the script to execute.
                                                 </div>
                                                 <div id="conditionsContainer"></div>
-                                                <button type="button" class="add-item-btn" onclick="addCondition()">+ Add Condition</button>
+                                                <button type="button" class="add-item-btn" onclick="addCondition()" style="background: #00a4dc; color: white; border: none; padding: 8px 16px; border-radius: 3px; cursor: pointer; font-size: 14px; font-weight: 600; min-height: 36px;">+ Add Condition</button>
                                             </div>
                                         </details>
 
                                         <!-- Data Attributes -->
-                                        <details class="collapsible-section">
-                                            <summary class="collapsible-header">
-                                                <span class="collapsible-title">Data Attributes</span>
+                                        <details style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
+                                            <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
+                                                Data Attributes
                                             </summary>
-                                            <div class="collapsible-content">
+                                            <div style="padding: 15px;">
                                                 <div class="fieldDescription" style="margin-bottom: 15px;">
                                                     Configure how event data is passed to your script. Data can be passed as JSON, environment variables, command line arguments, or plain strings.
                                                 </div>
                                                 <div id="dataAttributesContainer"></div>
-                                                <button type="button" class="add-item-btn" onclick="addDataAttribute()">+ Add Data Attribute</button>
+                                                <button type="button" class="add-item-btn" onclick="addDataAttribute()" style="background: #00a4dc; color: white; border: none; padding: 8px 16px; border-radius: 3px; cursor: pointer; font-size: 14px; font-weight: 600; min-height: 36px;">+ Add Data Attribute</button>
                                             </div>
                                         </details>
                                     </div>
@@ -477,11 +229,11 @@
                         </div>
 
                         <!-- Sonarr Settings -->
-                        <details class="collapsible-section">
-                            <summary class="collapsible-header">
-                                <span class="collapsible-title">Sonarr Configuration</span>
+                        <details style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
+                            <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
+                                Sonarr Configuration
                             </summary>
-                            <div class="collapsible-content">
+                            <div style="padding: 15px;">
                                 <div class="checkboxContainer checkboxContainer-withDescription">
                                     <label class="emby-checkbox-label">
                                         <input id="EnableNativeSonarrIntegration" name="EnableNativeSonarrIntegration" type="checkbox" is="emby-checkbox" />
@@ -500,7 +252,7 @@
                                     <div class="fieldDescription">Your Sonarr API key (found in Settings → General → Security).</div>
                                 </div>
                                 <div class="inputContainer">
-                                    <button id="testSonarrConnection" type="button" is="emby-button" class="raised button-submit" style="margin-bottom: 10px;">
+                                    <button id="testSonarrConnection" type="button" is="emby-button" class="raised button-submit" style="margin-bottom: 10px; padding: 10px 20px; font-size: 14px; min-height: 40px;">
                                         <span id="testSonarrText">Test Sonarr Connection</span>
                                     </button>
                                     <div id="sonarrTestResult" class="fieldDescription" style="display: none; font-weight: bold;"></div>
@@ -549,11 +301,11 @@
                         </details>
 
                         <!-- Radarr Settings -->
-                        <details class="collapsible-section">
-                            <summary class="collapsible-header">
-                                <span class="collapsible-title">Radarr Configuration</span>
+                        <details style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
+                            <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
+                                Radarr Configuration
                             </summary>
-                            <div class="collapsible-content">
+                            <div style="padding: 15px;">
                                 <div class="checkboxContainer checkboxContainer-withDescription">
                                     <label class="emby-checkbox-label">
                                         <input id="EnableNativeRadarrIntegration" name="EnableNativeRadarrIntegration" type="checkbox" is="emby-checkbox" />
@@ -572,7 +324,7 @@
                                     <div class="fieldDescription">Your Radarr API key (found in Settings → General → Security).</div>
                                 </div>
                                 <div class="inputContainer">
-                                    <button id="testRadarrConnection" type="button" is="emby-button" class="raised button-submit" style="margin-bottom: 10px;">
+                                    <button id="testRadarrConnection" type="button" is="emby-button" class="raised button-submit" style="margin-bottom: 10px; padding: 10px 20px; font-size: 14px; min-height: 40px;">
                                         <span id="testRadarrText">Test Radarr Connection</span>
                                     </button>
                                     <div id="radarrTestResult" class="fieldDescription" style="display: none; font-weight: bold;"></div>
@@ -610,32 +362,48 @@
                     <!-- Global Settings Tab -->
                     <div id="global-tab" class="tab-content" style="display: none;">
                         <div class="section-title" style="margin-bottom: 20px;">Global Execution Settings</div>
-                        <div class="inputContainer">
-                            <label class="inputLabel inputLabelUnfocused" for="MaxConcurrentExecutions">Max concurrent executions</label>
-                            <input id="MaxConcurrentExecutions" name="MaxConcurrentExecutions" type="number" is="emby-input" min="1" max="20" />
-                            <div class="fieldDescription">Maximum number of scripts that can run simultaneously.</div>
-                        </div>
-                        <div class="inputContainer">
-                            <label class="inputLabel inputLabelUnfocused" for="DefaultTimeoutSeconds">Default timeout (seconds)</label>
-                            <input id="DefaultTimeoutSeconds" name="DefaultTimeoutSeconds" type="number" is="emby-input" min="30" />
-                            <div class="fieldDescription">Default timeout for script execution when not specified in individual settings.</div>
-                        </div>
-                        <div class="inputContainer">
-                            <label class="inputLabel inputLabelUnfocused" for="QueueSize">Queue size</label>
-                            <input id="QueueSize" name="QueueSize" type="number" is="emby-input" min="10" />
-                            <div class="fieldDescription">Maximum number of pending script executions to queue.</div>
-                        </div>
-                        <div class="checkboxContainer checkboxContainer-withDescription">
-                            <label class="emby-checkbox-label">
-                                <input id="EnableVerboseLogging" name="EnableVerboseLogging" type="checkbox" is="emby-checkbox" />
-                                <span>Enable verbose logging</span>
-                            </label>
-                            <div class="fieldDescription">Log detailed information about script execution for debugging.</div>
-                        </div>
+                        
+                        <details open style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
+                            <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
+                                Execution Limits
+                            </summary>
+                            <div style="padding: 15px;">
+                                <div class="inputContainer">
+                                    <label class="inputLabel inputLabelUnfocused" for="MaxConcurrentExecutions">Max concurrent executions</label>
+                                    <input id="MaxConcurrentExecutions" name="MaxConcurrentExecutions" type="number" is="emby-input" min="1" max="20" />
+                                    <div class="fieldDescription">Maximum number of scripts that can run simultaneously.</div>
+                                </div>
+                                <div class="inputContainer">
+                                    <label class="inputLabel inputLabelUnfocused" for="DefaultTimeoutSeconds">Default timeout (seconds)</label>
+                                    <input id="DefaultTimeoutSeconds" name="DefaultTimeoutSeconds" type="number" is="emby-input" min="30" />
+                                    <div class="fieldDescription">Default timeout for script execution when not specified in individual settings.</div>
+                                </div>
+                                <div class="inputContainer">
+                                    <label class="inputLabel inputLabelUnfocused" for="QueueSize">Queue size</label>
+                                    <input id="QueueSize" name="QueueSize" type="number" is="emby-input" min="10" />
+                                    <div class="fieldDescription">Maximum number of pending script executions to queue.</div>
+                                </div>
+                            </div>
+                        </details>
+                        
+                        <details open style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
+                            <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
+                                Logging
+                            </summary>
+                            <div style="padding: 15px;">
+                                <div class="checkboxContainer checkboxContainer-withDescription">
+                                    <label class="emby-checkbox-label">
+                                        <input id="EnableVerboseLogging" name="EnableVerboseLogging" type="checkbox" is="emby-checkbox" />
+                                        <span>Enable verbose logging</span>
+                                    </label>
+                                    <div class="fieldDescription">Log detailed information about script execution for debugging.</div>
+                                </div>
+                            </div>
+                        </details>
                     </div>
 
                     <div style="margin-top: 30px;">
-                        <button is="emby-button" type="submit" class="raised button-submit block emby-button">
+                        <button is="emby-button" type="submit" class="raised button-submit block emby-button" style="padding: 12px 24px; font-size: 16px; min-height: 44px;">
                             <span>Save</span>
                         </button>
                     </div>
@@ -691,16 +459,23 @@
             }
 
             function selectScript(scriptId) {
-                JellyPyConfig.selectedScriptId = scriptId;
+                // Toggle selection if clicking the same script
+                if (JellyPyConfig.selectedScriptId === scriptId) {
+                    JellyPyConfig.selectedScriptId = null;
+                } else {
+                    JellyPyConfig.selectedScriptId = scriptId;
+                }
                 
                 // Update active state in list
                 document.querySelectorAll('.script-item').forEach(function(item) {
                     item.classList.remove('active');
                 });
                 
-                var selectedItem = document.querySelector('[data-script-id="' + scriptId + '"]');
-                if (selectedItem) {
-                    selectedItem.classList.add('active');
+                if (JellyPyConfig.selectedScriptId) {
+                    var selectedItem = document.querySelector('[data-script-id="' + JellyPyConfig.selectedScriptId + '"]');
+                    if (selectedItem) {
+                        selectedItem.classList.add('active');
+                    }
                 }
                 
                 renderScriptDetails();
@@ -736,38 +511,63 @@
                 JellyPyConfig.scriptSettings.forEach(function(script) {
                     var statusClass = script.Enabled ? 'status-enabled' : 'status-disabled';
                     var statusText = script.Enabled ? 'Enabled' : 'Disabled';
-                    var activeClass = script.Id === JellyPyConfig.selectedScriptId ? 'active' : '';
+                    var isActive = script.Id === JellyPyConfig.selectedScriptId;
                     
                     var scriptItem = document.createElement('div');
-                    scriptItem.className = 'script-item ' + activeClass;
+                    scriptItem.className = 'script-item';
                     scriptItem.setAttribute('data-script-id', script.Id);
                     scriptItem.onclick = function() { selectScript(script.Id); };
                     
+                    // Base styles for all scripts
+                    var baseStyle = 'padding: 15px; margin: 10px 10px 25px 10px; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: flex-start;';
+                    
+                    // Apply active or inactive styles
+                    if (isActive) {
+                        scriptItem.style.cssText = baseStyle + ' background: rgba(0, 164, 220, 0.3); border: 2px solid #00a4dc; box-shadow: 0 0 10px rgba(0, 164, 220, 0.3);';
+                    } else {
+                        scriptItem.style.cssText = baseStyle + ' background: rgba(0, 0, 0, 0.1); border: 1px solid #444;';
+                    }
+                    
                     var info = document.createElement('div');
-                    info.className = 'script-item-info';
+                    info.style.cssText = 'flex: 1; padding-bottom: 5px;';
                     
                     var name = document.createElement('div');
-                    name.className = 'script-item-name';
-                    name.textContent = script.Name;
+                    name.style.cssText = 'font-weight: bold; font-size: 1.1em; margin-bottom: 8px; display: flex; align-items: center;';
+                    
+                    var arrow = document.createElement('span');
+                    arrow.innerHTML = '&#9654;';
+                    arrow.style.cssText = 'margin-right: 10px; font-size: 12px; display: inline-block; min-width: 12px; transition: transform 0.2s ease;';
+                    
+                    if (isActive) {
+                        arrow.style.cssText += ' transform: rotate(90deg); color: #00a4dc;';
+                    } else {
+                        arrow.style.color = '#888';
+                    }
+                    
+                    var nameText = document.createTextNode(script.Name);
+                    
+                    name.appendChild(arrow);
+                    name.appendChild(nameText);
                     
                     var desc = document.createElement('div');
-                    desc.className = 'script-item-desc';
                     desc.textContent = script.Description || 'No description';
+                    desc.style.cssText = 'font-size: 0.9em; color: #aaa; line-height: 1.4; margin-bottom: 15px;';
                     
                     info.appendChild(name);
                     info.appendChild(desc);
                     
                     var status = document.createElement('div');
-                    status.className = 'script-item-status';
+                    status.style.cssText = 'margin-left: 10px;';
                     
                     var statusSpan = document.createElement('span');
-                    statusSpan.className = statusClass;
                     statusSpan.textContent = statusText;
+                    statusSpan.style.cssText = 'font-size: 0.8em;';
+                    statusSpan.style.color = script.Enabled ? '#4CAF50' : '#888';
                     
                     var deleteBtn = document.createElement('button');
                     deleteBtn.type = 'button';
-                    deleteBtn.className = 'delete-script-btn';
                     deleteBtn.textContent = '×';
+                    deleteBtn.style.cssText = 'background: #d32f2f; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 0.8em; margin-left: 8px;';
                     deleteBtn.onclick = function(e) {
                         e.stopPropagation();
                         deleteScript(script.Id);
@@ -786,11 +586,9 @@
             function renderScriptDetails() {
                 var noScriptDiv = document.getElementById('noScriptSelected');
                 var formDiv = document.getElementById('scriptForm');
-                var header = document.getElementById('scriptDetailsHeader');
                 
                 if (!JellyPyConfig.selectedScriptId) {
-                    header.textContent = 'Script Details';
-                    noScriptDiv.style.display = 'block';
+                    noScriptDiv.style.display = 'none';
                     formDiv.style.display = 'none';
                     return;
                 }
@@ -803,7 +601,6 @@
                 // Show form, hide "no script" message
                 noScriptDiv.style.display = 'none';
                 formDiv.style.display = 'block';
-                header.textContent = script.Name + ' - Details';
                 
                 // Populate basic fields
                 document.getElementById('script-name').value = script.Name;
@@ -856,10 +653,10 @@
                 var html = '';
                 eventTypes.forEach(function(eventType) {
                     var checked = triggers.includes(eventType.value) ? 'checked' : '';
-                    html += '<div class="trigger-checkbox">' +
+                    html += '<div style="padding: 8px 12px; border: 1px solid #444; border-radius: 4px; margin-bottom: 8px; background: rgba(0, 0, 0, 0.1); display: flex; align-items: center;">' +
                             '<input type="checkbox" id="trigger-' + eventType.value + '" ' + checked + ' ' +
-                                   'onchange="updateTrigger(' + eventType.value + ', this.checked)" />' +
-                            '<label for="trigger-' + eventType.value + '">' + eventType.label + '</label>' +
+                                   'onchange="updateTrigger(' + eventType.value + ', this.checked)" style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;" />' +
+                            '<label for="trigger-' + eventType.value + '" style="cursor: pointer; flex: 1; margin: 0; font-size: 14px;">' + eventType.label + '</label>' +
                         '</div>';
                 });
                 return html;
@@ -947,8 +744,8 @@
                 
                 var html = '';
                 conditions.forEach(function(condition, index) {
-                    html += '<div class="condition-item">';
-                    html += '<button type="button" class="remove-item-btn" onclick="removeCondition(' + index + ')">&times;</button>';
+                    html += '<div class="condition-item" style="border: 1px solid #444; border-radius: 4px; padding: 15px; margin-bottom: 15px; position: relative; background: rgba(0, 0, 0, 0.1);">';
+                    html += '<button type="button" class="remove-item-btn" onclick="removeCondition(' + index + ')" style="position: absolute; top: 10px; right: 10px; background: #d32f2f; color: white; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 20px; line-height: 1; font-weight: bold;">&times;</button>';
                     html += '<div class="form-row">';
                     html += '<div class="form-col">';
                     html += '<label class="inputLabel inputLabelUnfocused">Field</label>';
@@ -1038,8 +835,8 @@
                 
                 var html = '';
                 dataAttributes.forEach(function(attr, index) {
-                    html += '<div class="data-attribute-item">';
-                    html += '<button type="button" class="remove-item-btn" onclick="removeDataAttribute(' + index + ')">&times;</button>';
+                    html += '<div class="data-attribute-item" style="border: 1px solid #444; border-radius: 4px; padding: 15px; margin-bottom: 15px; position: relative; background: rgba(0, 0, 0, 0.1);">';
+                    html += '<button type="button" class="remove-item-btn" onclick="removeDataAttribute(' + index + ')" style="position: absolute; top: 10px; right: 10px; background: #d32f2f; color: white; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 20px; line-height: 1; font-weight: bold;">&times;</button>';
                     html += '<div class="form-row">';
                     html += '<div class="form-col">';
                     html += '<label class="inputLabel inputLabelUnfocused">Attribute Name</label>';
@@ -1183,9 +980,11 @@
                     content.style.display = 'none';
                 });
 
-                // Remove active class from all tab buttons
+                // Remove active class and reset styles from all tab buttons
                 document.querySelectorAll('.tab-button').forEach(function(button) {
                     button.classList.remove('active');
+                    button.style.borderBottom = '3px solid transparent';
+                    button.style.color = '#ccc';
                 });
 
                 // Show the selected tab content
@@ -1194,10 +993,12 @@
                     targetTab.style.display = 'block';
                 }
 
-                // Add active class to the button that matches this tab
+                // Add active class and styles to the button that matches this tab
                 var targetButton = document.querySelector(".tab-button[onclick*=\"'" + tabName + "'\"]");
                 if (targetButton) {
                     targetButton.classList.add('active');
+                    targetButton.style.borderBottom = '3px solid #00a4dc';
+                    targetButton.style.color = '#fff';
                 }
             }
 

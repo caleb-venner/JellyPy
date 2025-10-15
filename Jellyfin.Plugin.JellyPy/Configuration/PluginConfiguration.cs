@@ -33,6 +33,9 @@ public class PluginConfiguration : BasePluginConfiguration
         // Modern configuration
         ScriptSettings = new Collection<ScriptSetting>();
         GlobalSettings = new GlobalScriptSettings();
+        
+        // Initialize encryption key for API keys
+        EncryptionHelper.GenerateMachineKey();
 
         // Native integration settings - enabled by default
         EnableNativeSonarrIntegration = true;
@@ -322,9 +325,9 @@ public class PluginConfiguration : BasePluginConfiguration
     // New enhanced configuration properties
 
     /// <summary>
-    /// Gets the list of script settings for enhanced event handling.
+    /// Gets or sets the list of script settings for enhanced event handling.
     /// </summary>
-    public Collection<ScriptSetting> ScriptSettings { get; }
+    public Collection<ScriptSetting> ScriptSettings { get; set; }
 
     /// <summary>
     /// Gets or sets global settings for script execution.
