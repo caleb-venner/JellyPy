@@ -22,7 +22,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Added
 
-- Rotating triangle icons for expandable script sections
 - Active state highlighting with blue glow effect for selected scripts
 - Visual card styling for event trigger checkboxes
 - Circular red delete buttons with consistent styling
@@ -31,7 +30,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Changed
 
 - Complete UI architecture overhaul using inline styles
-- Enhanced button sizes for better usability (36-44px min-height)
+- Enhanced button sizes for better usability
 - Uniformly styled all collapsible sections throughout configuration page
 - Modernized tab navigation with inline style implementation
 - Script list now supports expand/collapse on click

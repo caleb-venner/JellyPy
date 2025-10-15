@@ -41,7 +41,6 @@ quality target
 - **Server-Bound Encryption**: API keys encrypted with Jellyfin server-specific keys
 - **System-Independent**: Encryption survives OS updates, machine renames,
 and user changes
-- **Auto Migration**: Existing plaintext keys automatically encrypted on first save
 
 ## Requirements
 
@@ -49,16 +48,7 @@ and user changes
 - **Sonarr**: v3 API (optional)
 - **Radarr**: v3 API (optional)
 
-## Documentation
-
-- [Plugin Distribution Guide](docs/PLUGIN_DISTRIBUTION.md) - Information for
-  plugin distributors
-
 ## Installation
-
-- **.NET**: 8.0 (bundled with Jellyfin)
-
-## 🔧 Installation
 
 ### Via Jellyfin Plugin Repository (Recommended)
 
@@ -71,11 +61,69 @@ and user changes
 
 1. Download the latest `Jellyfin.Plugin.JellyPy.dll`
 from [Releases](https://github.com/caleb-venner/jellypy/releases)
-2. Copy to your Jellyfin plugins directory:
+2. Copy to your Jellyfin plugins directory;
    - Linux: `/var/lib/jellyfin/plugins/Jellypy/`
    - Windows: `C:\ProgramData\Jellyfin\Server\plugins\Jellypy\`
-   - Docker: `/config/plugins/Jellypy/`
+   - Docker: `/config/data/plugins/Jellypy/`
 3. Restart Jellyfin
+
+### Docker Installation with Script Execution Support
+
+For script execution features, use the [linuxserver.io Jellyfin image](https://hub.docker.com/r/linuxserver/jellyfin)
+with Python support enabled.
+
+**Docker Compose Example:**
+
+```yaml
+services:
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Australia/Sydney
+      - DOCKER_MODS=linuxserver/mods:universal-package-install
+      - INSTALL_PIP_PACKAGES=requests
+    volumes:
+      - /path/to/config:/config
+      - /path/to/media:/data
+    ports:
+      - 8096:8096
+    restart: unless-stopped
+```
+
+**Docker Run Example:**
+
+```bash
+docker run -d \
+  --name=jellyfin \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ=Australia/Sydney \
+  -e DOCKER_MODS=linuxserver/mods:universal-package-install \
+  -e INSTALL_PIP_PACKAGES=requests \
+  -p 8096:8096 \
+  -v /path/to/config:/config \
+  -v /path/to/media:/data \
+  --restart unless-stopped \
+  lscr.io/linuxserver/jellyfin:latest
+```
+
+**Configuration Options:**
+
+• **DOCKER_MODS**: Enables package installation support
+
+- Use `linuxserver/mods:universal-package-install` for most systems
+- For Intel hardware transcoding: `linuxserver/mods:jellyfin-opencl-intel|linuxserver/mods:universal-package-install`
+
+• **INSTALL_PIP_PACKAGES**: Comma-separated list of Python packages to install
+
+- Example: `requests,discord.py,pyyaml`
+- Packages install automatically on container start
+
+**Note**: The linuxserver.io image includes Python 3 by default. The universal-package-install
+mod enables pip package installation for your custom scripts.
 
 ## ⚙️ Configuration
 
@@ -125,6 +173,11 @@ from [Releases](https://github.com/caleb-venner/jellypy/releases)
    | **Unmonitor Only If Watched** | ✗ | Only unmonitor if watch percentage exceeds threshold |
    | **Minimum Watch Percentage** | 90% | Percentage required to consider movie "watched" |
    | **Unmonitor After Quality Cutoff** | ✗ | Only unmonitor movies at their quality target |
+
+### Script Execution Setup
+
+For detailed script execution usage, refer to the
+[Script Execution Usage Guide](SCRIPT_EXECUTION.md).
 
 ## How It Works
 
@@ -178,13 +231,12 @@ Result:
    - Prevents unnecessary upgrade searches
 ```
 
-## 🔍 Use Cases
+## Use Case Examples
 
 ### Scenario 1: Binge Watching
 
 - Watch S01E01 of a new show
 - Plugin automatically queues next 5 episodes
-- Sonarr downloads them overnight
 - Continue watching seamlessly
 
 ### Scenario 2: Quality Upgrades
@@ -193,13 +245,7 @@ Result:
 - Re-monitor episodes for quality upgrades
 - Sonarr automatically upgrades to better quality
 
-### Scenario 3: Season-by-Season
-
-- Enable "Monitor Only Current Season"
-- Finish Season 1
-- Season 2 automatically starts monitoring when you begin watching
-
-### Scenario 4: Movie Collection
+### Scenario 3: Movie Collection
 
 - Watch movies from your library
 - Movies automatically unmonitor after watching
@@ -249,22 +295,6 @@ Dashboard → Plugins → JellyPy → Global Settings
 Enable Verbose Logging: ✓
 ```
 
-## 📚 Advanced Configuration
-
-### Custom Scripts (Legacy Feature)
-
-The plugin also supports custom Python script execution:
-
-1. **Script Settings Tab** → Add Script Setting
-2. Configure:
-   - Script path
-   - Python executable (auto-detected)
-   - Event triggers (PlaybackStart, PlaybackStop)
-   - Conditions (media type, genres, etc.)
-   - Data attributes to pass
-
-See `examples/` directory for sample scripts.
-
 ## Contributing
 
 Contributions welcome! Please:
@@ -274,7 +304,7 @@ Contributions welcome! Please:
 3. Make your changes with tests
 4. Submit a pull request
 
-## 📝 License
+## License
 
 This project is licensed under the GNU General Public
 License v3.0 - see [LICENSE](LICENSE) file for details.
