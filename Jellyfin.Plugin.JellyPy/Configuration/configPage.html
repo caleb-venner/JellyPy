@@ -408,9 +408,9 @@
                                         <div class="collapsible-section">
                                             <div class="collapsible-header" onclick="toggleCollapsible(this)">
                                                 <span class="collapsible-title">Event Triggers</span>
-                                                <span class="collapsible-toggle">▶</span>
+                                                <span class="collapsible-toggle expanded">▼</span>
                                             </div>
-                                            <div class="collapsible-content">
+                                            <div class="collapsible-content expanded">
                                                 <div class="fieldDescription" style="margin-bottom: 15px;">
                                                     Select which Jellyfin events should trigger this script.
                                                 </div>
@@ -422,18 +422,18 @@
                                         <div class="collapsible-section">
                                             <div class="collapsible-header" onclick="toggleCollapsible(this)">
                                                 <span class="collapsible-title">Execution Settings</span>
-                                                <span class="collapsible-toggle">▶</span>
+                                                <span class="collapsible-toggle expanded">▼</span>
                                             </div>
-                                            <div class="collapsible-content" id="executionSettingsContent"></div>
+                                            <div class="collapsible-content expanded" id="executionSettingsContent"></div>
                                         </div>
 
                                         <!-- Execution Conditions -->
                                         <div class="collapsible-section">
                                             <div class="collapsible-header" onclick="toggleCollapsible(this)">
                                                 <span class="collapsible-title">Execution Conditions</span>
-                                                <span class="collapsible-toggle">▶</span>
+                                                <span class="collapsible-toggle expanded">▼</span>
                                             </div>
-                                            <div class="collapsible-content">
+                                            <div class="collapsible-content expanded">
                                                 <div class="fieldDescription" style="margin-bottom: 15px;">
                                                     Add conditions to control when this script should run. All conditions must be met for the script to execute.
                                                 </div>
@@ -446,9 +446,9 @@
                                         <div class="collapsible-section">
                                             <div class="collapsible-header" onclick="toggleCollapsible(this)">
                                                 <span class="collapsible-title">Data Attributes</span>
-                                                <span class="collapsible-toggle">▶</span>
+                                                <span class="collapsible-toggle expanded">▼</span>
                                             </div>
-                                            <div class="collapsible-content">
+                                            <div class="collapsible-content expanded">
                                                 <div class="fieldDescription" style="margin-bottom: 15px;">
                                                     Configure how event data is passed to your script. Data can be passed as JSON, environment variables, command line arguments, or plain strings.
                                                 </div>
@@ -817,9 +817,11 @@
                 if (content.classList.contains('expanded')) {
                     content.classList.remove('expanded');
                     toggle.classList.remove('expanded');
+                    toggle.textContent = '▶';
                 } else {
                     content.classList.add('expanded');
                     toggle.classList.add('expanded');
+                    toggle.textContent = '▼';
                 }
             }
 
