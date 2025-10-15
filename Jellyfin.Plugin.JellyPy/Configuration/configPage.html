@@ -1351,6 +1351,14 @@
                         document.getElementById('testSonarrConnection').addEventListener('click', testSonarrConnection);
                         document.getElementById('testRadarrConnection').addEventListener('click', testRadarrConnection);
 
+                        // Setup collapsible section event handlers using event delegation
+                        document.addEventListener('click', function(e) {
+                            var header = e.target.closest('.collapsible-header');
+                            if (header) {
+                                toggleCollapsible(header);
+                            }
+                        });
+
                         Dashboard.hideLoadingMsg();
                     });
                 });
