@@ -18,6 +18,37 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Security
 
+## [2.0.0.0] - 2025-10-15
+
+### Added
+
+- Rotating triangle icons for expandable script sections
+- Active state highlighting with blue glow effect for selected scripts
+- Visual card styling for event trigger checkboxes
+- Circular red delete buttons with consistent styling
+- Toggle collapse functionality for script items
+
+### Changed
+
+- Complete UI architecture overhaul using inline styles
+- Enhanced button sizes for better usability (36-44px min-height)
+- Uniformly styled all collapsible sections throughout configuration page
+- Modernized tab navigation with inline style implementation
+- Script list now supports expand/collapse on click
+- Improved visual hierarchy and user experience across entire configuration
+
+### Fixed
+
+- Critical bug: Script settings not persisting to disk
+- XML serialization issue preventing script configuration saves
+- Changed ScriptSettings property from get-only to get/set for proper serialization
+- Added encryption key initialization in constructor
+
+### Removed
+
+- Redundant CSS styles (reduced from 280 to 75 lines)
+- CSS that was blocked by Jellyfin's iframe restrictions
+
 ## [1.1.2.0] - 2025-10-14
 
 ### Added
