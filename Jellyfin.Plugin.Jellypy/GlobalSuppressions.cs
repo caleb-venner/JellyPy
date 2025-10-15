@@ -83,3 +83,4 @@ using System.Diagnostics.CodeAnalysis;
 // CA1850: Static HashData method (1 warning)
 // Justification: Using disposable pattern with SHA256.Create() for compatibility and explicit resource management.
 [assembly: SuppressMessage("Performance", "CA1850:Prefer static 'System.Security.Cryptography.SHA256.HashData' method over 'ComputeHash'", Justification = "Using disposable pattern for compatibility and explicit resource management", Scope = "namespaceanddescendants", Target = "~N:Jellyfin.Plugin.Jellypy.Configuration")]
+[assembly: SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>", Scope = "member", Target = "~M:Jellyfin.Plugin.Jellypy.Configuration.EncryptionHelper.Decrypt(System.String,System.String)~System.String")]

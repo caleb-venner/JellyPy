@@ -387,7 +387,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                 }
             }
         }
-        catch
+        catch (Exception)
         {
             // If 'which' command fails, try direct execution
         }
@@ -429,7 +429,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                 }
             }
         }
-        catch
+        catch (Exception)
         {
             // Ignore
         }
