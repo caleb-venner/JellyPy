@@ -921,58 +921,6 @@
                 }
             }
 
-            function renderEnvironmentVariables(envVars) {
-                if (envVars.length === 0) {
-                    return '<div style="color: #888; font-style: italic; text-align: center; padding: 20px;">No environment variables configured.</div>';
-                }
-                
-                var html = '';
-                envVars.forEach(function(envVar, index) {
-                    html += '<div class="env-var-item">';
-                    html += '<button type="button" class="remove-item-btn" onclick="removeEnvironmentVariable(' + index + ')">&times;</button>';
-                    html += '<div class="form-row">';
-                    html += '<div class="form-col">';
-                    html += '<label class="inputLabel inputLabelUnfocused">Variable Name</label>';
-                    html += '<input type="text" is="emby-input" value="' + escapeHtml(envVar.Name) + '" ';
-                    html += 'onchange="updateEnvironmentVariable(' + index + ', \'Name\', this.value)" />';
-                    html += '</div>';
-                    html += '<div class="form-col">';
-                    html += '<label class="inputLabel inputLabelUnfocused">Value</label>';
-                    html += '<input type="text" is="emby-input" value="' + escapeHtml(envVar.Value) + '" ';
-                    html += 'onchange="updateEnvironmentVariable(' + index + ', \'Value\', this.value)" />';
-                    html += '</div>';
-                    html += '</div>';
-                    html += '</div>';
-                });
-                return html;
-            }
-
-            function addEnvironmentVariable() {
-                var script = JellyPyConfig.scriptSettings.find(s => s.Id === JellyPyConfig.selectedScriptId);
-                if (script) {
-                    script.Execution.EnvironmentVariables.push({
-                        Name: '',
-                        Value: ''
-                    });
-                    renderScriptDetails();
-                }
-            }
-
-            function removeEnvironmentVariable(index) {
-                var script = JellyPyConfig.scriptSettings.find(s => s.Id === JellyPyConfig.selectedScriptId);
-                if (script) {
-                    script.Execution.EnvironmentVariables.splice(index, 1);
-                    renderScriptDetails();
-                }
-            }
-
-            function updateEnvironmentVariable(index, property, value) {
-                var script = JellyPyConfig.scriptSettings.find(s => s.Id === JellyPyConfig.selectedScriptId);
-                if (script && script.Execution.EnvironmentVariables[index]) {
-                    script.Execution.EnvironmentVariables[index][property] = value;
-                }
-            }
-
             // Tab Management
             function switchTab(tabName) {
                 // Hide all tab contents
