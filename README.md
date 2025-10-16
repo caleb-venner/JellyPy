@@ -1,7 +1,7 @@
 # JellyPy - Jellyfin Plugin for Sonarr & Radarr Integration
 
 <div style="display:flex; align-items:flex-start; gap:16px;">
-   <img src="Jellyfin.Plugin.JellyPy/assets/jellypy-banner-purple.png" alt="JellyPy icon" width="225" height="120" />
+   <img src="Jellyfin.Plugin.JellyPy/assets/jellypy-banner-purple.png" alt="JellyPy icon" width="250" height="133" />
    <div style="display:flex; flex-direction:column; gap:8px;">
       <a href="https://www.gnu.org/licenses/gpl-3.0"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="GPLv3" /></a>
       <a href="https://jellyfin.org/"><img src="https://img.shields.io/badge/Jellyfin-10.9+-aa5cc3" alt="Jellyfin" /></a>
