@@ -1,4 +1,4 @@
-# JellyPy - Jellyfin Plugin for Sonarr & Radarr Integration
+# JellyPy - Jellyfin Plugin
 
 <div style="display:flex; align-items:flex-start; gap:16px;">
    <img src="Jellyfin.Plugin.JellyPy/assets/jellypy-banner-purple.png" alt="JellyPy icon" width="250" height="133" />
