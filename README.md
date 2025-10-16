@@ -1,8 +1,14 @@
 # JellyPy - Jellyfin Plugin for Sonarr & Radarr Integration
 
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![.NET](https://img.shields.io/badge/.NET-8.0-purple)](https://dotnet.microsoft.com/)
-[![Jellyfin](https://img.shields.io/badge/Jellyfin-10.9+-aa5cc3)](https://jellyfin.org/)
+<div style="display:flex; align-items:flex-start; gap:16px;">
+   <img src="Jellyfin.Plugin.JellyPy/assets/banner.png" alt="JellyPy icon" width="250" height="96" />
+   <div style="display:flex; flex-direction:column; gap:8px;">
+      <a href="https://www.gnu.org/licenses/gpl-3.0"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="GPLv3" /></a>
+      <a href="https://jellyfin.org/"><img src="https://img.shields.io/badge/Jellyfin-10.9+-aa5cc3" alt="Jellyfin" /></a>
+      <a href="https://dotnet.microsoft.com/"><img src="https://img.shields.io/badge/.NET-8.0-purple" alt=".NET 8.0" /></a>
+
+   </div>
+</div>
 
 A Jellyfin plugin that automatically updates your Sonarr and Radarr monitoring
 based on what you watch. Keep your media organised and automatic without manual intervention.
