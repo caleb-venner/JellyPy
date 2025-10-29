@@ -32,12 +32,10 @@ public class EventDeduplicationCache
     {
         CleanupOldEntries();
 
-        if (_recentEvents.TryGetValue(eventKey, out var lastProcessedTime))
+        if (_recentEvents.TryGetValue(eventKey, out var lastProcessedTime) &&
+            DateTime.UtcNow - lastProcessedTime < _threshold)
         {
-            if (DateTime.UtcNow - lastProcessedTime < _threshold)
-            {
-                return false; // Event is a duplicate, skip it
-            }
+            return false; // Event is a duplicate, skip it
         }
 
         // Update or add the event timestamp

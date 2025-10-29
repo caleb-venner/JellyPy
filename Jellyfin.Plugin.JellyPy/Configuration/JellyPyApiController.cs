@@ -270,8 +270,9 @@ public class JellyPyApiController : ControllerBase
 
             return fullPath;
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogDebug(ex, "Failed to get full path");
             return string.Empty;
         }
     }
@@ -336,16 +337,16 @@ public class JellyPyApiController : ControllerBase
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error validating executable path");
                 return Ok(new ExecutableTestResult
                 {
                     Success = false,
-                    Message = $"Invalid path: {ex.Message}"
+                    Message = "Invalid path format"
                 });
             }
 
             // Check if file exists
-            string safeExecutablePath = validatedPath;
-            if (!System.IO.File.Exists(safeExecutablePath))
+            if (!System.IO.File.Exists(validatedPath))
             {
                 return Ok(new ExecutableTestResult
                 {
@@ -358,7 +359,7 @@ public class JellyPyApiController : ControllerBase
             try
             {
 #pragma warning disable CA2050 // File path injection
-                var fileInfo = new System.IO.FileInfo(safeExecutablePath);
+                var fileInfo = new System.IO.FileInfo(validatedPath);
 #pragma warning restore CA2050
 
                 // Verify file is readable
@@ -384,7 +385,7 @@ public class JellyPyApiController : ControllerBase
                 // Try to verify it's actually executable by checking if we can read it
                 try
                 {
-                    using (var stream = System.IO.File.OpenRead(safeExecutablePath))
+                    using (var stream = System.IO.File.OpenRead(validatedPath))
                     {
                         // Just opening and closing is enough to verify access
                     }
@@ -399,10 +400,11 @@ public class JellyPyApiController : ControllerBase
                 }
                 catch (System.IO.IOException ex)
                 {
+                    _logger.LogWarning(ex, "IO error accessing executable");
                     return Ok(new ExecutableTestResult
                     {
                         Success = false,
-                        Message = $"Cannot access executable: {ex.Message}"
+                        Message = "Cannot access executable file"
                     });
                 }
 

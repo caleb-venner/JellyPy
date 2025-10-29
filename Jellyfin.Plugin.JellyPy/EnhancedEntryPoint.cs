@@ -120,14 +120,9 @@ public class EnhancedEntryPoint : IHostedService
     private void OnPlaybackProgress(object sender, PlaybackProgressEventArgs eventArgs)
     {
         // Route to pause or resume handler based on IsPaused state
-        if (eventArgs.IsPaused)
-        {
-            _ = HandlePlaybackPauseEventAsync(eventArgs);
-        }
-        else
-        {
-            _ = HandlePlaybackResumeEventAsync(eventArgs);
-        }
+        _ = eventArgs.IsPaused
+            ? HandlePlaybackPauseEventAsync(eventArgs)
+            : HandlePlaybackResumeEventAsync(eventArgs);
     }
 
     private async Task HandlePlaybackPauseEventAsync(PlaybackProgressEventArgs eventArgs)

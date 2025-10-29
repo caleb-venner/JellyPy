@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using MediaBrowser.Controller.Entities.TV;
 
 namespace Jellyfin.Plugin.JellyPy.Events;
@@ -74,14 +75,10 @@ public class SeriesEpisodeGroup
             return "Unknown";
         }
 
-        var seasons = new HashSet<int>();
-        foreach (var episode in Episodes)
-        {
-            if (episode.ParentIndexNumber.HasValue)
-            {
-                seasons.Add(episode.ParentIndexNumber.Value);
-            }
-        }
+        var seasons = Episodes
+            .Where(e => e.ParentIndexNumber.HasValue)
+            .Select(e => e.ParentIndexNumber!.Value)
+            .ToHashSet();
 
         if (seasons.Count == 0)
         {
