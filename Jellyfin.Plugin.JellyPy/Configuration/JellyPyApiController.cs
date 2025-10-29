@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -38,41 +39,43 @@ public class JellyPyApiController : ControllerBase
     {
         try
         {
-            var scriptDirectories = new[]
+            var config = Plugin.Instance?.Configuration as PluginConfiguration;
+            if (config?.GlobalSettings == null)
             {
-                "/config/data/plugins/Jellypy/scripts",  // Docker/Unraid path
-                "/jellypy/scripts",                       // Your preferred path
-                Path.Join(Environment.CurrentDirectory, "scripts"),
-                Path.Join(AppContext.BaseDirectory, "scripts")
-            };
+                return BadRequest("Configuration not available");
+            }
+
+            // Use custom directory if specified, otherwise use default
+            string scriptDirectory = string.IsNullOrWhiteSpace(config.GlobalSettings.CustomScriptsDirectory)
+                ? PluginConfiguration.ScriptsDirectory
+                : config.GlobalSettings.CustomScriptsDirectory;
 
             var scripts = new List<ScriptFile>();
 
-            foreach (var directory in scriptDirectories.Where(Directory.Exists))
+            if (!Directory.Exists(scriptDirectory))
             {
-                _logger.LogDebug("Scanning directory for scripts: {Directory}", directory);
-
-                var scriptFiles = Directory.GetFiles(directory, "*.py", SearchOption.AllDirectories)
-                    .Select(file => new ScriptFile
-                    {
-                        Name = Path.GetFileName(file),
-                        Path = file,
-                        RelativePath = Path.GetRelativePath(directory, file),
-                        Directory = directory
-                    })
-                    .OrderBy(s => s.Name);
-
-                scripts.AddRange(scriptFiles);
+                _logger.LogInformation("Scripts directory does not exist: {Directory}", scriptDirectory);
+                return Ok(scripts);
             }
 
-            // Remove duplicates based on file name (prefer shorter paths)
-            var uniqueScripts = scripts
-                .GroupBy(s => s.Name)
-                .Select(g => g.OrderBy(s => s.Path.Length).First())
+            _logger.LogDebug("Scanning directory for scripts: {Directory}", scriptDirectory);
+
+            var scriptFiles = Directory.GetFiles(scriptDirectory, "*", SearchOption.AllDirectories)
+                .Where(file => IsScriptFile(file))
+                .Select(file => new ScriptFile
+                {
+                    Name = Path.GetFileName(file),
+                    Path = file,
+                    RelativePath = Path.GetRelativePath(scriptDirectory, file),
+                    Directory = scriptDirectory
+                })
+                .OrderBy(s => s.Name)
                 .ToList();
 
-            _logger.LogInformation("Found {Count} script files", uniqueScripts.Count);
-            return Ok(uniqueScripts);
+            scripts.AddRange(scriptFiles);
+
+            _logger.LogInformation("Found {Count} script files in {Directory}", scripts.Count, scriptDirectory);
+            return Ok(scripts);
         }
         catch (UnauthorizedAccessException ex)
         {
@@ -88,6 +91,342 @@ public class JellyPyApiController : ControllerBase
         {
             _logger.LogError(ex, "Unexpected error scanning for script files");
             throw; // Rethrow to maintain CA1031 compliance while still logging the error
+        }
+    }
+
+    /// <summary>
+    /// Determines if a file is a valid script file.
+    /// </summary>
+    /// <param name="filePath">The file path to check.</param>
+    /// <returns>True if the file is a valid script file, false otherwise.</returns>
+    private static bool IsScriptFile(string filePath)
+    {
+        var supportedExtensions = new[] { ".py", ".sh" };
+        var extension = Path.GetExtension(filePath);
+        return supportedExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Browses directories for the directory selector.
+    /// </summary>
+    /// <param name="path">The directory path to browse. If empty, uses the home directory.</param>
+    /// <returns>Directory contents.</returns>
+    [HttpGet("browse-directory")]
+    public ActionResult<DirectoryBrowser> BrowseDirectory([FromQuery] string? path)
+    {
+        try
+        {
+            // If path is empty, start from home directory or root
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    path = "/"; // Fallback to root on Unix systems
+                }
+            }
+
+            // Normalize the path to prevent directory traversal
+            path = Path.GetFullPath(path);
+
+            // Ensure the path is a valid directory and exists
+            var dirInfo = new System.IO.DirectoryInfo(path);
+            if (!dirInfo.Exists)
+            {
+                return BadRequest(new { error = "Directory does not exist" });
+            }
+
+            var result = new DirectoryBrowser
+            {
+                CurrentPath = path,
+                ParentPath = dirInfo.Parent?.FullName,
+                HasScripts = false
+            };
+
+            try
+            {
+                // Get subdirectories
+                var directories = dirInfo.GetDirectories()
+                    .OrderBy(d => d.Name)
+                    .Take(100) // Limit to prevent huge responses
+                    .Select(d => new DirectoryInfoDto { Name = d.Name, Path = d.FullName })
+                    .ToList();
+
+                foreach (var dir in directories)
+                {
+                    result.Directories.Add(dir);
+                }
+
+                // Check if this directory has any script files
+                result.HasScripts = dirInfo.GetFiles("*.py", SearchOption.TopDirectoryOnly).Length > 0
+                    || dirInfo.GetFiles("*.sh", SearchOption.TopDirectoryOnly).Length > 0;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                _logger.LogWarning("Access denied when browsing directory: {Path}", path);
+                // Return what we can
+            }
+
+            return Ok(result);
+        }
+        catch (ArgumentException ex)
+        {
+            _logger.LogWarning(ex, "Invalid path provided");
+            return BadRequest(new { error = "Invalid path" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error browsing directory");
+            return StatusCode(500, new { error = "Unexpected error browsing directory" });
+        }
+    }
+
+    /// <summary>
+    /// Tests if a scripts directory exists and contains script files.
+    /// </summary>
+    /// <param name="request">The test request containing the directory path.</param>
+    /// <returns>Test result with script count.</returns>
+    [HttpPost("test-scripts-directory")]
+    public ActionResult<ScriptsDirectoryTestResult> TestScriptsDirectory([FromBody] DirectoryPathRequest request)
+    {
+        try
+        {
+            string path = string.IsNullOrWhiteSpace(request.Path)
+                ? PluginConfiguration.ScriptsDirectory
+                : request.Path;
+
+            // Normalize and validate path
+            path = Path.GetFullPath(path);
+            var dirInfo = new System.IO.DirectoryInfo(path);
+
+            if (!dirInfo.Exists)
+            {
+                return Ok(new ScriptsDirectoryTestResult
+                {
+                    Success = false,
+                    Message = $"Directory does not exist: {path}"
+                });
+            }
+
+            try
+            {
+                // Count Python and Bash script files
+                var pyFiles = dirInfo.GetFiles("*.py", SearchOption.TopDirectoryOnly);
+                var shFiles = dirInfo.GetFiles("*.sh", SearchOption.TopDirectoryOnly);
+                int totalScripts = pyFiles.Length + shFiles.Length;
+
+                _logger.LogInformation("Scripts directory test successful: {Path} ({Count} scripts found)", path, totalScripts);
+
+                return Ok(new ScriptsDirectoryTestResult
+                {
+                    Success = true,
+                    Message = $"Directory is valid. Found {totalScripts} script file(s): {pyFiles.Length} Python, {shFiles.Length} Bash"
+                });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Ok(new ScriptsDirectoryTestResult
+                {
+                    Success = false,
+                    Message = $"Access denied reading directory: {path}"
+                });
+            }
+        }
+        catch (ArgumentException)
+        {
+            return Ok(new ScriptsDirectoryTestResult
+            {
+                Success = false,
+                Message = "Invalid directory path"
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error testing scripts directory");
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Validates and normalizes an executable path.
+    /// </summary>
+    /// <param name="executablePath">The executable path to validate.</param>
+    /// <returns>Validated path or empty string if invalid.</returns>
+    private string ValidateExecutablePath(string executablePath)
+    {
+        if (string.IsNullOrWhiteSpace(executablePath))
+        {
+            return string.Empty;
+        }
+
+        string trimmedPath = executablePath.Trim();
+        try
+        {
+            string fullPath = Path.GetFullPath(trimmedPath);
+            if (fullPath.Contains("..", StringComparison.Ordinal))
+            {
+                return string.Empty;
+            }
+
+            return fullPath;
+        }
+        catch
+        {
+            return string.Empty;
+        }
+    }
+
+    /// <summary>
+    /// Formats a file size in bytes to a human-readable format.
+    /// </summary>
+    /// <param name="bytes">The file size in bytes.</param>
+    /// <returns>Formatted file size string.</returns>
+    private string FormatFileSize(long bytes)
+    {
+        string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+        double len = bytes;
+        int order = 0;
+
+        while (len >= 1024 && order < sizes.Length - 1)
+        {
+            order++;
+            len = len / 1024;
+        }
+
+        return $"{len:0.##} {sizes[order]}";
+    }
+
+    /// <summary>
+    /// Tests an executable path to verify it exists and is readable.
+    /// </summary>
+    /// <param name="request">The request containing the executable path to test.</param>
+    /// <returns>Result indicating success or failure with details.</returns>
+    [HttpPost("test-executable")]
+    public ActionResult<ExecutableTestResult> TestExecutable([FromBody] ExecutablePathRequest request)
+    {
+        try
+        {
+            string execPath = string.IsNullOrWhiteSpace(request.ExecutablePath)
+                ? string.Empty
+                : request.ExecutablePath.Trim();
+
+            if (string.IsNullOrEmpty(execPath))
+            {
+                return Ok(new ExecutableTestResult
+                {
+                    Success = false,
+                    Message = "Executable path cannot be empty"
+                });
+            }
+
+            // Normalize and validate the path
+            string validatedPath;
+            try
+            {
+                validatedPath = Path.GetFullPath(execPath);
+                // Validate that the path doesn't contain suspicious patterns
+                if (validatedPath.Contains("..", StringComparison.Ordinal) || string.IsNullOrEmpty(validatedPath))
+                {
+                    return Ok(new ExecutableTestResult
+                    {
+                        Success = false,
+                        Message = "Invalid path"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Ok(new ExecutableTestResult
+                {
+                    Success = false,
+                    Message = $"Invalid path: {ex.Message}"
+                });
+            }
+
+            // Check if file exists
+            string safeExecutablePath = validatedPath;
+            if (!System.IO.File.Exists(safeExecutablePath))
+            {
+                return Ok(new ExecutableTestResult
+                {
+                    Success = false,
+                    Message = $"Executable not found: {validatedPath}"
+                });
+            }
+
+            // Try to get file information and verify it's executable
+            try
+            {
+#pragma warning disable CA2050 // File path injection
+                var fileInfo = new System.IO.FileInfo(safeExecutablePath);
+#pragma warning restore CA2050
+
+                // Verify file is readable
+                if (!fileInfo.Exists)
+                {
+                    return Ok(new ExecutableTestResult
+                    {
+                        Success = false,
+                        Message = "File is not accessible"
+                    });
+                }
+
+                // Check if it's a regular file (not a directory)
+                if (fileInfo.Attributes.HasFlag(System.IO.FileAttributes.Directory))
+                {
+                    return Ok(new ExecutableTestResult
+                    {
+                        Success = false,
+                        Message = "Path is a directory, not an executable"
+                    });
+                }
+
+                // Try to verify it's actually executable by checking if we can read it
+                try
+                {
+                    using (var stream = System.IO.File.OpenRead(safeExecutablePath))
+                    {
+                        // Just opening and closing is enough to verify access
+                    }
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    return Ok(new ExecutableTestResult
+                    {
+                        Success = false,
+                        Message = "Cannot read executable (permission denied)"
+                    });
+                }
+                catch (System.IO.IOException ex)
+                {
+                    return Ok(new ExecutableTestResult
+                    {
+                        Success = false,
+                        Message = $"Cannot access executable: {ex.Message}"
+                    });
+                }
+
+                _logger.LogInformation("Executable test successful: {Path} (Size: {Size} bytes)", validatedPath, fileInfo.Length);
+
+                return Ok(new ExecutableTestResult
+                {
+                    Success = true,
+                    Message = $"Executable verified: {Path.GetFileName(validatedPath)} ({FormatFileSize(fileInfo.Length)})"
+                });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Ok(new ExecutableTestResult
+                {
+                    Success = false,
+                    Message = $"Access denied reading executable: {execPath}"
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error testing executable");
+            throw;
         }
     }
 
@@ -357,4 +696,108 @@ public class ApiKeysResponse
     /// Gets or sets the decrypted Radarr API key.
     /// </summary>
     public string RadarrApiKey { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// Represents directory browser results for path selection.
+/// </summary>
+public class DirectoryBrowser
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DirectoryBrowser"/> class.
+    /// </summary>
+    public DirectoryBrowser()
+    {
+        Directories = new Collection<DirectoryInfoDto>();
+    }
+
+    /// <summary>
+    /// Gets or sets the current directory path.
+    /// </summary>
+    public string CurrentPath { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the parent directory path, or null if at root.
+    /// </summary>
+    public string? ParentPath { get; set; }
+
+    /// <summary>
+    /// Gets the list of subdirectories in the current path.
+    /// </summary>
+    public Collection<DirectoryInfoDto> Directories { get; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether this directory contains script files.
+    /// </summary>
+    public bool HasScripts { get; set; }
+}
+
+/// <summary>
+/// Represents a directory in the browser results.
+/// </summary>
+public class DirectoryInfoDto
+{
+    /// <summary>
+    /// Gets or sets the directory name.
+    /// </summary>
+    public string Name { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the full directory path.
+    /// </summary>
+    public string Path { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// Represents a request to test a directory path.
+/// </summary>
+public class DirectoryPathRequest
+{
+    /// <summary>
+    /// Gets or sets the directory path to test.
+    /// </summary>
+    public string Path { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// Represents the result of a scripts directory test.
+/// </summary>
+public class ScriptsDirectoryTestResult
+{
+    /// <summary>
+    /// Gets or sets a value indicating whether the directory test was successful.
+    /// </summary>
+    public bool Success { get; set; }
+
+    /// <summary>
+    /// Gets or sets the message describing the result.
+    /// </summary>
+    public string Message { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// Represents a request to test an executable path.
+/// </summary>
+public class ExecutablePathRequest
+{
+    /// <summary>
+    /// Gets or sets the executable path to test.
+    /// </summary>
+    public string ExecutablePath { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// Represents the result of an executable test.
+/// </summary>
+public class ExecutableTestResult
+{
+    /// <summary>
+    /// Gets or sets a value indicating whether the executable test was successful.
+    /// </summary>
+    public bool Success { get; set; }
+
+    /// <summary>
+    /// Gets or sets the message describing the result.
+    /// </summary>
+    public string Message { get; set; } = string.Empty;
 }

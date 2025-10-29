@@ -138,6 +138,8 @@
                                     
                                     <!-- Script Form (hidden by default) -->
                                     <div id="scriptForm" style="display: none;">
+                                        
+                                        
                                         <!-- Basic Information -->
                                         <details open style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
                                             <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
@@ -167,6 +169,14 @@
                                             </div>
                                         </details>
 
+                                        <!-- Execution Settings -->
+                                        <details style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
+                                            <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
+                                                Execution Settings
+                                            </summary>
+                                            <div style="padding: 15px;" id="executionSettingsContent"></div>
+                                        </details>
+
                                         <!-- Event Triggers -->
                                         <details style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
                                             <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
@@ -178,14 +188,6 @@
                                                 </div>
                                                 <div class="trigger-checkboxes" id="triggerCheckboxes"></div>
                                             </div>
-                                        </details>
-
-                                        <!-- Execution Settings -->
-                                        <details style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
-                                            <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
-                                                Execution Settings
-                                            </summary>
-                                            <div style="padding: 15px;" id="executionSettingsContent"></div>
                                         </details>
 
                                         <!-- Execution Conditions -->
@@ -365,6 +367,55 @@
                         
                         <details open style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
                             <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
+                                Interpreter Paths
+                            </summary>
+                            <div style="padding: 15px;">
+                                <div class="inputContainer">
+                                    <label class="inputLabel inputLabelUnfocused" for="PythonExecutablePath">Python Executable Path</label>
+                                    <input id="PythonExecutablePath" name="PythonExecutablePath" type="text" is="emby-input" placeholder="/usr/bin/python3" />
+                                    <div class="fieldDescription">Path to the Python interpreter executable. Example: /usr/bin/python3</div>
+                                </div>
+                                <div class="inputContainer" style="margin-top: 15px;">
+                                    <button id="testPythonExecutable" type="button" is="emby-button" class="raised button-submit" style="margin-bottom: 10px; padding: 10px 20px; font-size: 14px; min-height: 40px;">
+                                        <span id="testPythonExecText">Test Python Path</span>
+                                    </button>
+                                    <div id="pythonExecTestResult" class="fieldDescription" style="display: none; font-weight: bold;"></div>
+                                </div>
+                                <div class="inputContainer" style="margin-top: 20px;">
+                                    <label class="inputLabel inputLabelUnfocused" for="BashExecutablePath">Bash Executable Path</label>
+                                    <input id="BashExecutablePath" name="BashExecutablePath" type="text" is="emby-input" placeholder="/bin/bash" />
+                                    <div class="fieldDescription">Path to the Bash interpreter executable. Example: /bin/bash</div>
+                                </div>
+                                <div class="inputContainer" style="margin-top: 15px;">
+                                    <button id="testBashExecutable" type="button" is="emby-button" class="raised button-submit" style="margin-bottom: 10px; padding: 10px 20px; font-size: 14px; min-height: 40px;">
+                                        <span id="testBashExecText">Test Bash Path</span>
+                                    </button>
+                                    <div id="bashExecTestResult" class="fieldDescription" style="display: none; font-weight: bold;"></div>
+                                </div>
+                            </div>
+                        </details>
+                        
+                        <details open style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
+                            <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
+                                Script Directory
+                            </summary>
+                            <div style="padding: 15px;">
+                                <div class="inputContainer">
+                                    <label class="inputLabel inputLabelUnfocused" for="CustomScriptsDirectory">Scripts Directory Path</label>
+                                    <input id="CustomScriptsDirectory" name="CustomScriptsDirectory" type="text" is="emby-input" placeholder="/path/to/scripts" />
+                                    <div class="fieldDescription">The directory to scan for .py and .sh script files. Leave empty to use the default plugin scripts directory.</div>
+                                </div>
+                                <div class="inputContainer" style="margin-top: 15px;">
+                                    <button id="testScriptsDirectory" type="button" is="emby-button" class="raised button-submit" style="margin-bottom: 10px; padding: 10px 20px; font-size: 14px; min-height: 40px;">
+                                        <span id="testScriptsDirText">Test Scripts Directory</span>
+                                    </button>
+                                    <div id="scriptsDirTestResult" class="fieldDescription" style="display: none; font-weight: bold;"></div>
+                                </div>
+                            </div>
+                        </details>
+                        
+                        <details open style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
+                            <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
                                 Execution Limits
                             </summary>
                             <div style="padding: 15px;">
@@ -429,7 +480,6 @@
                     Conditions: [],
                     Execution: {
                         ExecutorType: 0, // Python
-                        ExecutablePath: '/usr/bin/python3',
                         ScriptPath: '',
                         WorkingDirectory: '',
                         AdditionalArguments: '',
@@ -620,6 +670,9 @@
                 document.getElementById('executionSettingsContent').innerHTML = renderExecutionSettings(script.Execution);
                 document.getElementById('conditionsContainer').innerHTML = renderConditions(script.Conditions);
                 document.getElementById('dataAttributesContainer').innerHTML = renderDataAttributes(script.DataAttributes);
+                
+                // Load available scripts into the dropdown after rendering
+                loadAvailableScripts();
             }
 
             function updateScriptProperty(property, value) {
@@ -678,10 +731,7 @@
             function renderExecutionSettings(execution) {
                 var executorTypes = [
                     { value: 0, label: 'Python' },
-                    { value: 1, label: 'PowerShell' },
-                    { value: 2, label: 'Bash' },
-                    { value: 3, label: 'Node.js' },
-                    { value: 4, label: 'Binary' }
+                    { value: 2, label: 'Bash' }
                 ];
                 
                 var executorOptions = '';
@@ -692,10 +742,11 @@
                 
                 var html = '<div class="form-row">' +
                         '<div class="form-col">' +
-                            '<label class="inputLabel inputLabelUnfocused" for="executor-type">Executor Type</label>' +
+                            '<label class="inputLabel inputLabelUnfocused" for="executor-type">Executor</label>' +
                             '<select id="executor-type" is="emby-select" onchange="updateExecutionProperty(\'ExecutorType\', parseInt(this.value))">' +
                                 executorOptions +
                             '</select>' +
+                            '<div class="fieldDescription">Select Python or Bash. Executable paths are configured in Global Settings.</div>' +
                         '</div>' +
                         '<div class="form-col">' +
                             '<label class="inputLabel inputLabelUnfocused" for="timeout-seconds">Timeout (seconds)</label>' +
@@ -704,16 +755,10 @@
                         '</div>' +
                     '</div>' +
                     '<div class="inputContainer">' +
-                        '<label class="inputLabel inputLabelUnfocused" for="executable-path">Executable Path</label>' +
-                        '<input id="executable-path" type="text" is="emby-input" ' +
-                               'value="' + escapeHtml(execution.ExecutablePath) + '" onchange="updateExecutionProperty(\'ExecutablePath\', this.value)" />' +
-                        '<div class="fieldDescription">Path to the interpreter or executable (e.g., /usr/bin/python3, powershell, /bin/bash)</div>' +
-                    '</div>' +
-                    '<div class="inputContainer">' +
-                        '<label class="inputLabel inputLabelUnfocused" for="script-path">Script Path</label>' +
-                        '<input id="script-path" type="text" is="emby-input" ' +
-                               'value="' + escapeHtml(execution.ScriptPath) + '" onchange="updateExecutionProperty(\'ScriptPath\', this.value)" />' +
-                        '<div class="fieldDescription">Full path to your script file</div>' +
+                        '<label class="inputLabel inputLabelUnfocused" for="script-path">Script</label>' +
+                        '<select id="script-path" is="emby-select" onchange="updateExecutionProperty(\'ScriptPath\', this.value)">' +
+                            '<option value="">Select a script file...</option>' +
+                        '</select>' +
                     '</div>' +
                     '<div class="inputContainer">' +
                         '<label class="inputLabel inputLabelUnfocused" for="working-directory">Working Directory</label>' +
@@ -990,6 +1035,189 @@
                 }
             }
 
+            // Load Available Scripts Function
+            async function loadAvailableScripts() {
+                try {
+                    const response = await ApiClient.ajax({
+                        type: 'GET',
+                        url: ApiClient.getUrl('/Plugins/Jellypy/scripts')
+                    });
+
+                    let scriptList = response;
+                    if (response instanceof Response) {
+                        if (response.ok) {
+                            scriptList = await response.json();
+                        } else {
+                            console.error('Failed to load available scripts:', response.status);
+                            return;
+                        }
+                    }
+
+                    // Populate the script dropdown for all open script forms
+                    var scriptPath = document.getElementById('script-path');
+                    if (scriptPath) {
+                        var currentValue = scriptPath.value;
+                        scriptPath.innerHTML = '<option value="">Select a script file...</option>';
+                        
+                        if (scriptList && scriptList.length > 0) {
+                            scriptList.forEach(function(scriptFile) {
+                                var option = document.createElement('option');
+                                // Handle both 'name' (camelCase) and 'Name' (PascalCase)
+                                var fileName = scriptFile.name || scriptFile.Name || 'Unknown';
+                                option.value = fileName;
+                                option.textContent = fileName;
+                                scriptPath.appendChild(option);
+                            });
+                        }
+                        
+                        if (currentValue) {
+                            scriptPath.value = currentValue;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error loading available scripts:', error);
+                }
+            }
+
+            // Test Scripts Directory Function
+            async function testScriptsDirectory() {
+                const button = document.getElementById('testScriptsDirectory');
+                const textElement = document.getElementById('testScriptsDirText');
+                const resultElement = document.getElementById('scriptsDirTestResult');
+                const pathElement = document.getElementById('CustomScriptsDirectory');
+
+                const path = pathElement.value.trim();
+
+                // Disable button and show loading
+                button.disabled = true;
+                textElement.textContent = 'Testing...';
+                resultElement.style.display = 'none';
+
+                try {
+                    const response = await ApiClient.ajax({
+                        type: 'POST',
+                        url: ApiClient.getUrl('/Plugins/Jellypy/test-scripts-directory'),
+                        data: JSON.stringify({ Path: path }),
+                        contentType: 'application/json'
+                    });
+
+                    let result = response;
+                    if (response instanceof Response) {
+                        if (response.ok) {
+                            result = await response.json();
+                        } else {
+                            showTestResult(resultElement, false, 'HTTP ' + response.status);
+                            return;
+                        }
+                    }
+
+                    showTestResult(resultElement, result.Success, result.Message);
+                } catch (error) {
+                    console.error('Scripts directory test error:', error);
+                    showTestResult(resultElement, false, `Test failed: ${error.message || 'Unknown error'}`);
+                } finally {
+                    // Re-enable button
+                    button.disabled = false;
+                    textElement.textContent = 'Test Scripts Directory';
+                }
+            }
+
+            // Test Python Executable Path Function
+            async function testPythonExecutable() {
+                const button = document.getElementById('testPythonExecutable');
+                const textElement = document.getElementById('testPythonExecText');
+                const resultElement = document.getElementById('pythonExecTestResult');
+                const execPathElement = document.getElementById('PythonExecutablePath');
+
+                const execPath = execPathElement.value.trim();
+
+                if (!execPath) {
+                    showTestResult(resultElement, false, 'Please enter a Python executable path');
+                    return;
+                }
+
+                // Disable button and show loading
+                button.disabled = true;
+                textElement.textContent = 'Testing...';
+                resultElement.style.display = 'none';
+
+                try {
+                    const response = await ApiClient.ajax({
+                        type: 'POST',
+                        url: ApiClient.getUrl('/Plugins/Jellypy/test-executable'),
+                        data: JSON.stringify({ ExecutablePath: execPath }),
+                        contentType: 'application/json'
+                    });
+
+                    let result = response;
+                    if (response instanceof Response) {
+                        if (response.ok) {
+                            result = await response.json();
+                        } else {
+                            showTestResult(resultElement, false, 'HTTP ' + response.status);
+                            return;
+                        }
+                    }
+
+                    showTestResult(resultElement, result.Success, result.Message);
+                } catch (error) {
+                    console.error('Python path test error:', error);
+                    showTestResult(resultElement, false, `Test failed: ${error.message || 'Unknown error'}`);
+                } finally {
+                    // Re-enable button
+                    button.disabled = false;
+                    textElement.textContent = 'Test Python Path';
+                }
+            }
+
+            // Test Bash Executable Path Function
+            async function testBashExecutable() {
+                const button = document.getElementById('testBashExecutable');
+                const textElement = document.getElementById('testBashExecText');
+                const resultElement = document.getElementById('bashExecTestResult');
+                const execPathElement = document.getElementById('BashExecutablePath');
+
+                const execPath = execPathElement.value.trim();
+
+                if (!execPath) {
+                    showTestResult(resultElement, false, 'Please enter a Bash executable path');
+                    return;
+                }
+
+                // Disable button and show loading
+                button.disabled = true;
+                textElement.textContent = 'Testing...';
+                resultElement.style.display = 'none';
+
+                try {
+                    const response = await ApiClient.ajax({
+                        type: 'POST',
+                        url: ApiClient.getUrl('/Plugins/Jellypy/test-executable'),
+                        data: JSON.stringify({ ExecutablePath: execPath }),
+                        contentType: 'application/json'
+                    });
+
+                    let result = response;
+                    if (response instanceof Response) {
+                        if (response.ok) {
+                            result = await response.json();
+                        } else {
+                            showTestResult(resultElement, false, 'HTTP ' + response.status);
+                            return;
+                        }
+                    }
+
+                    showTestResult(resultElement, result.Success, result.Message);
+                } catch (error) {
+                    console.error('Bash path test error:', error);
+                    showTestResult(resultElement, false, `Test failed: ${error.message || 'Unknown error'}`);
+                } finally {
+                    // Re-enable button
+                    button.disabled = false;
+                    textElement.textContent = 'Test Bash Path';
+                }
+            }
+
             // Connection Test Function
             async function testConnection(type) {
                 const isSonarr = type === 'sonarr';
@@ -1067,6 +1295,9 @@
 
                         // Load global settings
                         var globalSettings = config.GlobalSettings || {};
+                        document.querySelector('#CustomScriptsDirectory').value = globalSettings.CustomScriptsDirectory || '';
+                        document.querySelector('#PythonExecutablePath').value = globalSettings.PythonExecutablePath || '/usr/bin/python3';
+                        document.querySelector('#BashExecutablePath').value = globalSettings.BashExecutablePath || '/bin/bash';
                         document.querySelector('#MaxConcurrentExecutions').value = globalSettings.MaxConcurrentExecutions || 5;
                         document.querySelector('#DefaultTimeoutSeconds').value = globalSettings.DefaultTimeoutSeconds || 300;
                         document.querySelector('#QueueSize').value = globalSettings.QueueSize || 100;
@@ -1102,6 +1333,13 @@
                         document.getElementById('testSonarrConnection').addEventListener('click', testSonarrConnection);
                         document.getElementById('testRadarrConnection').addEventListener('click', testRadarrConnection);
 
+                        // Add test scripts directory button event listener
+                        document.getElementById('testScriptsDirectory').addEventListener('click', testScriptsDirectory);
+
+                        // Add test executable path button event listeners
+                        document.getElementById('testPythonExecutable').addEventListener('click', testPythonExecutable);
+                        document.getElementById('testBashExecutable').addEventListener('click', testBashExecutable);
+
                         Dashboard.hideLoadingMsg();
                     });
                 });
@@ -1116,6 +1354,9 @@
                     if (!config.GlobalSettings) {
                         config.GlobalSettings = {};
                     }
+                    config.GlobalSettings.CustomScriptsDirectory = document.querySelector('#CustomScriptsDirectory').value;
+                    config.GlobalSettings.PythonExecutablePath = document.querySelector('#PythonExecutablePath').value;
+                    config.GlobalSettings.BashExecutablePath = document.querySelector('#BashExecutablePath').value;
                     config.GlobalSettings.MaxConcurrentExecutions = parseInt(document.querySelector('#MaxConcurrentExecutions').value || 5, 10);
                     config.GlobalSettings.DefaultTimeoutSeconds = parseInt(document.querySelector('#DefaultTimeoutSeconds').value || 300, 10);
                     config.GlobalSettings.QueueSize = parseInt(document.querySelector('#QueueSize').value || 100, 10);

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using Jellyfin.Plugin.JellyPy.Events;
 
 namespace Jellyfin.Plugin.JellyPy.Configuration;
@@ -99,14 +100,19 @@ public class ScriptExecution
     public string ExecutablePath { get; set; } = "/usr/bin/python3";
 
     /// <summary>
-    /// Gets or sets the path to the script file.
+    /// Gets or sets the name of the script file (relative to the scripts directory).
+    /// The full path is resolved from AppContext.BaseDirectory/scripts.
     /// </summary>
-    public string ScriptPath { get; set; } = string.Empty;
+    public string ScriptName { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the working directory for script execution.
+    /// Gets the full path to the script file.
+    /// Scripts are stored in AppContext.BaseDirectory/scripts.
     /// </summary>
-    public string WorkingDirectory { get; set; } = string.Empty;
+    [System.Text.Json.Serialization.JsonIgnore]
+    public string ScriptPath => string.IsNullOrEmpty(ScriptName)
+        ? string.Empty
+        : Path.Join(PluginConfiguration.ScriptsDirectory, ScriptName);
 
     /// <summary>
     /// Gets or sets additional command line arguments.

@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using MediaBrowser.Controller.Entities.TV;
 
 namespace Jellyfin.Plugin.JellyPy.Events;
 
@@ -110,6 +111,26 @@ public class EventData
     /// Gets or sets the episode number (for TV episodes).
     /// </summary>
     public int? EpisodeNumber { get; set; }
+
+    /// <summary>
+    /// Gets the list of episodes (for SeriesEpisodesAdded events with multiple episodes).
+    /// </summary>
+    public Collection<Episode> Episodes { get; } = new();
+
+    /// <summary>
+    /// Gets or sets the total count of episodes in a series group event.
+    /// </summary>
+    public int? EpisodeGroupCount { get; set; }
+
+    /// <summary>
+    /// Gets or sets the episode range display string (e.g., "S01E01-E05").
+    /// </summary>
+    public string? EpisodeRange { get; set; }
+
+    /// <summary>
+    /// Gets or sets the season range for grouped episodes (e.g., "1-2").
+    /// </summary>
+    public string? SeasonRange { get; set; }
 
     /// <summary>
     /// Gets or sets the movie year (for movies).

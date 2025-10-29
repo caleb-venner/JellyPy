@@ -21,7 +21,6 @@ namespace Jellyfin.Plugin.JellyPy.Services;
 /// </summary>
 public class ScriptExecutionService : IScriptExecutionService, IDisposable
 {
-    private static readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = false };
     private readonly ILogger<ScriptExecutionService> _logger;
     private readonly ConditionEvaluator _conditionEvaluator;
     private readonly DataAttributeProcessor _dataAttributeProcessor;
@@ -59,12 +58,6 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         if (config.ScriptSettings?.Count > 0)
         {
             await ExecuteEnhancedScriptsAsync(config, eventData).ConfigureAwait(false);
-        }
-
-        // Execute legacy scripts for backward compatibility
-        if (ShouldExecuteLegacyScript(eventData.EventType, config) && IsValidLegacyConfiguration(config))
-        {
-            await ExecuteLegacyScriptAsync(config, eventData).ConfigureAwait(false);
         }
     }
 
@@ -125,7 +118,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
-                WorkingDirectory = Path.GetDirectoryName(setting.Execution.ScriptPath) ?? Environment.CurrentDirectory
+                WorkingDirectory = PluginConfiguration.ScriptsDirectory
             };
 
             // Add script path as first argument
@@ -537,50 +530,6 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         }
     }
 
-    private async Task ExecuteLegacyScriptAsync(PluginConfiguration config, EventData eventData)
-    {
-        await _scriptSemaphore.WaitAsync().ConfigureAwait(false);
-        try
-        {
-            await ExecuteScriptInternal(config, eventData).ConfigureAwait(false);
-        }
-        finally
-        {
-            _scriptSemaphore.Release();
-        }
-    }
-
-    private static bool ShouldExecuteLegacyScript(EventType eventType, PluginConfiguration config)
-    {
-        // For now, map event types to existing configuration flags
-        return eventType switch
-        {
-            EventType.PlaybackStart => true, // Always enabled for now
-            EventType.PlaybackStop => true,  // Always enabled for now
-            EventType.PlaybackPause => true, // Always enabled for now
-            EventType.PlaybackResume => true, // Always enabled for now
-            EventType.ItemAdded => config.EnableEpisodeProcessing || config.EnableMovieProcessing,
-            EventType.ItemUpdated => config.EnableEpisodeProcessing || config.EnableMovieProcessing,
-            EventType.UserCreated => true, // Always enabled for now
-            _ => false
-        };
-    }
-
-    private static bool IsValidLegacyConfiguration(PluginConfiguration config)
-    {
-        if (string.IsNullOrWhiteSpace(config.PythonExecutablePath) || !File.Exists(config.PythonExecutablePath))
-        {
-            return false;
-        }
-
-        if (string.IsNullOrWhiteSpace(config.ScriptPath) || !File.Exists(config.ScriptPath))
-        {
-            return false;
-        }
-
-        return true;
-    }
-
     private async Task ExecuteProcessAsync(ProcessStartInfo startInfo, int timeoutSeconds, EventType eventType)
     {
         try
@@ -669,254 +618,24 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         }
     }
 
-    private static bool ShouldExecuteForEvent(EventType eventType, PluginConfiguration config)
+    /// <inheritdoc />
+    public void Dispose()
     {
-        // For now, map event types to existing configuration flags
-        return eventType switch
-        {
-            EventType.PlaybackStart => true, // Always enabled for now
-            EventType.PlaybackStop => true,  // Always enabled for now
-            EventType.PlaybackPause => true, // Always enabled for now
-            EventType.PlaybackResume => true, // Always enabled for now
-            EventType.ItemAdded => config.EnableEpisodeProcessing || config.EnableMovieProcessing,
-            EventType.ItemUpdated => config.EnableEpisodeProcessing || config.EnableMovieProcessing,
-            EventType.UserCreated => true, // Always enabled for now
-            _ => false
-        };
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 
-    private static bool IsValidConfiguration(PluginConfiguration config)
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+    /// </summary>
+    /// <param name="disposing">True if disposing from user code, false if called from finalizer.</param>
+    protected virtual void Dispose(bool disposing)
     {
-        if (string.IsNullOrWhiteSpace(config.PythonExecutablePath) || !File.Exists(config.PythonExecutablePath))
+        if (!_disposed && disposing)
         {
-            return false;
+            _scriptSemaphore?.Dispose();
+            _disposed = true;
         }
-
-        if (string.IsNullOrWhiteSpace(config.ScriptPath) || !File.Exists(config.ScriptPath))
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    private async Task ExecuteScriptInternal(PluginConfiguration config, EventData eventData)
-    {
-        var arguments = BuildScriptArguments(config, eventData);
-        var environmentVars = BuildEnvironmentVariables(config, eventData);
-
-        var startInfo = new ProcessStartInfo
-        {
-            FileName = config.PythonExecutablePath,
-            UseShellExecute = false,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            WorkingDirectory = ResolveWorkingDirectory(config)
-        };
-
-        // Add script arguments
-        foreach (var argument in arguments)
-        {
-            startInfo.ArgumentList.Add(argument);
-        }
-
-        // Add environment variables
-        foreach (var (key, value) in environmentVars)
-        {
-            startInfo.Environment[key] = value;
-        }
-
-        try
-        {
-            using var process = Process.Start(startInfo);
-            if (process is null)
-            {
-                _logger.LogError("Failed to start external script process for event {EventType}", eventData.EventType);
-                return;
-            }
-
-            using var cts = CreateTimeoutToken(config.ScriptTimeoutSeconds);
-            var stdOutTask = process.StandardOutput.ReadToEndAsync();
-            var stdErrTask = process.StandardError.ReadToEndAsync();
-
-            try
-            {
-                if (cts is not null)
-                {
-                    await process.WaitForExitAsync(cts.Token).ConfigureAwait(false);
-                }
-                else
-                {
-                    await process.WaitForExitAsync().ConfigureAwait(false);
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                TryTerminateProcess(process);
-                await process.WaitForExitAsync().ConfigureAwait(false);
-                await Task.WhenAll(stdOutTask, stdErrTask).ConfigureAwait(false);
-                _logger.LogError(
-                    "Script execution timed out after {TimeoutSeconds} seconds for event {EventType}",
-                    config.ScriptTimeoutSeconds,
-                    eventData.EventType);
-                return;
-            }
-
-            var output = await stdOutTask.ConfigureAwait(false);
-            var error = await stdErrTask.ConfigureAwait(false);
-
-            LogScriptResults(eventData, process.ExitCode, output, error);
-        }
-        catch (OperationCanceledException ex)
-        {
-            _logger.LogError(ex, "Script execution was cancelled for event {EventType}", eventData.EventType);
-        }
-        catch (InvalidOperationException ex)
-        {
-            _logger.LogError(ex, "Invalid operation while executing script for event {EventType}", eventData.EventType);
-        }
-        catch (System.ComponentModel.Win32Exception ex)
-        {
-            _logger.LogError(ex, "Failed to start script process for event {EventType}", eventData.EventType);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Unexpected error while executing script for event {EventType}", eventData.EventType);
-            throw; // Rethrow to maintain CA1031 compliance while still logging the error
-        }
-    }
-
-    private List<string> BuildScriptArguments(PluginConfiguration config, EventData eventData)
-    {
-        var arguments = new List<string> { config.ScriptPath };
-
-        // Add event type
-        arguments.Add("--event-type");
-        arguments.Add(eventData.EventType.ToString());
-
-        // Add event data as JSON
-        arguments.Add("--event-data");
-        arguments.Add(JsonSerializer.Serialize(eventData, _jsonOptions));
-
-        // Legacy arguments for backward compatibility with existing scripts
-        if (eventData.EventType == EventType.PlaybackStart || eventData.EventType == EventType.PlaybackStop)
-        {
-            if (!string.IsNullOrEmpty(eventData.SeriesName))
-            {
-                arguments.Add("-mt");
-                arguments.Add(eventData.SeriesName);
-                if (eventData.SeasonNumber.HasValue)
-                {
-                    arguments.Add("-sn");
-                    arguments.Add(eventData.SeasonNumber.Value.ToString(CultureInfo.InvariantCulture));
-                }
-
-                if (eventData.EpisodeNumber.HasValue)
-                {
-                    arguments.Add("-en");
-                    arguments.Add(eventData.EpisodeNumber.Value.ToString(CultureInfo.InvariantCulture));
-                }
-            }
-            else if (!string.IsNullOrEmpty(eventData.ItemName) && eventData.ItemType == "Movie")
-            {
-                arguments.Add("-mt");
-                arguments.Add(eventData.ItemName);
-            }
-        }
-
-        // Add additional arguments from configuration
-        foreach (var extraArgument in TokenizeAdditionalArguments(config.AdditionalArguments))
-        {
-            arguments.Add(extraArgument);
-        }
-
-        return arguments;
-    }
-
-    private Dictionary<string, string> BuildEnvironmentVariables(PluginConfiguration config, EventData eventData)
-    {
-        var environmentVars = new Dictionary<string, string>();
-
-        // Add legacy environment variables for backward compatibility
-        if (!string.IsNullOrWhiteSpace(config.SonarrApiKey))
-        {
-            environmentVars["SONARR_APIKEY"] = config.SonarrApiKey;
-        }
-
-        if (!string.IsNullOrWhiteSpace(config.SonarrUrl))
-        {
-            environmentVars["SONARR_URL"] = config.SonarrUrl;
-        }
-
-        if (!string.IsNullOrWhiteSpace(config.RadarrApiKey))
-        {
-            environmentVars["RADARR_APIKEY"] = config.RadarrApiKey;
-        }
-
-        if (!string.IsNullOrWhiteSpace(config.RadarrUrl))
-        {
-            environmentVars["RADARR_URL"] = config.RadarrUrl;
-        }
-
-        // Add new event-specific environment variables
-        environmentVars["JELLYPY_EVENT_TYPE"] = eventData.EventType.ToString();
-        environmentVars["JELLYPY_TIMESTAMP"] = eventData.Timestamp.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture);
-
-        if (eventData.ItemId.HasValue)
-        {
-            environmentVars["JELLYPY_ITEM_ID"] = eventData.ItemId.Value.ToString();
-        }
-
-        if (!string.IsNullOrEmpty(eventData.ItemName))
-        {
-            environmentVars["JELLYPY_ITEM_NAME"] = eventData.ItemName;
-        }
-
-        if (!string.IsNullOrEmpty(eventData.ItemType))
-        {
-            environmentVars["JELLYPY_ITEM_TYPE"] = eventData.ItemType;
-        }
-
-        if (eventData.UserId.HasValue)
-        {
-            environmentVars["JELLYPY_USER_ID"] = eventData.UserId.Value.ToString();
-        }
-
-        if (!string.IsNullOrEmpty(eventData.UserName))
-        {
-            environmentVars["JELLYPY_USER_NAME"] = eventData.UserName;
-        }
-
-        return environmentVars;
-    }
-
-    private void LogScriptResults(EventData eventData, int exitCode, string output, string error)
-    {
-        if (!string.IsNullOrWhiteSpace(error))
-        {
-            _logger.LogWarning("Script stderr for event {EventType}: {Error}", eventData.EventType, error.Trim());
-        }
-
-        if (exitCode != 0)
-        {
-            _logger.LogWarning("Script exited with code {ExitCode} for event {EventType}", exitCode, eventData.EventType);
-        }
-
-        if (!string.IsNullOrWhiteSpace(output))
-        {
-            _logger.LogInformation("Script output for event {EventType}: {Output}", eventData.EventType, output.Trim());
-        }
-    }
-
-    private static string ResolveWorkingDirectory(PluginConfiguration config)
-    {
-        if (!string.IsNullOrWhiteSpace(config.ScriptWorkingDirectory))
-        {
-            return config.ScriptWorkingDirectory;
-        }
-
-        var scriptDirectory = Path.GetDirectoryName(config.ScriptPath);
-        return string.IsNullOrWhiteSpace(scriptDirectory) ? Directory.GetCurrentDirectory() : scriptDirectory;
     }
 
     private static CancellationTokenSource? CreateTimeoutToken(int timeoutSeconds)
@@ -927,30 +646,6 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         }
 
         return new CancellationTokenSource(TimeSpan.FromSeconds(timeoutSeconds));
-    }
-
-    private void TryTerminateProcess(Process process)
-    {
-        try
-        {
-            if (!process.HasExited)
-            {
-                process.Kill(entireProcessTree: true);
-            }
-        }
-        catch (InvalidOperationException ex)
-        {
-            _logger.LogDebug(ex, "Failed to terminate process after timeout (invalid operation).");
-        }
-        catch (System.ComponentModel.Win32Exception ex)
-        {
-            _logger.LogDebug(ex, "Failed to terminate process after timeout (Win32 error).");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogDebug(ex, "Failed to terminate process after timeout.");
-            throw; // Rethrow to maintain CA1031 compliance while still logging the error
-        }
     }
 
     private static IEnumerable<string> TokenizeAdditionalArguments(string? arguments)
@@ -988,26 +683,6 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         if (current.Length > 0)
         {
             yield return current.ToString();
-        }
-    }
-
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
-    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-    /// </summary>
-    /// <param name="disposing">True if disposing from user code, false if called from finalizer.</param>
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!_disposed && disposing)
-        {
-            _scriptSemaphore?.Dispose();
-            _disposed = true;
         }
     }
 }

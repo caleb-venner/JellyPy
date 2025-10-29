@@ -33,6 +33,11 @@ public enum EventType
     ItemAdded,
 
     /// <summary>
+    /// Multiple episodes from the same series have been added to the library.
+    /// </summary>
+    SeriesEpisodesAdded,
+
+    /// <summary>
     /// An existing library item has been updated.
     /// </summary>
     ItemUpdated,

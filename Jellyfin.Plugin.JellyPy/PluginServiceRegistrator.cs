@@ -1,6 +1,8 @@
+using System;
 using Jellyfin.Plugin.JellyPy.Configuration;
 using Jellyfin.Plugin.JellyPy.Events;
 using Jellyfin.Plugin.JellyPy.Events.Handlers;
+using Jellyfin.Plugin.JellyPy.Events.Managers;
 using Jellyfin.Plugin.JellyPy.Services;
 using Jellyfin.Plugin.JellyPy.Services.Arr;
 using MediaBrowser.Controller;
@@ -25,6 +27,12 @@ public class PluginServiceRegistrator : IPluginServiceRegistrator
         // Register the entry point
         serviceCollection.AddHostedService<EnhancedEntryPoint>();
 
+        // Register library event managers (hosted services that process queued items)
+        serviceCollection.AddSingleton<IItemAddedManager, ItemAddedManager>();
+        serviceCollection.AddSingleton<IItemDeletedManager, ItemDeletedManager>();
+        serviceCollection.AddHostedService(provider => provider.GetRequiredService<IItemAddedManager>() as ItemAddedManager ?? throw new InvalidOperationException("Failed to resolve ItemAddedManager"));
+        serviceCollection.AddHostedService(provider => provider.GetRequiredService<IItemDeletedManager>() as ItemDeletedManager ?? throw new InvalidOperationException("Failed to resolve ItemDeletedManager"));
+
         // Register the script execution service and supporting services
         serviceCollection.AddSingleton<IScriptExecutionService, ScriptExecutionService>();
         serviceCollection.AddSingleton<ConditionEvaluator>();
@@ -39,5 +47,10 @@ public class PluginServiceRegistrator : IPluginServiceRegistrator
         // Register event handlers
         serviceCollection.AddTransient<PlaybackStartHandler>();
         serviceCollection.AddTransient<PlaybackStopHandler>();
+        serviceCollection.AddTransient<PlaybackPauseHandler>();
+        serviceCollection.AddTransient<PlaybackResumeHandler>();
+        serviceCollection.AddTransient<ItemAddedHandler>();
+        serviceCollection.AddTransient<ItemDeletedHandler>();
+        serviceCollection.AddTransient<SeriesEpisodesAddedHandler>();
     }
 }

@@ -83,3 +83,8 @@ using System.Diagnostics.CodeAnalysis;
 // CA1850: Static HashData method (1 warning)
 // Justification: Using disposable pattern with SHA256.Create() for compatibility and explicit resource management.
 [assembly: SuppressMessage("Performance", "CA1850:Prefer static 'System.Security.Cryptography.SHA256.HashData' method over 'ComputeHash'", Justification = "Using disposable pattern for compatibility and explicit resource management", Scope = "namespaceanddescendants", Target = "~N:Jellyfin.Plugin.JellyPy.Configuration")]
+
+// CA8091: File path injection vulnerability (1 warning)
+// Justification: File paths are validated through Path.GetFullPath() before use, and".."
+// path traversal attempts are explicitly blocked. User input is properly sanitized.
+[assembly: SuppressMessage("Security", "CA8091:Path contains invalid characters", Justification = "File paths validated and sanitized before use in File.Exists and FileInfo constructors", Scope = "member", Target = "~M:Jellyfin.Plugin.JellyPy.Configuration.JellyPyApiController.TestExecutable(Jellyfin.Plugin.JellyPy.Configuration.ExecutablePathRequest)~Microsoft.AspNetCore.Mvc.ActionResult`1:Jellyfin.Plugin.JellyPy.Configuration.ExecutableTestResult")]

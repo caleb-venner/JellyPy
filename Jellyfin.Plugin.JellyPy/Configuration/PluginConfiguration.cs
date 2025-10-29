@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using MediaBrowser.Model.Plugins;
 
@@ -22,7 +23,6 @@ public class PluginConfiguration : BasePluginConfiguration
     {
         // Legacy properties - no defaults to prevent unwanted execution
         PythonExecutablePath = string.Empty;
-        ScriptPath = string.Empty;
         ScriptWorkingDirectory = string.Empty;
         EnableEpisodeProcessing = false;
         EnableMovieProcessing = false;
@@ -33,7 +33,7 @@ public class PluginConfiguration : BasePluginConfiguration
         // Modern configuration
         ScriptSettings = new Collection<ScriptSetting>();
         GlobalSettings = new GlobalScriptSettings();
-        
+
         // Initialize encryption key for API keys
         EncryptionHelper.GenerateMachineKey();
 
@@ -52,17 +52,25 @@ public class PluginConfiguration : BasePluginConfiguration
         UnmonitorAfterUpgrade = false;
     }
 
+    /// <summary>
+    /// Gets the directory where user scripts are stored.
+    /// This resolves to {AppContext.BaseDirectory}/scripts by default.
+    ///
+    /// On different platforms:
+    /// • Docker: /app/scripts
+    /// • Windows: {Jellyfin Install}/scripts
+    /// • macOS/Linux: {Jellyfin Install}/scripts.
+    /// </summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    [System.Xml.Serialization.XmlIgnore]
+    public static string ScriptsDirectory => Path.Join(AppContext.BaseDirectory, "scripts");
+
     // Legacy configuration properties (maintained for backward compatibility)
 
     /// <summary>
     /// Gets or sets the absolute path to the Python interpreter used to run scripts.
     /// </summary>
     public string PythonExecutablePath { get; set; }
-
-    /// <summary>
-    /// Gets or sets the absolute path to the script that should be executed.
-    /// </summary>
-    public string ScriptPath { get; set; }
 
     /// <summary>
     /// Gets or sets the optional working directory for the script process.
@@ -325,9 +333,9 @@ public class PluginConfiguration : BasePluginConfiguration
     // New enhanced configuration properties
 
     /// <summary>
-    /// Gets or sets the list of script settings for enhanced event handling.
+    /// Gets the list of script settings for enhanced event handling.
     /// </summary>
-    public Collection<ScriptSetting> ScriptSettings { get; set; }
+    public Collection<ScriptSetting> ScriptSettings { get; }
 
     /// <summary>
     /// Gets or sets global settings for script execution.

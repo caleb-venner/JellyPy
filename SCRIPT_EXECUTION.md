@@ -13,9 +13,7 @@ other services beyond the built-in Sonarr and Radarr support.
 ### Supported Script Types
 
 • **Python**: Python 3 scripts (.py)
-• **PowerShell**: PowerShell scripts (.ps1)
 • **Bash/Shell**: Shell scripts (.sh)
-• **Node.js**: JavaScript/TypeScript scripts (.js, .ts)
 • **Binary**: Direct executable binaries
 
 ## Getting Started
@@ -74,18 +72,16 @@ Scripts can be triggered by the following Jellyfin events:
 
 Configure how your script is executed:
 
-**Executor Type**: Select the script type (Python, PowerShell, Bash, NodeJs, Binary)
+**Executor Type**: Select the script type (Python, Bash, Binary)
 
 **Executable Path**: Path to the interpreter or executable
 • Python: `/usr/bin/python3` or `C:\Python39\python.exe`
-• PowerShell: `/usr/bin/pwsh` or `C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe`
 • Bash: `/bin/bash`
-• Node.js: `/usr/bin/node` or `C:\Program Files\nodejs\node.exe`
 • Binary: Leave empty or specify full path to executable
 
 **Script Path**: Absolute path to your script file
 • Linux: `/opt/scripts/jellypy_notification.py`
-• Windows: `C:\Scripts\jellypy_notification.ps1`
+• Windows: `C:\Scripts\jellypy_notification.py`
 
 **Working Directory**: Optional directory where script runs (defaults to script location)
 
@@ -238,16 +234,6 @@ args = parser.parse_args()
 print(f"Processing {args.event_type} for item {args.item_id}")
 ```
 
-**PowerShell Example**:
-
-```powershell
-$EventType = $env:EVENT_TYPE
-$UserName = $env:USER_NAME
-$ItemName = $env:ITEM_NAME
-
-Write-Host "Event: $EventType by $UserName for $ItemName"
-```
-
 ### Best Practices
 
 **Error Handling**: Implement robust error handling to prevent script failures from
@@ -341,7 +327,7 @@ python3 script.py --event-type PlaybackStart --item-id 12345
 1. **Check script setting is enabled**: Verify the Enabled checkbox is checked
 2. **Verify triggers are configured**: At least one event trigger must be selected
 3. **Review conditions**: Ensure conditions match your event data
-4. **Check executable path**: Verify Python/PowerShell/etc. path is correct
+4. **Check executable path**: Verify Python/etc. path is correct
 5. **Confirm script path**: Ensure script file exists and has execute permissions
 
 ### Permission Issues
@@ -383,7 +369,7 @@ If your script fails:
 
 **Script timeout**: Increase timeout value or optimize script performance
 
-**Path issues on Windows**: Use double backslashes in paths: `C:\\Scripts\\script.ps1`
+**Path issues on Windows**: Use double backslashes in paths: `C:\\Scripts\\script.py`
 
 **Permission denied**: Grant execute permissions and verify Jellyfin user can access script
 
