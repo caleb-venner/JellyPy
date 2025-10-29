@@ -18,6 +18,33 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Security
 
+## [2.1.0.0] - 2025-10-29
+
+### Added
+
+- Global configuration for Python and Bash executable paths
+- Configurable interpreter paths in Global Settings with test buttons
+- Robust executable path validation with enhanced error messages
+- File permission verification during executable testing
+- Human-readable file size formatting (B, KB, MB, GB, TB)
+- Test functionality for both Python and Bash interpreters
+- `check-dotnet` Make target for environment validation
+
+### Changed
+
+- Simplified Execution Settings - Executor Type now just selects Python or Bash
+- Executable paths moved from per-script to global configuration
+- Each script references globally-configured interpreter paths
+- More streamlined configuration workflow (set paths once, use everywhere)
+- Improved executable validation to check file type and read permissions
+- Better user feedback on executable path testing results
+
+### Improved
+
+- Makefile `release` target now executes release.sh automatically
+- Build process integration between Make and release script
+- Global Settings section reorganized with Interpreter Paths first
+
 ## [2.0.0.0] - 2025-10-15
 
 ### Added

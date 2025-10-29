@@ -9,6 +9,14 @@
         "category": "General",
         "versions": [
             {
+                "version": "2.1.0.0",
+                "changelog": "**Version 2.1.0.0 - Global Interpreter Configuration & Enhanced Validation**\n\n**New Features:**\n\u2022 Global configuration for Python and Bash executable paths\n\u2022 Configurable interpreter paths in Global Settings with test buttons\n\u2022 Robust executable path validation with enhanced error messages\n\u2022 File permission verification during executable testing\n\u2022 Human-readable file size formatting (B, KB, MB, GB, TB)\n\u2022 Test functionality for both Python and Bash interpreters\n\n**Improvements:**\n\u2022 Simplified Execution Settings - Executor Type now just selects Python or Bash\n\u2022 Executable paths moved from per-script to global configuration\n\u2022 Each script references globally-configured interpreter paths\n\u2022 More streamlined configuration workflow\n\u2022 Improved executable validation checking file type and read permissions\n\u2022 Better user feedback on executable path testing results\n\u2022 Makefile release target now executes release.sh automatically\n\n**Notes:**\n\u2022 Global executable paths eliminate repetition across scripts\n\u2022 Easier to maintain consistent interpreter versions across all scripts\n\u2022 Better validation prevents misconfiguration issues before script execution",
+                "targetAbi": "10.9.0.0",
+                "sourceUrl": "https://raw.githubusercontent.com/caleb-venner/jellypy/main/releases/jellypy_2.1.0.0.zip",
+                "checksum": "79b59b8b793b9e2fcef159ba885905e1",
+                "timestamp": "2025-10-29T13:05:00Z"
+            },
+            {
                 "version": "2.0.0.0",
                 "changelog": "**Version 2.0.0 - Major UI Overhaul & Critical Fixes**\n\n**Critical Fixes:**\n\u2022 Fixed script settings not persisting to disk\n\u2022 Resolved XML serialization bug preventing script configuration saves\n\u2022 Added encryption key initialization in constructor\n\n**UI Enhancements:**\n\u2022 Complete visual redesign with inline styling architecture\n\u2022 Added rotating triangle icons for expandable sections\n\u2022 Implemented active state highlighting with blue glow effect\n\u2022 Enhanced button sizes for improved usability (36-44px)\n\u2022 Uniformly styled collapsible sections throughout\n\u2022 Redesigned event trigger checkboxes as visual cards\n\u2022 Modernized tab navigation with inline styles\n\u2022 Converted delete buttons to circular red buttons\n\n**Code Quality:**\n\u2022 Removed redundant CSS (reduced from 280 to 75 lines)\n\u2022 Improved maintainability with inline style approach\n\u2022 Better compatibility with Jellyfin's iframe restrictions\n\n**Note:** This is a major release due to the critical persistence bug fix and complete UI architecture overhaul.",
                 "targetAbi": "10.9.0.0",
