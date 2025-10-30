@@ -109,6 +109,9 @@ public class ItemAddedManager : IItemAddedManager, IHostedService
             {
                 break;
             }
+
+            // Generic catch intentional: ProcessBatchAsync can throw InvalidOperationException
+            // from GetRequiredService, plus any exception from handler implementation
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing queued items");
@@ -192,6 +195,9 @@ public class ItemAddedManager : IItemAddedManager, IHostedService
                     var handler = scope.ServiceProvider.GetRequiredService<SeriesEpisodesAddedHandler>();
                     await handler.HandleAsync(group).ConfigureAwait(false);
                 }
+
+                // Generic catch intentional: GetRequiredService can throw InvalidOperationException,
+                // and handler execution may throw any exception
                 catch (Exception ex)
                 {
                     _logger.LogError(
@@ -217,6 +223,9 @@ public class ItemAddedManager : IItemAddedManager, IHostedService
                         var handler = scope.ServiceProvider.GetRequiredService<ItemAddedHandler>();
                         await handler.HandleAsync(episode).ConfigureAwait(false);
                     }
+
+                    // Generic catch intentional: GetRequiredService can throw InvalidOperationException,
+                    // and handler execution may throw any exception
                     catch (Exception ex)
                     {
                         _logger.LogError(
@@ -243,6 +252,9 @@ public class ItemAddedManager : IItemAddedManager, IHostedService
                 var handler = scope.ServiceProvider.GetRequiredService<ItemAddedHandler>();
                 await handler.HandleAsync(queuedItem.Item).ConfigureAwait(false);
             }
+
+            // Generic catch intentional: GetRequiredService can throw InvalidOperationException,
+            // and handler execution may throw any exception
             catch (Exception ex)
             {
                 _logger.LogError(

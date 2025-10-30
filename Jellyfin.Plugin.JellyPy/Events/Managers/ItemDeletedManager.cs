@@ -107,6 +107,9 @@ public class ItemDeletedManager : IItemDeletedManager, IHostedService
             {
                 break;
             }
+
+            // Generic catch intentional: ProcessBatchAsync can throw InvalidOperationException
+            // from GetRequiredService, plus any exception from handler implementation
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing queued items");
@@ -131,6 +134,9 @@ public class ItemDeletedManager : IItemDeletedManager, IHostedService
                 var handler = scope.ServiceProvider.GetRequiredService<ItemDeletedHandler>();
                 await handler.HandleAsync(queuedItem.Item).ConfigureAwait(false);
             }
+
+            // Generic catch intentional: GetRequiredService can throw InvalidOperationException,
+            // and handler execution may throw any exception
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing deleted item: {ItemName} ({ItemId})", queuedItem.Item.Name, queuedItem.Item.Id);

@@ -39,7 +39,7 @@ public class JellyPyApiController : ControllerBase
     {
         try
         {
-            var config = Plugin.Instance?.Configuration as PluginConfiguration;
+            var config = Plugin.Instance?.Configuration;
             if (config?.GlobalSettings == null)
             {
                 return BadRequest("Configuration not available");
@@ -163,7 +163,8 @@ public class JellyPyApiController : ControllerBase
             }
             catch (UnauthorizedAccessException)
             {
-                _logger.LogWarning("Access denied when browsing directory: {Path}", path);
+                var sanitizedPath = path?.Replace("\r", string.Empty, StringComparison.Ordinal).Replace("\n", string.Empty, StringComparison.Ordinal);
+                _logger.LogWarning("Access denied when browsing directory: {Path}", sanitizedPath);
                 // Return what we can
             }
 
@@ -174,6 +175,8 @@ public class JellyPyApiController : ControllerBase
             _logger.LogWarning(ex, "Invalid path provided");
             return BadRequest(new { error = "Invalid path" });
         }
+
+        // Generic catch as fallback for unexpected errors during directory browsing
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unexpected error browsing directory");
@@ -215,7 +218,8 @@ public class JellyPyApiController : ControllerBase
                 var shFiles = dirInfo.GetFiles("*.sh", SearchOption.TopDirectoryOnly);
                 int totalScripts = pyFiles.Length + shFiles.Length;
 
-                _logger.LogInformation("Scripts directory test successful: {Path} ({Count} scripts found)", path, totalScripts);
+                var sanitizedPath = path?.Replace("\r", string.Empty, StringComparison.Ordinal).Replace("\n", string.Empty, StringComparison.Ordinal);
+                _logger.LogInformation("Scripts directory test successful: {Path} ({Count} scripts found)", sanitizedPath, totalScripts);
 
                 return Ok(new ScriptsDirectoryTestResult
                 {
@@ -270,7 +274,7 @@ public class JellyPyApiController : ControllerBase
 
             return fullPath;
         }
-        catch (Exception ex)
+        catch (ArgumentException ex)
         {
             _logger.LogDebug(ex, "Failed to get full path");
             return string.Empty;
@@ -335,7 +339,7 @@ public class JellyPyApiController : ControllerBase
                     });
                 }
             }
-            catch (Exception ex)
+            catch (ArgumentException ex)
             {
                 _logger.LogError(ex, "Error validating executable path");
                 return Ok(new ExecutableTestResult
@@ -385,7 +389,7 @@ public class JellyPyApiController : ControllerBase
                 // Try to verify it's actually executable by checking if we can read it
                 try
                 {
-                    using (var stream = System.IO.File.OpenRead(validatedPath))
+                    using (System.IO.File.OpenRead(validatedPath))
                     {
                         // Just opening and closing is enough to verify access
                     }
@@ -408,7 +412,8 @@ public class JellyPyApiController : ControllerBase
                     });
                 }
 
-                _logger.LogInformation("Executable test successful: {Path} (Size: {Size} bytes)", validatedPath, fileInfo.Length);
+                var sanitizedExecutablePath = validatedPath?.Replace("\r", string.Empty, StringComparison.Ordinal).Replace("\n", string.Empty, StringComparison.Ordinal);
+                _logger.LogInformation("Executable test successful: {Path} (Size: {Size} bytes)", sanitizedExecutablePath, fileInfo.Length);
 
                 return Ok(new ExecutableTestResult
                 {

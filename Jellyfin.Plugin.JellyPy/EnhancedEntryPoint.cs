@@ -65,7 +65,11 @@ public class EnhancedEntryPoint : IHostedService
                 _logger.LogInformation("Created scripts directory: {Directory}", scriptsDirectory);
             }
         }
-        catch (Exception ex)
+        catch (IOException ex)
+        {
+            _logger.LogError(ex, "Failed to create scripts directory");
+        }
+        catch (UnauthorizedAccessException ex)
         {
             _logger.LogError(ex, "Failed to create scripts directory");
         }
