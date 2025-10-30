@@ -13,7 +13,7 @@
                 "changelog": "**Version 2.1.0.0 - Global Interpreter Configuration & Enhanced Validation**\n\n**New Features:**\n\u2022 Global configuration for Python and Bash executable paths\n\u2022 Configurable interpreter paths in Global Settings with test buttons\n\u2022 Robust executable path validation with enhanced error messages\n\u2022 File permission verification during executable testing\n\u2022 Human-readable file size formatting (B, KB, MB, GB, TB)\n\u2022 Test functionality for both Python and Bash interpreters\n\n**Improvements:**\n\u2022 Simplified Execution Settings - Executor Type now just selects Python or Bash\n\u2022 Executable paths moved from per-script to global configuration\n\u2022 Each script references globally-configured interpreter paths\n\u2022 More streamlined configuration workflow\n\u2022 Improved executable validation checking file type and read permissions\n\u2022 Better user feedback on executable path testing results\n\u2022 Makefile release target now executes release.sh automatically\n\n**Notes:**\n\u2022 Global executable paths eliminate repetition across scripts\n\u2022 Easier to maintain consistent interpreter versions across all scripts\n\u2022 Better validation prevents misconfiguration issues before script execution",
                 "targetAbi": "10.9.0.0",
                 "sourceUrl": "https://raw.githubusercontent.com/caleb-venner/jellypy/main/releases/jellypy_2.1.0.0.zip",
-                "checksum": "79b59b8b793b9e2fcef159ba885905e1",
+                "checksum": "4604ac62d26b5866b799f5215309ccc5",
                 "timestamp": "2025-10-29T13:05:00Z"
             },
             {
