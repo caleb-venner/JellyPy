@@ -330,7 +330,7 @@ public class JellyPyApiController : ControllerBase
             {
                 validatedPath = Path.GetFullPath(execPath);
                 // Validate that the path doesn't contain suspicious patterns
-                if (validatedPath.Contains("..", StringComparison.Ordinal) || string.IsNullOrEmpty(validatedPath))
+                if (string.IsNullOrEmpty(validatedPath) || validatedPath.Contains("..", StringComparison.Ordinal))
                 {
                     return Ok(new ExecutableTestResult
                     {
