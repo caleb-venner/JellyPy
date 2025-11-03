@@ -29,6 +29,10 @@ dist/
 Thumbs.db
 desktop.ini
 ._*
+.AppleDouble/
+.LSOverride/
+*.swp
+*~
 
 # Environment and secrets
 *.env
@@ -41,8 +45,6 @@ appsettings.local.json
 *.tmp
 *.temp
 *.cache
-*.swp
-*~
 
 # NuGet
 *.nupkg
@@ -59,6 +61,9 @@ TestResults/
 *.bak
 *.backup
 *_backup
+*.csproj.bak
+*.sln.bak
+*.yaml.bak
 
 # JetBrains Rider
 .idea/
