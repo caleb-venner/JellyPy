@@ -42,7 +42,7 @@ jobs:
         run: dotnet build Jellyfin.Plugin.JellyPy.sln --configuration Release --no-restore
 
       - name: Publish plugin
-  run: dotnet publish Jellyfin.Plugin.JellyPy/Jellyfin.Plugin.JellyPy.csproj --configuration Release --no-build --output ./dist
+        run: dotnet publish Jellyfin.Plugin.JellyPy/Jellyfin.Plugin.JellyPy.csproj --configuration Release --no-build --output ./dist
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
