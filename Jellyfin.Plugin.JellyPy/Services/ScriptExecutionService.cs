@@ -124,6 +124,13 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
             // Add script path as first argument
             startInfo.ArgumentList.Add(setting.Execution.ScriptPath);
 
+            if (setting.ExecutionMode == ExecutionMode.JsonPayload)
+            {
+                // Add EventData as JSON argument
+                var eventDataJson = JsonSerializer.Serialize(eventData, new JsonSerializerOptions { WriteIndented = false });
+                startInfo.ArgumentList.Add(eventDataJson);
+            }
+
             // Add processed arguments
             foreach (var argument in arguments)
             {

@@ -1,0 +1,27 @@
+{
+  "movie": {
+    "EventType": "ItemAdded",
+    "ItemType": "Movie",
+    "ItemName": "The Matrix",
+    "Year": 1999,
+    "Genres": ["Action", "Sci-Fi"],
+    "ContentRating": "R",
+    "RunTimeTicks": 81600000000
+  },
+  "episodes": {
+    "EventType": "SeriesEpisodesAdded",
+    "SeriesName": "The Expanse",
+    "EpisodeGroupCount": 10,
+    "EpisodeRange": "S01E01-E10",
+    "SeasonRange": "1",
+    "Genres": ["Sci-Fi", "Drama"],
+    "ContentRating": "TV-14"
+  },
+  "playback": {
+    "EventType": "PlaybackStart",
+    "ItemName": "The Matrix",
+    "ItemType": "Movie",
+    "Username": "testuser",
+    "ClientName": "Chrome"
+  }
+}

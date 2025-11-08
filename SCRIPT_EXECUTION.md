@@ -195,11 +195,27 @@ Client/Device:
 
 ## Global Settings
 
-Configure global script execution behavior:
+Configure global script execution behavior in the **Global Settings** tab.
+
+### Item Grouping
+
+These settings control how the plugin handles items that are added to the library in quick succession, such as when adding a full season of a TV show.
+
+**Enable Item Grouping**:
+- **Enabled** (default): The plugin will wait for a short period to collect all related items (like episodes from the same season) and fire a single `SeriesEpisodesAdded` event. This is highly recommended to avoid spamming your scripts with dozens of individual `ItemAdded` events.
+- **Disabled**: The plugin will fire an `ItemAdded` event immediately for every single item added to the library.
+
+**Grouping Delay (seconds)**:
+- The number of seconds to wait for more items before processing a group. If you have a slow system or are adding a very large number of items at once, you may want to increase this value.
+- Default: `2` seconds.
+
+### Execution Limits
 
 **Max Concurrent Executions**: Number of scripts that can run simultaneously (default: 5)
 
 **Default Timeout**: Default timeout for all scripts unless overridden (default: 300 seconds)
+
+### Logging
 
 **Verbose Logging**: Enable detailed logging for troubleshooting
 
@@ -207,7 +223,37 @@ Configure global script execution behavior:
 
 ### Receiving Event Data
 
-Your scripts receive event data based on the configured data attributes:
+Your scripts receive event data in two ways simultaneously:
+
+1.  **As a complete JSON object**: The entire event data is automatically passed as a JSON string as the **first argument** to your script. This is the recommended way to access all event information.
+2.  **As individual data attributes**: The data fields you configure in the "Data Attributes" section are passed as environment variables or subsequent command-line arguments. This is useful for backward compatibility or for scripts that only need a few specific pieces of data.
+
+**Accessing the Full JSON Payload (Recommended)**
+
+This method gives you access to all event details, including grouped episodes.
+
+```python
+import sys
+import json
+
+# The first argument is the script name, the second is the JSON data.
+if len(sys.argv) < 2:
+    print("No JSON data provided.", file=sys.stderr)
+    sys.exit(1)
+
+try:
+    event_data = json.loads(sys.argv[1])
+    event_type = event_data.get('EventType')
+    item_name = event_data.get('ItemName')
+    print(f"Processing {event_type} for item {item_name}")
+except json.JSONDecodeError:
+    print("Failed to decode JSON data.", file=sys.stderr)
+    sys.exit(1)
+```
+
+**Accessing Individual Data Attributes (Legacy)**
+
+This method is simpler if you only need a few fields and don't need grouped data.
 
 **Environment Variables** (Python example):
 
@@ -280,6 +326,40 @@ python3 script.py --event-type PlaybackStart --item-id 12345
 ```
 
 ## Example Configurations
+
+### Example: Grouped Discord Notifications for New Media
+
+This example uses the `examples/discord_notification.py` script to send rich, grouped notifications to Discord when new movies or TV show episodes are added. It avoids notification spam by grouping episodes added in the same batch.
+
+**Prerequisites**:
+1.  Install the `requests` Python library: `pip install requests`
+2.  Have your Discord Webhook URL ready.
+
+**Configuration**:
+
+1.  **Triggers**:
+    *   `ItemAdded`
+    *   `SeriesEpisodesAdded` (This is crucial for grouping)
+
+2.  **Execution Settings**:
+    *   **Executor Type**: `Python`
+    *   **Script Path**: `/path/to/your/scripts/discord_notification.py`
+
+3.  **Data Attributes**:
+    *   Create one **Environment** variable to hold your secret webhook URL:
+        *   **Name**: `DISCORD_WEBHOOK_URL`
+        *   **Source Field**: `Custom`
+        *   **Custom Value**: `https://discord.com/api/webhooks/your/webhook_url`
+        *   **Format**: `Environment`
+
+    No other data attributes are needed, as the script uses the full JSON payload that is passed automatically.
+
+**How It Works**:
+
+*   The `ItemAddedManager` in the plugin automatically buffers new items for a few seconds.
+*   If multiple episodes from the same series are detected, it fires a single `SeriesEpisodesAdded` event.
+*   If a single movie or episode is added, it fires an `ItemAdded` event.
+*   The `discord_notification.py` script receives the event data as a JSON object, checks if it's a grouped event or a single item, and formats the Discord message accordingly.
 
 ### Send Discord Notification on Playback
 

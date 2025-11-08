@@ -1,0 +1,300 @@
+name: Create Release
+
+# Trigger on version tags (e.g., v2.1.0.0)
+on:
+  push:
+    tags:
+      - 'v*'
+
+# Grant permissions to create releases, write contents, and push commits
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  validate-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Extract version from tag (v2.1.0.0 -> 2.1.0.0)
+      - name: Extract version from tag
+        id: version
+        run: |
+          TAG=${GITHUB_REF#refs/tags/v}
+          echo "version=$TAG" >> $GITHUB_OUTPUT
+          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          echo "Extracted version: $TAG"
+
+      # Validate version format (x.x.x.x)
+      - name: Validate version format
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          if ! [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: Invalid version format: $VERSION"
+            echo "Expected format: x.x.x.x (e.g., 2.1.0.0)"
+            exit 1
+          fi
+          echo "Version format valid: $VERSION"
+
+      # All releases use the same manifest
+      - name: Determine release type
+        id: release_type
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          echo "type=release" >> $GITHUB_OUTPUT
+          echo "prerelease=false" >> $GITHUB_OUTPUT
+          echo "Release type: RELEASE"
+
+      # Setup .NET 8.0
+      - name: Setup .NET 8.0
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # Verify Directory.Build.props exists and has correct version
+      - name: Verify version consistency
+        run: |
+          TAG_VERSION="${{ steps.version.outputs.version }}"
+          
+          if [ ! -f "Directory.Build.props" ]; then
+            echo "Error: Directory.Build.props not found"
+            echo "Please run 'make release' before tagging"
+            exit 1
+          fi
+          
+          # Extract version from Directory.Build.props
+          PROPS_VERSION=$(grep -oP '<Version>\K[0-9.]+' Directory.Build.props | head -1)
+          
+          echo "Tag version: $TAG_VERSION"
+          echo "Directory.Build.props version: $PROPS_VERSION"
+          
+          if [ "$TAG_VERSION" != "$PROPS_VERSION" ]; then
+            echo "Error: Version mismatch!"
+            echo "Tag version ($TAG_VERSION) does not match Directory.Build.props ($PROPS_VERSION)"
+            echo "Please run 'make release' with version $TAG_VERSION before tagging"
+            exit 1
+          fi
+          echo "Version consistency verified"
+
+      # Restore dependencies
+      - name: Restore dependencies
+        run: dotnet restore Jellyfin.Plugin.JellyPy.sln
+
+      # Build plugin (Release configuration)
+      - name: Build plugin
+        run: |
+          echo "Building plugin in Release mode..."
+          dotnet build Jellyfin.Plugin.JellyPy.sln --configuration Release --no-restore
+          echo "Build completed successfully"
+
+      # Publish plugin
+      - name: Publish plugin
+        run: |
+          echo "Publishing plugin..."
+          dotnet publish Jellyfin.Plugin.JellyPy/Jellyfin.Plugin.JellyPy.csproj \
+            --configuration Release \
+            --no-build \
+            --output ./publish
+          echo "Publish completed"
+
+      # Create release zip
+      - name: Create release package
+        id: package
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          ZIP_FILE="jellypy_${VERSION}.zip"
+          
+          echo "Creating release package: $ZIP_FILE"
+          
+          cd publish
+          
+          # Verify required files exist
+          if [ ! -f "Jellyfin.Plugin.JellyPy.dll" ]; then
+            echo "Error: Required file Jellyfin.Plugin.JellyPy.dll not found"
+            exit 1
+          fi
+          
+          # Create zip with only the plugin DLL
+          zip "../${ZIP_FILE}" Jellyfin.Plugin.JellyPy.dll
+          
+          cd ..
+          
+          # Verify zip was created
+          if [ ! -f "$ZIP_FILE" ]; then
+            echo "Error: Failed to create $ZIP_FILE"
+            exit 1
+          fi
+          
+          echo "zip_file=$ZIP_FILE" >> $GITHUB_OUTPUT
+          echo "Package created successfully: $ZIP_FILE"
+
+      # Calculate checksum
+      - name: Calculate checksum
+        id: checksum
+        run: |
+          ZIP_FILE="${{ steps.package.outputs.zip_file }}"
+          
+          # Calculate MD5 checksum
+          CHECKSUM=$(md5sum "$ZIP_FILE" | cut -d' ' -f1)
+          
+          echo "checksum=$CHECKSUM" >> $GITHUB_OUTPUT
+          echo "MD5 Checksum: $CHECKSUM"
+
+      # Validate package
+      - name: Validate package
+        run: |
+          ZIP_FILE="${{ steps.package.outputs.zip_file }}"
+          
+          echo "Validating package..."
+          
+          # Check file size
+          FILE_SIZE=$(stat -c%s "$ZIP_FILE")
+          FILE_SIZE_KB=$((FILE_SIZE / 1024))
+          
+          echo "Package size: ${FILE_SIZE_KB}KB"
+          
+          if [ $FILE_SIZE -lt 10000 ]; then
+            echo "Error: Package seems too small (${FILE_SIZE_KB}KB)"
+            exit 1
+          fi
+          
+          if [ $FILE_SIZE -gt 10485760 ]; then
+            echo "Warning: Package seems large (${FILE_SIZE_KB}KB)"
+          fi
+          
+          # List contents
+          echo "Package contents:"
+          unzip -l "$ZIP_FILE"
+          
+          echo "Package validation completed"
+
+      # Extract changelog from git tag annotation
+      - name: Extract changelog
+        id: changelog
+        run: |
+          # Get the tag annotation (this is what was in the -F file when creating the tag)
+          TAG="${{ steps.version.outputs.tag }}"
+          CHANGELOG=$(git tag -l --format='%(contents)' "$TAG" || echo "See CHANGELOG.md for details")
+          
+          if [ -z "$CHANGELOG" ]; then
+            CHANGELOG="See CHANGELOG.md for details"
+          fi
+          
+          # Escape for GitHub output
+          CHANGELOG="${CHANGELOG//'%'/'%25'}"
+          CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
+          CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
+          
+          echo "changelog=$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "Extracted changelog from git tag annotation"
+
+      # Create GitHub Release
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.package.outputs.zip_file }}
+          name: Release ${{ steps.version.outputs.tag }}
+          tag_name: ${{ steps.version.outputs.tag }}
+          body: |
+            ## JellyPy ${{ steps.version.outputs.version }}
+            
+            **Release Type:** ${{ steps.release_type.outputs.type == 'stable' && 'Stable' || 'Beta' }}
+            **MD5 Checksum:** `${{ steps.checksum.outputs.checksum }}`
+            
+            ### Download
+            - [jellypy_${{ steps.version.outputs.version }}.zip](${{ github.server_url }}/${{ github.repository }}/releases/download/${{ steps.version.outputs.tag }}/jellypy_${{ steps.version.outputs.version }}.zip)
+            
+            ### Installation
+            Add the repository URL to your Jellyfin plugin repositories:
+            - **Stable Channel:** `https://caleb-venner.github.io/jellypy/manifest.json`
+            - **Beta Channel:** `https://caleb-venner.github.io/jellypy/manifest-beta.json`
+            
+            ### Changes
+            ${{ steps.changelog.outputs.changelog }}
+            
+            ### Verification
+            Verify the download integrity:
+            ```bash
+            md5sum jellypy_${{ steps.version.outputs.version }}.zip
+            # Should output: ${{ steps.checksum.outputs.checksum }}
+            ```
+          prerelease: false
+          draft: false
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Automatically update manifest.json
+      - name: Update manifest.json
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          CHECKSUM="${{ steps.checksum.outputs.checksum }}"
+          CHANGELOG="${{ steps.changelog.outputs.changelog }}"
+          SOURCEURL="${{ github.server_url }}/${{ github.repository }}/releases/download/${{ steps.version.outputs.tag }}/jellypy_${{ steps.version.outputs.version }}.zip"
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          
+          # Format changelog for JSON (escape quotes and newlines)
+          CHANGELOG_JSON=$(echo "$CHANGELOG" | jq -Rs .)
+          
+          # Create new version entry
+          NEW_ENTRY=$(cat <<EOF
+          {
+            "version": "$VERSION",
+            "changelog": $CHANGELOG_JSON,
+            "targetAbi": "10.9.0.0",
+            "sourceUrl": "$SOURCEURL",
+            "checksum": "$CHECKSUM",
+            "timestamp": "$TIMESTAMP"
+          }
+          EOF
+          )
+          
+          # Read current manifest, add new entry at top of versions array
+          jq --argjson newEntry "$NEW_ENTRY" \
+            '.[0].versions = [$newEntry] + .[0].versions' \
+            manifest.json > manifest.json.tmp
+          
+          mv manifest.json.tmp manifest.json
+          
+          echo "✓ Updated manifest.json with version $VERSION"
+
+      # Commit and push manifest changes
+      - name: Commit and push manifest
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add manifest.json
+          
+          # Check if there are changes to commit
+          if git diff --staged --quiet; then
+            echo "No changes to manifest.json"
+            exit 0
+          fi
+          
+          git commit -m "Update manifest for v$VERSION"
+          git push origin main
+          
+          echo "✓ Pushed manifest.json update to main branch"
+
+      # Output summary
+      - name: Release Summary
+        run: |
+          echo "=========================================="
+          echo "RELEASE COMPLETED SUCCESSFULLY"
+          echo "=========================================="
+          echo "Version: ${{ steps.version.outputs.version }}"
+          echo "Package: ${{ steps.package.outputs.zip_file }}"
+          echo "Checksum: ${{ steps.checksum.outputs.checksum }}"
+          echo "Release URL: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ steps.version.outputs.tag }}"
+          echo "Manifest URL: https://caleb-venner.github.io/jellypy/manifest.json"
+          echo ""
+          echo "✓ manifest.json automatically updated and pushed"
+          echo "✓ GitHub Pages will deploy the updated manifest"
+          echo "✓ Users will see the new version in Jellyfin!"
+          echo "=========================================="

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Jellypy Plugin Release Script - STABLE RELEASES ONLY
-# This script automates the release process for stable versions (x.x.x.0)
-# For beta releases, use release-beta.sh
+# JellyPy Plugin Release Script
+# Simplified workflow: version -> build -> tag -> GitHub Actions -> manifest update
+# No more build.yaml dependency!
 
 set -e  # Exit on any error
 
@@ -35,339 +35,244 @@ print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
-# Function to get current version from build.yaml
-get_current_version() {
-    grep '^version:' build.yaml | sed 's/version: *"//' | sed 's/"//'
-}
-
-# Function to update version in build.yaml
-update_build_version() {
-    local new_version=$1
-    print_status "Updating build.yaml version to $new_version"
-    
-    # Create backup
-    cp build.yaml build.yaml.bak
-    
-    # Update version
-    sed -i.tmp "s/^version: \".*\"/version: \"$new_version\"/" build.yaml
-    rm build.yaml.tmp
-    
-    print_success "Updated build.yaml version to $new_version"
-}
-
-# Function to update version in .csproj file
-update_csproj_version() {
-    local new_version=$1
-    local csproj_file="Jellyfin.Plugin.Jellypy/Jellyfin.Plugin.Jellypy.csproj"
-    
-    if [ ! -f "$csproj_file" ]; then
-        print_warning "Could not find $csproj_file - skipping .csproj update"
-        return
-    fi
-    
-    print_status "Updating $csproj_file version to $new_version"
-    
-    # Create backup
-    cp "$csproj_file" "$csproj_file.bak"
-    
-    # Extract 3-digit version (remove .0 suffix for Version tag)
-    local short_version=$(echo "$new_version" | sed 's/\.0$//')
-    
-    # Update Version (3-digit), AssemblyVersion (4-digit), and FileVersion (4-digit)
-    sed -i.tmp "s|<Version>.*</Version>|<Version>$short_version</Version>|" "$csproj_file"
-    sed -i.tmp "s|<AssemblyVersion>.*</AssemblyVersion>|<AssemblyVersion>$new_version</AssemblyVersion>|" "$csproj_file"
-    sed -i.tmp "s|<FileVersion>.*</FileVersion>|<FileVersion>$new_version</FileVersion>|" "$csproj_file"
-    rm "$csproj_file.tmp"
-    
-    print_success "Updated $csproj_file versions (Version: $short_version, Assembly/File: $new_version)"
-}
-
-# Function to build the plugin
-build_plugin() {
-    print_status "Building plugin..."
-    
-    # Clean previous build
-    dotnet clean Jellyfin.Plugin.Jellypy.sln --configuration Release > /dev/null 2>&1
-    
-    # Build plugin
-    dotnet build Jellyfin.Plugin.Jellypy.sln --configuration Release
-    
-    if [ $? -eq 0 ]; then
-        print_success "Plugin built successfully"
-    else
-        print_error "Plugin build failed"
+# Function to validate version format
+validate_version() {
+    local version=$1
+    if [[ ! $version =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        print_error "Invalid version format: $version"
+        print_error "Expected format: x.x.x.x (e.g., 2.1.0.0)"
         exit 1
     fi
 }
 
-# Function to create release zip
-create_release_zip() {
-    local version=$1
-    local zip_file="releases/jellypy_$version.zip"
-    
-    print_status "Creating release zip: $zip_file"
-    
-    # Ensure releases directory exists
-    mkdir -p releases
-    
-    # Remove existing zip if it exists
-    if [ -f "$zip_file" ]; then
-        rm "$zip_file"
-        print_warning "Removed existing $zip_file"
+# Function to get current version from manifest.json
+get_current_version() {
+    if [ -f "manifest.json" ]; then
+        local version=$(jq -r '.[0].versions[0].version' manifest.json 2>/dev/null)
+        if [ "$version" != "null" ] && [ -n "$version" ]; then
+            echo "$version"
+            return 0
+        fi
     fi
+    echo "0.0.0.0"
+}
+
+# Function to update Directory.Build.props
+update_directory_build_props() {
+    local version=$1
     
-    # Create zip with only necessary files
-    cd Jellyfin.Plugin.Jellypy/bin/Release/net8.0
+    print_status "Updating Directory.Build.props with version $version..."
     
-    # Check if required files exist
-    required_files=("Jellyfin.Plugin.Jellypy.dll")
-    for file in "${required_files[@]}"; do
-        if [ ! -f "$file" ]; then
-            print_error "Required file $file not found in build output"
+    cat > "Directory.Build.props" << EOF
+<Project>
+    <PropertyGroup>
+        <Version>$version</Version>
+        <AssemblyVersion>$version</AssemblyVersion>
+        <FileVersion>$version</FileVersion>
+    </PropertyGroup>
+</Project>
+EOF
+    
+    print_success "Updated Directory.Build.props"
+}
+
+# Function to verify CHANGELOG.md has entry
+verify_changelog() {
+    local version=$1
+    
+    print_status "Checking CHANGELOG.md for version $version..."
+    
+    if ! grep -q "\[$version\]" CHANGELOG.md 2>/dev/null; then
+        print_warning "Version $version not found in CHANGELOG.md"
+        print_warning "Please add a changelog entry before releasing"
+        echo ""
+        echo -n "Continue anyway? [y/N]: "
+        read -r continue_without_changelog
+        
+        if [[ ! $continue_without_changelog =~ ^[Yy]$ ]]; then
+            print_error "Please update CHANGELOG.md before releasing"
             exit 1
         fi
-    done
-    
-    # Create zip with only the essential plugin DLL
-    # Include the plugin DLL and the repository thumb image so installs show the plugin icon
-    zip "../../../../$zip_file" \
-        Jellyfin.Plugin.Jellypy.dll \
-        "Jellyfin.Plugin.Jellypy/thumb.png" \
-        > /dev/null
-    
-    cd - > /dev/null
-    
-    if [ -f "$zip_file" ]; then
-        print_success "Created $zip_file"
     else
-        print_error "Failed to create $zip_file"
-        exit 1
+        print_success "CHANGELOG.md contains entry for version $version"
     fi
 }
 
-# Function to verify release
-verify_release() {
-    local version=$1
-    local zip_file="releases/jellypy_$version.zip"
+# Function to build and verify
+build_and_verify() {
+    print_status "Building plugin to verify compilation..."
     
-    print_status "Verifying release..."
-    
-    # Check file exists
-    if [ ! -f "$zip_file" ]; then
-        print_error "Release file $zip_file not found"
+    # Restore dependencies
+    if ! dotnet restore Jellyfin.Plugin.JellyPy.sln > /dev/null 2>&1; then
+        print_error "Failed to restore dependencies"
         exit 1
     fi
     
-    # Check file size (should be reasonable, not empty, not too large)
-    local file_size=$(stat -f%z "$zip_file" 2>/dev/null || stat -c%s "$zip_file" 2>/dev/null)
-    local file_size_kb=$((file_size / 1024))
-    
-    print_status "File size: ${file_size_kb}KB"
-    
-    if [ $file_size -lt 10000 ]; then  # Less than 10KB
-        print_error "Release file seems too small ($file_size_kb KB)"
+    # Build in Release mode
+    if ! dotnet build Jellyfin.Plugin.JellyPy.sln --configuration Release --no-restore > /dev/null 2>&1; then
+        print_error "Plugin build failed. Fix build errors before releasing."
         exit 1
     fi
     
-    if [ $file_size -gt 10485760 ]; then  # More than 10MB
-        print_warning "Release file seems large ($file_size_kb KB)"
-    fi
-    
-    # List contents of zip
-    print_status "Release contents:"
-    unzip -l "$zip_file"
-    
-    print_success "Release verification completed"
+    print_success "Plugin builds successfully"
 }
 
-# Function to calculate checksum
-calculate_checksum() {
+# Function to collect changelog text for GitHub release
+collect_changelog_text() {
     local version=$1
-    local zip_file="releases/jellypy_$version.zip"
+    local changelog_file=$(mktemp)
     
-    # Calculate MD5 checksum (without mixing output)
-    local checksum=""
-    if command -v md5sum >/dev/null 2>&1; then
-        checksum=$(md5sum "$zip_file" | cut -d' ' -f1)
-    elif command -v md5 >/dev/null 2>&1; then
-        checksum=$(md5 -q "$zip_file")
-    else
-        print_error "No MD5 utility found (tried md5sum and md5)"
+    echo ""
+    print_status "Enter release notes for version $version"
+    print_status "(These will be used for the GitHub release description)"
+    print_status "Press Ctrl+D when done, or Ctrl+C to cancel"
+    echo ""
+    
+    # Collect multi-line input
+    cat > "$changelog_file"
+    
+    # Check if anything was entered
+    if [ ! -s "$changelog_file" ]; then
+        print_error "No changelog text provided"
+        rm "$changelog_file"
         exit 1
     fi
     
-    echo "$checksum"
+    echo "$changelog_file"
 }
 
-# Function to update manifest checksum
-update_manifest_checksum() {
+# Function to show next steps
+show_next_steps() {
     local version=$1
-    local checksum=$2
-    local manifest_file="manifest.json"
-    
-    if [ ! -f "$manifest_file" ]; then
-        print_error "Manifest file $manifest_file not found"
-        exit 1
-    fi
-    
-    print_status "Updating checksum in $manifest_file"
-    
-    # Create backup
-    cp "$manifest_file" "$manifest_file.bak"
-    
-    # Update checksum for the specific version
-    # This is a bit complex as we need to update the right version entry
-    python3 -c "
-import json
-import sys
-
-try:
-    with open('$manifest_file', 'r') as f:
-        data = json.load(f)
-    
-    updated = False
-    for plugin in data:
-        for version in plugin['versions']:
-            if version['version'] == '$version':
-                version['checksum'] = '$checksum'
-                updated = True
-                print(f'Updated checksum for version $version')
-                break
-    
-    if not updated:
-        print(f'Version $version not found in manifest')
-        sys.exit(1)
-    
-    with open('$manifest_file', 'w') as f:
-        json.dump(data, f, indent=4)
-    
-    print('Manifest updated successfully')
-except Exception as e:
-    print(f'Error updating manifest: {e}')
-    sys.exit(1)
-"
-    
-    if [ $? -eq 0 ]; then
-        print_success "Updated checksum in $manifest_file"
-        rm "$manifest_file.bak"
-    else
-        print_error "Failed to update manifest"
-        mv "$manifest_file.bak" "$manifest_file"
-        exit 1
-    fi
-}
-
-# Function to show release summary
-show_release_summary() {
-    local version=$1
-    local checksum=$2
+    local changelog_file=$2
     
     echo ""
     echo "=========================================="
-    print_success "STABLE RELEASE SUMMARY"
+    print_success "RELEASE PREPARATION COMPLETE"
     echo "=========================================="
     echo "Version: $version"
-    echo "Type: STABLE"
-    echo "File: releases/jellypy_$version.zip"
-    echo "Checksum: $checksum"
-    echo "Download URL: https://raw.githubusercontent.com/caleb-venner/jellypy/main/releases/jellypy_$version.zip"
-    echo "Repository URL: https://caleb-venner.github.io/jellypy/manifest.json"
-    
     echo ""
-    echo "Next steps:"
-    echo "1. Review the changes with 'git diff'"
-    echo "2. Commit the changes: git add . && git commit -m 'Release v$version (stable)'"
-    echo "3. Push to GitHub: git push origin main"
-    echo "4. Plugin will be available immediately via repository URL"
-    echo "5. No GitHub release creation needed - files served from /releases directory"
+    echo "Files updated:"
+    echo "  • Directory.Build.props (version $version)"
+    echo "  • CHANGELOG.md (if updated)"
+    echo ""
+    echo "Release notes saved to: $changelog_file"
+    echo ""
+    echo "Next Steps:"
+    echo ""
+    echo "1. Review changes:"
+    echo "   git diff"
+    echo ""
+    echo "2. Commit version update:"
+    echo "   git add Directory.Build.props CHANGELOG.md"
+    echo "   git commit -m 'Prepare release v$version'"
+    echo ""
+    echo "3. Create and push tag:"
+    echo "   git tag -a v$version -F $changelog_file"
+    echo "   git push origin main"
+    echo "   git push origin v$version"
+    echo ""
+    echo "4. GitHub Actions will automatically:"
+    echo "   • Build the plugin"
+    echo "   • Create release package (jellypy_$version.zip)"
+    echo "   • Calculate MD5 checksum"
+    echo "   • Create GitHub Release with your changelog"
+    echo ""
+    echo "5. After GitHub Actions completes, update manifest.json:"
+    echo "   • Add new version entry at the TOP of the versions array"
+    echo "   • Use the checksum from GitHub Actions output"
+    echo "   • Set sourceUrl to:"
+    echo "     https://github.com/caleb-venner/jellypy/releases/download/v$version/jellypy_$version.zip"
+    echo ""
+    echo "6. Commit and push manifest.json to trigger deployment"
+    echo ""
     echo "=========================================="
+    print_warning "Remember: manifest.json is what Jellyfin actually reads!"
+    echo "=========================================="
+}
+
+# Function to generate manifest entry template
+generate_manifest_template() {
+    local version=$1
+    local changelog_file=$2
+    
+    local template_file="manifest-entry-$version.json"
+    
+    cat > "$template_file" << EOF
+{
+    "version": "$version",
+    "changelog": "YOUR_CHANGELOG_HERE (from GitHub Actions or $changelog_file)",
+    "targetAbi": "10.9.0.0",
+    "sourceUrl": "https://github.com/caleb-venner/jellypy/releases/download/v$version/jellypy_$version.zip",
+    "checksum": "CHECKSUM_FROM_GITHUB_ACTIONS",
+    "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+}
+EOF
+    
+    print_status "Manifest entry template saved to: $template_file"
+    echo ""
+    print_warning "After GitHub Actions completes:"
+    echo "  1. Copy checksum from GitHub Actions output"
+    echo "  2. Copy your changelog text"
+    echo "  3. Add this entry to TOP of manifest.json versions array"
+    echo "  4. Commit and push manifest.json"
 }
 
 # Main function
 main() {
-    print_status "Starting Jellypy STABLE release process..."
+    print_status "Starting JellyPy release preparation..."
     
     # Check if we're in the right directory
-    if [ ! -f "build.yaml" ]; then
-        print_error "build.yaml not found. Please run this script from the project root directory."
+    if [ ! -f "Jellyfin.Plugin.JellyPy.sln" ]; then
+        print_error "Solution file not found. Please run this script from the project root."
         exit 1
     fi
     
-    # Remind user to update changelog
-    echo ""
-    print_warning "⚠️  REMINDER: Have you updated CHANGELOG.md for this release?"
-    echo -n "Continue with release? [y/N]: "
-    read -r continue_release
+    # Get current version
+    local current_version=$(get_current_version)
+    print_status "Current version in manifest.json: $current_version"
     
-    if [[ ! $continue_release =~ ^[Yy]$ ]]; then
-        print_status "Release cancelled. Please update CHANGELOG.md and try again."
-        exit 0
-    fi
-    echo ""
-    
-    # Get version argument or current version
+    # Get new version
     local version=""
     if [ $# -eq 1 ]; then
         version=$1
         print_status "Using provided version: $version"
-        
-        # Update both build.yaml and .csproj with new version
-        update_build_version "$version"
-        update_csproj_version "$version"
     else
-        version=$(get_current_version)
-        print_status "Using current version from build.yaml: $version"
+        echo ""
+        echo -n "Enter new version (x.x.x.x format) [$current_version]: "
+        read -r new_version
         
-        # Ask if user wants to increment version
-        echo -n "Do you want to update the version? (current: $version) [y/N]: "
-        read -r update_version
-        
-        if [[ $update_version =~ ^[Yy]$ ]]; then
-            echo -n "Enter new version (x.x.x.x format): "
-            read -r new_version
-            
-            # Validate version format
-            if [[ ! $new_version =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-                print_error "Invalid version format. Use x.x.x.x format (e.g., 1.1.2.0)"
-                exit 1
-            fi
-            
+        if [ -z "$new_version" ]; then
+            version=$current_version
+        else
             version=$new_version
-            update_build_version "$version"
-            update_csproj_version "$version"
         fi
     fi
     
     # Validate version format
-    if [[ ! $version =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-        print_error "Invalid version format: $version. Use x.x.x.x format (e.g., 1.1.2.0)"
-        exit 1
-    fi
+    validate_version "$version"
     
-    # Validate this is a stable version (must end in .0)
-    if [[ ! $version =~ \.0$ ]]; then
-        print_error "This script is for stable releases only (must end in .0, e.g., 1.1.2.0)"
-        print_error "For beta releases (x.x.x.1-999), use release-beta.sh instead"
-        exit 1
-    fi
+    print_status "Preparing release for version $version"
     
-    print_status "Creating STABLE release for version $version"
+    # Update Directory.Build.props
+    update_directory_build_props "$version"
     
-    # Execute release steps
-    build_plugin
-    create_release_zip "$version"
-    verify_release "$version"
+    # Verify CHANGELOG.md
+    verify_changelog "$version"
     
-    print_status "Calculating MD5 checksum..."
-    local checksum=$(calculate_checksum "$version")
-    print_success "Checksum: $checksum"
+    # Build and verify
+    build_and_verify
     
-    update_manifest_checksum "$version" "$checksum"
+    # Collect changelog text
+    local changelog_file=$(collect_changelog_text "$version")
     
-    # Show summary
-    show_release_summary "$version" "$checksum"
+    # Generate manifest template
+    generate_manifest_template "$version" "$changelog_file"
     
-    print_success "Release process completed successfully!"
+    # Show next steps
+    show_next_steps "$version" "$changelog_file"
+    
+    print_success "Release preparation completed successfully!"
 }
 
 # Script entry point

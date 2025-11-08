@@ -80,42 +80,80 @@ public class ItemAddedManager : IItemAddedManager, IHostedService
 
     private async Task ProcessQueuedItemsAsync(CancellationToken cancellationToken)
     {
-        const int processingDelayMs = 2000; // Wait 2 seconds for bulk adds to complete
+        var config = Plugin.Instance.Configuration;
+        var processingDelayMs = config.ItemGroupingDelaySeconds * 1000;
         const int maxBatchSize = 50; // Process max 50 items per cycle
 
         while (!cancellationToken.IsCancellationRequested)
         {
             try
             {
-                await Task.Delay(processingDelayMs, cancellationToken).ConfigureAwait(false);
-
-                if (_itemQueue.IsEmpty)
+                if (config.EnableItemGrouping)
                 {
-                    continue;
+                    // Batch processing logic (grouping enabled)
+                    await Task.Delay(processingDelayMs, cancellationToken).ConfigureAwait(false);
+
+                    if (_itemQueue.IsEmpty)
+                    {
+                        continue;
+                    }
+
+                    var itemsToProcess = new List<QueuedItem>();
+                    while (itemsToProcess.Count < maxBatchSize && _itemQueue.TryRemove(_itemQueue.Keys.First(), out var queuedItem))
+                    {
+                        itemsToProcess.Add(queuedItem);
+                    }
+
+                    if (itemsToProcess.Count > 0)
+                    {
+                        await ProcessBatchAsync(itemsToProcess, cancellationToken).ConfigureAwait(false);
+                    }
                 }
-
-                var itemsToProcess = new List<QueuedItem>();
-                while (itemsToProcess.Count < maxBatchSize && _itemQueue.TryRemove(_itemQueue.Keys.First(), out var queuedItem))
+                else
                 {
-                    itemsToProcess.Add(queuedItem);
-                }
-
-                if (itemsToProcess.Count > 0)
-                {
-                    await ProcessBatchAsync(itemsToProcess, cancellationToken).ConfigureAwait(false);
+                    // Immediate processing logic (grouping disabled)
+                    if (_itemQueue.TryRemove(_itemQueue.Keys.First(), out var queuedItem))
+                    {
+                        await ProcessIndividualItemAsync(queuedItem.Item, cancellationToken).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        // If queue is empty, wait a bit before checking again
+                        await Task.Delay(100, cancellationToken).ConfigureAwait(false);
+                    }
                 }
             }
             catch (OperationCanceledException)
             {
                 break;
             }
-
-            // Generic catch intentional: ProcessBatchAsync can throw InvalidOperationException
-            // from GetRequiredService, plus any exception from handler implementation
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing queued items");
             }
+        }
+    }
+
+    private async Task ProcessIndividualItemAsync(BaseItem item, CancellationToken cancellationToken)
+    {
+        if (cancellationToken.IsCancellationRequested)
+        {
+            return;
+        }
+
+        try
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var handler = scope.ServiceProvider.GetRequiredService<ItemAddedHandler>();
+            await handler.HandleAsync(item).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error processing individual item: {ItemName} ({ItemId})",
+                item.Name,
+                item.Id);
         }
     }
 

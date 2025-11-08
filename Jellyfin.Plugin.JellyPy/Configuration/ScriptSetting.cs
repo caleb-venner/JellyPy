@@ -56,6 +56,11 @@ public class ScriptSetting
     /// Gets or sets the priority of this script (lower numbers = higher priority).
     /// </summary>
     public int Priority { get; set; } = 100;
+
+    /// <summary>
+    /// Gets or sets the execution mode for this script.
+    /// </summary>
+    public ExecutionMode ExecutionMode { get; set; } = ExecutionMode.JsonPayload;
 }
 
 /// <summary>
@@ -272,4 +277,20 @@ public enum DataAttributeFormat
     /// Pass as command line argument.
     /// </summary>
     Argument
+}
+
+/// <summary>
+/// Enumeration of script execution modes.
+/// </summary>
+public enum ExecutionMode
+{
+    /// <summary>
+    /// Send the full JSON payload as the first argument.
+    /// </summary>
+    JsonPayload,
+
+    /// <summary>
+    /// Only send the individual data attributes.
+    /// </summary>
+    Compatibility
 }

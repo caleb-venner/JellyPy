@@ -439,6 +439,26 @@
                         
                         <details open style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
                             <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
+                                Item Grouping
+                            </summary>
+                            <div style="padding: 15px;">
+                                <div class="checkboxContainer checkboxContainer-withDescription">
+                                    <label class="emby-checkbox-label">
+                                        <input id="EnableItemGrouping" name="EnableItemGrouping" type="checkbox" is="emby-checkbox" />
+                                        <span>Enable Item Grouping</span>
+                                    </label>
+                                    <div class="fieldDescription">Group items added in quick succession (e.g., a full season) into a single event to avoid spam.</div>
+                                </div>
+                                <div class="inputContainer">
+                                    <label class="inputLabel inputLabelUnfocused" for="ItemGroupingDelaySeconds">Grouping Delay (seconds)</label>
+                                    <input id="ItemGroupingDelaySeconds" name="ItemGroupingDelaySeconds" type="number" is="emby-input" min="1" max="60" />
+                                    <div class="fieldDescription">Time to wait for more items before processing a group (default: 2 seconds).</div>
+                                </div>
+                            </div>
+                        </details>
+
+                        <details open style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
+                            <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
                                 Logging
                             </summary>
                             <div style="padding: 15px;">
@@ -486,7 +506,8 @@
                         TimeoutSeconds: 300
                     },
                     DataAttributes: [],
-                    Priority: 100
+                    Priority: 100,
+                    ExecutionMode: 0 // JsonPayload
                 };
                 
                 JellyPyConfig.scriptSettings.push(newScript);
@@ -665,6 +686,9 @@
                 document.getElementById('script-enabled').checked = script.Enabled;
                 document.getElementById('script-enabled').onchange = function() { updateScriptProperty('Enabled', this.checked); };
                 
+                document.getElementById('execution-mode').value = script.ExecutionMode;
+                document.getElementById('execution-mode').onchange = function() { updateScriptProperty('ExecutionMode', parseInt(this.value)); };
+                
                 // Populate sections using existing render functions
                 document.getElementById('triggerCheckboxes').innerHTML = renderTriggerCheckboxes(script.Triggers);
                 document.getElementById('executionSettingsContent').innerHTML = renderExecutionSettings(script.Execution);
@@ -771,6 +795,14 @@
                         '<input id="additional-arguments" type="text" is="emby-input" ' +
                                'value="' + escapeHtml(execution.AdditionalArguments) + '" onchange="updateExecutionProperty(\'AdditionalArguments\', this.value)" />' +
                         '<div class="fieldDescription">Extra command line arguments (optional)</div>' +
+                    '</div>' +
+                    '<div class="inputContainer">' +
+                        '<label class="inputLabel inputLabelUnfocused" for="execution-mode">Execution Mode</label>' +
+                        '<select id="execution-mode" is="emby-select">' +
+                            '<option value="0">JSON Payload</option>' +
+                            '<option value="1">Compatibility</option>' +
+                        '</select>' +
+                        '<div class="fieldDescription">"JSON Payload" sends the full event data as the first argument. "Compatibility" only sends individual data attributes.</div>' +
                     '</div>';
                 return html;
             }
@@ -1303,6 +1335,10 @@
                         document.querySelector('#QueueSize').value = globalSettings.QueueSize || 100;
                         document.querySelector('#EnableVerboseLogging').checked = globalSettings.EnableVerboseLogging || false;
 
+                        // Load item grouping settings
+                        document.querySelector('#EnableItemGrouping').checked = config.EnableItemGrouping !== undefined ? config.EnableItemGrouping : true;
+                        document.querySelector('#ItemGroupingDelaySeconds').value = config.ItemGroupingDelaySeconds || 2;
+
                         // Load native integration settings
                         document.querySelector('#EnableNativeSonarrIntegration').checked = config.EnableNativeSonarrIntegration !== undefined ? config.EnableNativeSonarrIntegration : true;
                         document.querySelector('#SonarrUrl').value = config.SonarrUrl || '';
@@ -1361,6 +1397,10 @@
                     config.GlobalSettings.DefaultTimeoutSeconds = parseInt(document.querySelector('#DefaultTimeoutSeconds').value || 300, 10);
                     config.GlobalSettings.QueueSize = parseInt(document.querySelector('#QueueSize').value || 100, 10);
                     config.GlobalSettings.EnableVerboseLogging = document.querySelector('#EnableVerboseLogging').checked;
+
+                    // Save item grouping settings
+                    config.EnableItemGrouping = document.querySelector('#EnableItemGrouping').checked;
+                    config.ItemGroupingDelaySeconds = parseInt(document.querySelector('#ItemGroupingDelaySeconds').value || 2, 10);
 
                     // Save native integration settings
                     config.EnableNativeSonarrIntegration = document.querySelector('#EnableNativeSonarrIntegration').checked;

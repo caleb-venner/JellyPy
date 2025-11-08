@@ -50,6 +50,10 @@ public class PluginConfiguration : BasePluginConfiguration
         UnmonitorOnlyIfWatched = false;
         MinimumWatchPercentage = 90;
         UnmonitorAfterUpgrade = false;
+
+        // Item grouping settings
+        EnableItemGrouping = true;
+        ItemGroupingDelaySeconds = 2;
     }
 
     /// <summary>
@@ -63,7 +67,7 @@ public class PluginConfiguration : BasePluginConfiguration
     /// </summary>
     [System.Text.Json.Serialization.JsonIgnore]
     [System.Xml.Serialization.XmlIgnore]
-    public static string ScriptsDirectory => Path.Join(AppContext.BaseDirectory, "scripts");
+    public static string ScriptsDirectory { get; set; } = string.Empty;
 
     // Legacy configuration properties (maintained for backward compatibility)
 
@@ -341,6 +345,17 @@ public class PluginConfiguration : BasePluginConfiguration
     /// Gets or sets global settings for script execution.
     /// </summary>
     public GlobalScriptSettings GlobalSettings { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to enable item grouping.
+    /// When enabled, items added in quick succession will be grouped into a single event.
+    /// </summary>
+    public bool EnableItemGrouping { get; set; }
+
+    /// <summary>
+    /// Gets or sets the delay in seconds to wait for more items before processing a group.
+    /// </summary>
+    public int ItemGroupingDelaySeconds { get; set; }
 
     /// <summary>
     /// Ensures API keys are properly encrypted before saving.

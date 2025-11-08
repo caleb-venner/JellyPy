@@ -37,12 +37,8 @@ help: ## Show this help message
 check-dotnet: ## Check if dotnet is installed
 	@command -v dotnet >/dev/null 2>&1 || { echo "$(RED)❌ dotnet is not installed$(NC)"; exit 1; }
 
-.PHONY: generate-version
-generate-version: ## Generate Directory.Build.props from build.yaml
-	@bash scripts/generate-version.sh
-
 .PHONY: restore
-restore: check-dotnet generate-version ## Restore NuGet packages
+restore: check-dotnet ## Restore NuGet packages
 	@echo "$(YELLOW)📦 Restoring NuGet packages...$(NC)"
 	@dotnet restore $(SOLUTION_FILE)
 
@@ -113,10 +109,10 @@ clean: ## Clean all build artifacts
 	@echo "$(GREEN)✅ Clean complete!$(NC)"
 
 .PHONY: release
-release: dev ## Create a plugin package for distribution
-	@echo "$(YELLOW)📦 Creating release with scripts/release.sh...$(NC)"
+release: ## Prepare version for automated GitHub Actions release
+	@echo "$(YELLOW)📦 Preparing release with scripts/release.sh...$(NC)"
 	@bash scripts/release.sh
-	@echo "$(GREEN)✅ Release complete!$(NC)"
+	@echo "$(GREEN)✅ Release preparation complete!$(NC)"
 
 .PHONY: info
 info: ## Show project information
