@@ -170,15 +170,27 @@
                                         </details>
 
                                         <!-- Execution Settings -->
-                                        <details style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
+                                        <details open style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
                                             <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
                                                 Execution Settings
                                             </summary>
-                                            <div style="padding: 15px;" id="executionSettingsContent"></div>
+                                            <div style="padding: 15px;" id="executionSettingsContent">
+                                                <!-- Content will be rendered by JavaScript -->
+                                            </div>
+                                            <div style="padding: 15px;">
+                                                <div class="inputContainer">
+                                                    <label class="inputLabel inputLabelUnfocused" for="execution-mode">Execution Mode</label>
+                                                    <select id="execution-mode" is="emby-select">
+                                                        <option value="0">JSON Payload</option>
+                                                        <option value="1">Compatibility</option>
+                                                    </select>
+                                                    <div class="fieldDescription">"JSON Payload" sends the full event data as the first argument. "Compatibility" only sends individual data attributes.</div>
+                                                </div>
+                                            </div>
                                         </details>
 
                                         <!-- Event Triggers -->
-                                        <details style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
+                                        <details open style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
                                             <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
                                                 Event Triggers
                                             </summary>
@@ -191,7 +203,7 @@
                                         </details>
 
                                         <!-- Execution Conditions -->
-                                        <details style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
+                                        <details open style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
                                             <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
                                                 Execution Conditions
                                             </summary>
@@ -205,7 +217,7 @@
                                         </details>
 
                                         <!-- Data Attributes -->
-                                        <details style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
+                                        <details open style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
                                             <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
                                                 Data Attributes
                                             </summary>
@@ -685,7 +697,7 @@
                 
                 document.getElementById('script-enabled').checked = script.Enabled;
                 document.getElementById('script-enabled').onchange = function() { updateScriptProperty('Enabled', this.checked); };
-                
+
                 document.getElementById('execution-mode').value = script.ExecutionMode;
                 document.getElementById('execution-mode').onchange = function() { updateScriptProperty('ExecutionMode', parseInt(this.value)); };
                 
@@ -795,15 +807,8 @@
                         '<input id="additional-arguments" type="text" is="emby-input" ' +
                                'value="' + escapeHtml(execution.AdditionalArguments) + '" onchange="updateExecutionProperty(\'AdditionalArguments\', this.value)" />' +
                         '<div class="fieldDescription">Extra command line arguments (optional)</div>' +
-                    '</div>' +
-                    '<div class="inputContainer">' +
-                        '<label class="inputLabel inputLabelUnfocused" for="execution-mode">Execution Mode</label>' +
-                        '<select id="execution-mode" is="emby-select">' +
-                            '<option value="0">JSON Payload</option>' +
-                            '<option value="1">Compatibility</option>' +
-                        '</select>' +
-                        '<div class="fieldDescription">"JSON Payload" sends the full event data as the first argument. "Compatibility" only sends individual data attributes.</div>' +
                     '</div>';
+                
                 return html;
             }
 

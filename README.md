@@ -2,7 +2,9 @@
 
 ![JellyPy banner](Jellyfin.Plugin.JellyPy/assets/jellypy-banner-purple.png)
 
-[![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Jellyfin 10.9+](https://img.shields.io/badge/Jellyfin-10.9+-aa5cc3)](https://jellyfin.org/) [![.NET 8.0](https://img.shields.io/badge/.NET-8.0-purple)](https://dotnet.microsoft.com/)
+[![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Jellyfin 10.9+](https://img.shields.io/badge/Jellyfin-10.9+-aa5cc3)](https://jellyfin.org/)
+[![.NET 8.0](https://img.shields.io/badge/.NET-8.0-purple)](https://dotnet.microsoft.com/)
 
 A Jellyfin plugin that automatically updates your Sonarr and Radarr monitoring
 based on what you watch. Keep your media organised and automatic without manual intervention.
@@ -29,9 +31,10 @@ quality target
 
 ### Custom Script Execution
 
-- Execute Python scripts on Jellyfin events
+- Execute Python, Bash, or binary scripts on Jellyfin events
 - Flexible event triggers (PlaybackStart, PlaybackStop, etc.)
-- Custom environment variables and data attributes
+- **Default JSON Payload**: All event data is passed to your script as a single JSON object by default.
+- **Custom Data Attributes**: Optionally, configure specific data attributes to be passed as environment variables or command-line arguments.
 - Conditional execution based on media properties
 
 ### Security & Configuration

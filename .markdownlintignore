@@ -14,5 +14,3 @@ pub/
 # Ignore example and external scripts
 examples/
 config/data/plugins/Jellypy/scripts/
-/scripts/
- 

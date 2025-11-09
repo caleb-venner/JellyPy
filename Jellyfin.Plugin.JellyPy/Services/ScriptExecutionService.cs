@@ -103,7 +103,15 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
     {
         try
         {
-            var (arguments, environmentVariables) = _dataAttributeProcessor.ProcessDataAttributes(setting.DataAttributes, eventData);
+            var arguments = new List<string>();
+            var environmentVariables = new Dictionary<string, string>();
+
+            var useJsonPayload = setting.ExecutionMode == ExecutionMode.JsonPayload || !setting.DataAttributes.Any();
+
+            if (!useJsonPayload)
+            {
+                (arguments, environmentVariables) = _dataAttributeProcessor.ProcessDataAttributes(setting.DataAttributes, eventData);
+            }
 
             var executorPath = GetExecutorPath(setting.Execution.ExecutorType, setting.Execution.ExecutablePath);
             if (string.IsNullOrEmpty(executorPath))
@@ -124,17 +132,19 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
             // Add script path as first argument
             startInfo.ArgumentList.Add(setting.Execution.ScriptPath);
 
-            if (setting.ExecutionMode == ExecutionMode.JsonPayload)
+            if (useJsonPayload)
             {
                 // Add EventData as JSON argument
                 var eventDataJson = JsonSerializer.Serialize(eventData, new JsonSerializerOptions { WriteIndented = false });
                 startInfo.ArgumentList.Add(eventDataJson);
             }
-
-            // Add processed arguments
-            foreach (var argument in arguments)
+            else
             {
-                startInfo.ArgumentList.Add(argument);
+                // Add processed arguments
+                foreach (var argument in arguments)
+                {
+                    startInfo.ArgumentList.Add(argument);
+                }
             }
 
             // Add custom arguments
