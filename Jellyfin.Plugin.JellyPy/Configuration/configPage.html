@@ -138,10 +138,12 @@
                                     
                                     <!-- Script Form (hidden by default) -->
                                     <div id="scriptForm" style="display: none;">
-                                        
-                                        
+                                        <div class="fieldDescription" style="margin-bottom: 12px; color: #b0b0b0;">
+                                            Expand sections to edit settings. Sections stay collapsed by default for quicker scanning.
+                                        </div>
+
                                         <!-- Basic Information -->
-                                        <details open style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
+                                        <details style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
                                             <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
                                                 Basic Information
                                             </summary>
@@ -170,7 +172,7 @@
                                         </details>
 
                                         <!-- Execution Settings -->
-                                        <details open style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
+                                        <details style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
                                             <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
                                                 Execution Settings
                                             </summary>
@@ -190,7 +192,7 @@
                                         </details>
 
                                         <!-- Event Triggers -->
-                                        <details open style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
+                                        <details style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
                                             <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
                                                 Event Triggers
                                             </summary>
@@ -203,7 +205,7 @@
                                         </details>
 
                                         <!-- Execution Conditions -->
-                                        <details open style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
+                                        <details style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
                                             <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
                                                 Execution Conditions
                                             </summary>
@@ -217,7 +219,7 @@
                                         </details>
 
                                         <!-- Data Attributes -->
-                                        <details open style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
+                                        <details style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
                                             <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
                                                 Data Attributes
                                             </summary>
@@ -375,114 +377,82 @@
 
                     <!-- Global Settings Tab -->
                     <div id="global-tab" class="tab-content" style="display: none;">
-                        <div class="section-title" style="margin-bottom: 20px;">Global Execution Settings</div>
-                        
-                        <details open style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
-                            <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
-                                Interpreter Paths
-                            </summary>
-                            <div style="padding: 15px;">
-                                <div class="inputContainer">
-                                    <label class="inputLabel inputLabelUnfocused" for="PythonExecutablePath">Python Executable Path</label>
-                                    <input id="PythonExecutablePath" name="PythonExecutablePath" type="text" is="emby-input" placeholder="/usr/bin/python3" />
-                                    <div class="fieldDescription">Path to the Python interpreter executable. Example: /usr/bin/python3</div>
-                                </div>
-                                <div class="inputContainer" style="margin-top: 15px;">
-                                    <button id="testPythonExecutable" type="button" is="emby-button" class="raised button-submit" style="margin-bottom: 10px; padding: 10px 20px; font-size: 14px; min-height: 40px;">
-                                        <span id="testPythonExecText">Test Python Path</span>
-                                    </button>
-                                    <div id="pythonExecTestResult" class="fieldDescription" style="display: none; font-weight: bold;"></div>
-                                </div>
-                                <div class="inputContainer" style="margin-top: 20px;">
-                                    <label class="inputLabel inputLabelUnfocused" for="BashExecutablePath">Bash Executable Path</label>
-                                    <input id="BashExecutablePath" name="BashExecutablePath" type="text" is="emby-input" placeholder="/bin/bash" />
-                                    <div class="fieldDescription">Path to the Bash interpreter executable. Example: /bin/bash</div>
-                                </div>
-                                <div class="inputContainer" style="margin-top: 15px;">
-                                    <button id="testBashExecutable" type="button" is="emby-button" class="raised button-submit" style="margin-bottom: 10px; padding: 10px 20px; font-size: 14px; min-height: 40px;">
-                                        <span id="testBashExecText">Test Bash Path</span>
-                                    </button>
-                                    <div id="bashExecTestResult" class="fieldDescription" style="display: none; font-weight: bold;"></div>
-                                </div>
-                            </div>
-                        </details>
-                        
-                        <details open style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
-                            <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
-                                Script Directory
-                            </summary>
-                            <div style="padding: 15px;">
-                                <div class="inputContainer">
-                                    <label class="inputLabel inputLabelUnfocused" for="CustomScriptsDirectory">Scripts Directory Path</label>
-                                    <input id="CustomScriptsDirectory" name="CustomScriptsDirectory" type="text" is="emby-input" placeholder="/path/to/scripts" />
-                                    <div class="fieldDescription">The directory to scan for .py and .sh script files. Leave empty to use the default plugin scripts directory.</div>
-                                </div>
-                                <div class="inputContainer" style="margin-top: 15px;">
-                                    <button id="testScriptsDirectory" type="button" is="emby-button" class="raised button-submit" style="margin-bottom: 10px; padding: 10px 20px; font-size: 14px; min-height: 40px;">
-                                        <span id="testScriptsDirText">Test Scripts Directory</span>
-                                    </button>
-                                    <div id="scriptsDirTestResult" class="fieldDescription" style="display: none; font-weight: bold;"></div>
-                                </div>
-                            </div>
-                        </details>
-                        
-                        <details open style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
-                            <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
-                                Execution Limits
-                            </summary>
-                            <div style="padding: 15px;">
-                                <div class="inputContainer">
-                                    <label class="inputLabel inputLabelUnfocused" for="MaxConcurrentExecutions">Max concurrent executions</label>
-                                    <input id="MaxConcurrentExecutions" name="MaxConcurrentExecutions" type="number" is="emby-input" min="1" max="20" />
-                                    <div class="fieldDescription">Maximum number of scripts that can run simultaneously.</div>
-                                </div>
-                                <div class="inputContainer">
-                                    <label class="inputLabel inputLabelUnfocused" for="DefaultTimeoutSeconds">Default timeout (seconds)</label>
-                                    <input id="DefaultTimeoutSeconds" name="DefaultTimeoutSeconds" type="number" is="emby-input" min="30" />
-                                    <div class="fieldDescription">Default timeout for script execution when not specified in individual settings.</div>
-                                </div>
-                                <div class="inputContainer">
-                                    <label class="inputLabel inputLabelUnfocused" for="QueueSize">Queue size</label>
-                                    <input id="QueueSize" name="QueueSize" type="number" is="emby-input" min="10" />
-                                    <div class="fieldDescription">Maximum number of pending script executions to queue.</div>
-                                </div>
-                            </div>
-                        </details>
-                        
-                        <details open style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
-                            <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
-                                Item Grouping
-                            </summary>
-                            <div style="padding: 15px;">
-                                <div class="checkboxContainer checkboxContainer-withDescription">
-                                    <label class="emby-checkbox-label">
-                                        <input id="EnableItemGrouping" name="EnableItemGrouping" type="checkbox" is="emby-checkbox" />
-                                        <span>Enable Item Grouping</span>
-                                    </label>
-                                    <div class="fieldDescription">Group items added in quick succession (e.g., a full season) into a single event to avoid spam.</div>
-                                </div>
-                                <div class="inputContainer">
-                                    <label class="inputLabel inputLabelUnfocused" for="ItemGroupingDelaySeconds">Grouping Delay (seconds)</label>
-                                    <input id="ItemGroupingDelaySeconds" name="ItemGroupingDelaySeconds" type="number" is="emby-input" min="1" max="60" />
-                                    <div class="fieldDescription">Time to wait for more items before processing a group (default: 2 seconds).</div>
-                                </div>
-                            </div>
-                        </details>
+                        <div class="section-title" style="margin-bottom: 12px;">Global Settings</div>
+                        <div class="fieldDescription" style="margin-bottom: 18px;">Shared settings for all scripts. These stay visible for quick access.</div>
 
-                        <details open style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
-                            <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
-                                Logging
-                            </summary>
-                            <div style="padding: 15px;">
-                                <div class="checkboxContainer checkboxContainer-withDescription">
-                                    <label class="emby-checkbox-label">
-                                        <input id="EnableVerboseLogging" name="EnableVerboseLogging" type="checkbox" is="emby-checkbox" />
-                                        <span>Enable verbose logging</span>
-                                    </label>
-                                    <div class="fieldDescription">Log detailed information about script execution for debugging.</div>
-                                </div>
+                        <div style="border: 1px solid #444; border-radius: 4px; padding: 16px; margin-bottom: 18px; background: rgba(0, 0, 0, 0.15);">
+                            <div style="font-weight: bold; font-size: 16px; margin-bottom: 10px;">Paths</div>
+                            <div class="inputContainer">
+                                <label class="inputLabel inputLabelUnfocused" for="PythonExecutablePath">Python Executable Path</label>
+                                <input id="PythonExecutablePath" name="PythonExecutablePath" type="text" is="emby-input" placeholder="/usr/bin/python3" />
+                                <div class="fieldDescription">Path to the Python interpreter executable. Example: /usr/bin/python3</div>
                             </div>
-                        </details>
+                            <div class="inputContainer" style="margin-top: 12px;">
+                                <button id="testPythonExecutable" type="button" is="emby-button" class="raised button-submit" style="margin-bottom: 10px; padding: 10px 20px; font-size: 14px; min-height: 40px;">
+                                    <span id="testPythonExecText">Test Python Path</span>
+                                </button>
+                                <div id="pythonExecTestResult" class="fieldDescription" style="display: none; font-weight: bold;"></div>
+                            </div>
+                            <div class="inputContainer" style="margin-top: 16px;">
+                                <label class="inputLabel inputLabelUnfocused" for="BashExecutablePath">Bash Executable Path</label>
+                                <input id="BashExecutablePath" name="BashExecutablePath" type="text" is="emby-input" placeholder="/bin/bash" />
+                                <div class="fieldDescription">Path to the Bash interpreter executable. Example: /bin/bash</div>
+                            </div>
+                            <div class="inputContainer" style="margin-top: 12px;">
+                                <button id="testBashExecutable" type="button" is="emby-button" class="raised button-submit" style="margin-bottom: 10px; padding: 10px 20px; font-size: 14px; min-height: 40px;">
+                                    <span id="testBashExecText">Test Bash Path</span>
+                                </button>
+                                <div id="bashExecTestResult" class="fieldDescription" style="display: none; font-weight: bold;"></div>
+                            </div>
+                            <div class="inputContainer" style="margin-top: 16px;">
+                                <label class="inputLabel inputLabelUnfocused" for="CustomScriptsDirectory">Scripts Directory Path</label>
+                                <input id="CustomScriptsDirectory" name="CustomScriptsDirectory" type="text" is="emby-input" placeholder="/path/to/scripts" />
+                                <div class="fieldDescription">Directory to scan for .py and .sh files. Leave empty to use the default plugin scripts directory.</div>
+                            </div>
+                            <div class="inputContainer" style="margin-top: 12px;">
+                                <button id="testScriptsDirectory" type="button" is="emby-button" class="raised button-submit" style="margin-bottom: 10px; padding: 10px 20px; font-size: 14px; min-height: 40px;">
+                                    <span id="testScriptsDirText">Test Scripts Directory</span>
+                                </button>
+                                <div id="scriptsDirTestResult" class="fieldDescription" style="display: none; font-weight: bold;"></div>
+                            </div>
+                        </div>
+
+                        <div style="border: 1px solid #444; border-radius: 4px; padding: 16px; margin-bottom: 18px; background: rgba(0, 0, 0, 0.15);">
+                            <div style="font-weight: bold; font-size: 16px; margin-bottom: 10px;">Scripts</div>
+                            <div class="inputContainer">
+                                <label class="inputLabel inputLabelUnfocused" for="MaxConcurrentExecutions">Max concurrent executions</label>
+                                <input id="MaxConcurrentExecutions" name="MaxConcurrentExecutions" type="number" is="emby-input" min="1" max="20" />
+                                <div class="fieldDescription">Maximum number of scripts that can run simultaneously.</div>
+                            </div>
+                            <div class="inputContainer" style="margin-top: 12px;">
+                                <label class="inputLabel inputLabelUnfocused" for="DefaultTimeoutSeconds">Default timeout (seconds)</label>
+                                <input id="DefaultTimeoutSeconds" name="DefaultTimeoutSeconds" type="number" is="emby-input" min="30" />
+                                <div class="fieldDescription">Fallback timeout when an individual script has no custom timeout.</div>
+                            </div>
+                            <div class="checkboxContainer checkboxContainer-withDescription" style="margin-top: 14px;">
+                                <label class="emby-checkbox-label">
+                                    <input id="EnableItemGrouping" name="EnableItemGrouping" type="checkbox" is="emby-checkbox" />
+                                    <span>Enable Item Grouping</span>
+                                </label>
+                                <div class="fieldDescription">Group items added in quick succession (e.g., a full season) into a single event to avoid spam.</div>
+                            </div>
+                            <div class="inputContainer" style="margin-top: 12px;">
+                                <label class="inputLabel inputLabelUnfocused" for="ItemGroupingDelaySeconds">Grouping Delay (seconds)</label>
+                                <input id="ItemGroupingDelaySeconds" name="ItemGroupingDelaySeconds" type="number" is="emby-input" min="1" max="60" />
+                                <div class="fieldDescription">Time to wait for more items before processing a group (default: 2 seconds).</div>
+                            </div>
+                        </div>
+
+                        <div style="border: 1px solid #444; border-radius: 4px; padding: 16px; margin-bottom: 18px; background: rgba(0, 0, 0, 0.15);">
+                            <div style="font-weight: bold; font-size: 16px; margin-bottom: 10px;">General</div>
+                            <div class="checkboxContainer checkboxContainer-withDescription">
+                                <label class="emby-checkbox-label">
+                                    <input id="EnableVerboseLogging" name="EnableVerboseLogging" type="checkbox" is="emby-checkbox" />
+                                    <span>Enable verbose logging</span>
+                                </label>
+                                <div class="fieldDescription">Log detailed information about script execution for debugging.</div>
+                            </div>
+                        </div>
                     </div>
 
                     <div style="margin-top: 30px;">
@@ -512,8 +482,7 @@
                     Conditions: [],
                     Execution: {
                         ExecutorType: 0, // Python
-                        ScriptPath: '',
-                        WorkingDirectory: '',
+                        ScriptName: '',
                         AdditionalArguments: '',
                         TimeoutSeconds: 300
                     },
@@ -523,9 +492,9 @@
                 };
                 
                 JellyPyConfig.scriptSettings.push(newScript);
+                JellyPyConfig.selectedScriptId = newScript.Id;
                 renderScriptList();
-                // Don't auto-select the new script - let user click it
-                // This prevents form state issues and jumbling
+                renderScriptDetails();
             }
 
             function deleteScript(scriptId) {
@@ -709,6 +678,15 @@
                 
                 // Load available scripts into the dropdown after rendering
                 loadAvailableScripts();
+
+                // Collapse all detail sections by default for readability
+                collapseScriptSections();
+            }
+
+            function collapseScriptSections() {
+                document.querySelectorAll('#scriptForm details').forEach(function(section) {
+                    section.open = false;
+                });
             }
 
             function updateScriptProperty(property, value) {
@@ -776,38 +754,35 @@
                     executorOptions += '<option value="' + type.value + '" ' + selected + '>' + type.label + '</option>';
                 });
                 
-                var html = '<div class="form-row">' +
-                        '<div class="form-col">' +
-                            '<label class="inputLabel inputLabelUnfocused" for="executor-type">Executor</label>' +
-                            '<select id="executor-type" is="emby-select" onchange="updateExecutionProperty(\'ExecutorType\', parseInt(this.value))">' +
-                                executorOptions +
-                            '</select>' +
-                            '<div class="fieldDescription">Select Python or Bash. Executable paths are configured in Global Settings.</div>' +
-                        '</div>' +
-                        '<div class="form-col">' +
-                            '<label class="inputLabel inputLabelUnfocused" for="timeout-seconds">Timeout (seconds)</label>' +
-                            '<input id="timeout-seconds" type="number" is="emby-input" min="30" max="3600" ' +
-                                   'value="' + execution.TimeoutSeconds + '" onchange="updateExecutionProperty(\'TimeoutSeconds\', parseInt(this.value))" />' +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="inputContainer">' +
-                        '<label class="inputLabel inputLabelUnfocused" for="script-path">Script</label>' +
-                        '<select id="script-path" is="emby-select" onchange="updateExecutionProperty(\'ScriptPath\', this.value)">' +
-                            '<option value="">Select a script file...</option>' +
-                        '</select>' +
-                    '</div>' +
-                    '<div class="inputContainer">' +
-                        '<label class="inputLabel inputLabelUnfocused" for="working-directory">Working Directory</label>' +
-                        '<input id="working-directory" type="text" is="emby-input" ' +
-                               'value="' + escapeHtml(execution.WorkingDirectory) + '" onchange="updateExecutionProperty(\'WorkingDirectory\', this.value)" />' +
-                        '<div class="fieldDescription">Directory to run the script from (optional)</div>' +
-                    '</div>' +
-                    '<div class="inputContainer">' +
-                        '<label class="inputLabel inputLabelUnfocused" for="additional-arguments">Additional Arguments</label>' +
-                        '<input id="additional-arguments" type="text" is="emby-input" ' +
-                               'value="' + escapeHtml(execution.AdditionalArguments) + '" onchange="updateExecutionProperty(\'AdditionalArguments\', this.value)" />' +
-                        '<div class="fieldDescription">Extra command line arguments (optional)</div>' +
-                    '</div>';
+                var html = '';
+                html += '<div class="form-row">';
+                html +=   '<div class="form-col">';
+                html +=     '<label class="inputLabel inputLabelUnfocused" for="executor-type">Executor</label>';
+                html +=     '<select id="executor-type" is="emby-select" onchange="updateExecutionProperty(\'ExecutorType\', parseInt(this.value))">';
+                html +=       executorOptions;
+                html +=     '</select>';
+                html +=     '<div class="fieldDescription">Select Python or Bash. Executable paths are configured in Global Settings.</div>';
+                html +=   '</div>';
+                html +=   '<div class="form-col">';
+                html +=     '<label class="inputLabel inputLabelUnfocused" for="timeout-seconds">Timeout (seconds)</label>';
+                html +=     '<input id="timeout-seconds" type="number" is="emby-input" min="30" max="3600" ' +
+                           'value="' + execution.TimeoutSeconds + '" onchange="updateExecutionProperty(\'TimeoutSeconds\', parseInt(this.value))" />';
+                html +=   '</div>';
+                html += '</div>';
+
+                html += '<div class="inputContainer">';
+                html +=   '<label class="inputLabel inputLabelUnfocused" for="script-path">Script</label>';
+                html +=   '<select id="script-path" is="emby-select" onchange="updateExecutionProperty(\'ScriptName\', this.value)">';
+                html +=     '<option value="">Select a script file...</option>';
+                html +=   '</select>';
+                html += '</div>';
+
+                html += '<div class="inputContainer">';
+                html +=   '<label class="inputLabel inputLabelUnfocused" for="additional-arguments">Additional Arguments</label>';
+                html +=   '<input id="additional-arguments" type="text" is="emby-input" ' +
+                           'value="' + escapeHtml(execution.AdditionalArguments) + '" onchange="updateExecutionProperty(\'AdditionalArguments\', this.value)" />';
+                html +=   '<div class="fieldDescription">Extra command line arguments (optional)</div>';
+                html += '</div>';
                 
                 return html;
             }
@@ -831,9 +806,7 @@
                     html += '<div class="form-row">';
                     html += '<div class="form-col">';
                     html += '<label class="inputLabel inputLabelUnfocused">Field</label>';
-                    html += '<input type="text" is="emby-input" value="' + escapeHtml(condition.Field) + '" ';
-                    html += 'onchange="updateCondition(' + index + ', \'Field\', this.value)" ';
-                    html += 'placeholder="e.g., User.Name, Item.Type, etc." />';
+                    html += renderConditionFieldSelect(condition.Field, index);
                     html += '</div>';
                     html += '<div class="form-col-narrow">';
                     html += '<label class="inputLabel inputLabelUnfocused">Operator</label>';
@@ -857,6 +830,83 @@
                     html += '</div>';
                 });
                 return html;
+            }
+
+            function renderConditionFieldSelect(selectedField, index) {
+                var fields = getConditionFields();
+                var isKnown = fields.some(function(field) { return field.value === selectedField; });
+                var selectHtml = '<select is="emby-select" onchange="updateConditionField(' + index + ', this.value)" data-condition-select="' + index + '">';
+                fields.forEach(function(field, fieldIndex) {
+                    var isSelected = selectedField ? field.value === selectedField : fieldIndex === 0;
+                    var selectedAttr = isSelected ? 'selected' : '';
+                    selectHtml += '<option value="' + field.value + '" ' + selectedAttr + '>' + field.label + '</option>';
+                });
+                var customSelected = !isKnown && selectedField;
+                selectHtml += '<option value="__custom" ' + (customSelected ? 'selected' : '') + '>Custom…</option>';
+                selectHtml += '</select>';
+
+                var customValue = customSelected ? escapeHtml(selectedField) : '';
+                var customStyle = customSelected ? '' : 'display:none;';
+                var customInput = '<input type="text" is="emby-input" style="margin-top: 8px; ' + customStyle + '" ' +
+                    'value="' + customValue + '" placeholder="Custom field name" ' +
+                    'onchange="updateConditionCustomField(' + index + ', this.value)" ' +
+                    'data-condition-custom="' + index + '" />';
+
+                return selectHtml + customInput;
+            }
+
+            function getConditionFields() {
+                return [
+                    { value: 'EventType', label: 'Event Type' },
+                    { value: 'UserId', label: 'User Id' },
+                    { value: 'UserName', label: 'User Name' },
+                    { value: 'SessionId', label: 'Session Id' },
+                    { value: 'ItemId', label: 'Item Id' },
+                    { value: 'ItemName', label: 'Item Name' },
+                    { value: 'ItemType', label: 'Item Type' },
+                    { value: 'ItemPath', label: 'Item Path' },
+                    { value: 'LibraryId', label: 'Library Id' },
+                    { value: 'LibraryName', label: 'Library Name' },
+                    { value: 'ClientName', label: 'Client Name' },
+                    { value: 'DeviceName', label: 'Device Name' },
+                    { value: 'DeviceId', label: 'Device Id' },
+                    { value: 'SeriesName', label: 'Series Name' },
+                    { value: 'SeasonNumber', label: 'Season Number' },
+                    { value: 'EpisodeNumber', label: 'Episode Number' },
+                    { value: 'Year', label: 'Year' },
+                    { value: 'ContentRating', label: 'Content Rating' },
+                    { value: 'IsPaused', label: 'Is Paused' },
+                    { value: 'PlaybackPositionTicks', label: 'Playback Position Ticks' },
+                    { value: 'Genres', label: 'Genres' },
+                    { value: 'AdditionalData', label: 'Additional Data (JSON key)' }
+                ];
+            }
+
+            function updateConditionField(index, value) {
+                var script = JellyPyConfig.scriptSettings.find(s => s.Id === JellyPyConfig.selectedScriptId);
+                if (!script || !script.Conditions[index]) return;
+
+                var customInput = document.querySelector('input[data-condition-custom="' + index + '"]');
+                if (value === '__custom') {
+                    if (customInput) {
+                        customInput.style.display = 'block';
+                        customInput.focus();
+                    }
+                    return;
+                }
+
+                script.Conditions[index].Field = value;
+                if (customInput) {
+                    customInput.style.display = 'none';
+                    customInput.value = '';
+                }
+            }
+
+            function updateConditionCustomField(index, customValue) {
+                var script = JellyPyConfig.scriptSettings.find(s => s.Id === JellyPyConfig.selectedScriptId);
+                if (!script || !script.Conditions[index]) return;
+
+                script.Conditions[index].Field = customValue;
             }
 
             function renderOperatorOptions(selectedOperator) {
@@ -885,8 +935,10 @@
             function addCondition() {
                 var script = JellyPyConfig.scriptSettings.find(s => s.Id === JellyPyConfig.selectedScriptId);
                 if (script) {
+                    var availableFields = getConditionFields();
+                    var defaultField = availableFields.length > 0 ? availableFields[0].value : '';
                     script.Conditions.push({
-                        Field: '',
+                        Field: defaultField,
                         Operator: 0, // Equals
                         Value: '',
                         CaseSensitive: false
@@ -912,7 +964,7 @@
 
             function renderDataAttributes(dataAttributes) {
                 if (dataAttributes.length === 0) {
-                    return '<div style="color: #888; font-style: italic; text-align: center; padding: 20px;">No data attributes configured. Event data will be passed as JSON.</div>';
+                    return '<div style="color: #888; font-style: italic; text-align: center; padding: 20px;">No data attributes configured.\nAll available Event data will be passed as JSON.</div>';
                 }
                 
                 var html = '';
@@ -1093,7 +1145,8 @@
                     // Populate the script dropdown for all open script forms
                     var scriptPath = document.getElementById('script-path');
                     if (scriptPath) {
-                        var currentValue = scriptPath.value;
+                        var selectedScript = JellyPyConfig.scriptSettings.find(s => s.Id === JellyPyConfig.selectedScriptId);
+                        var currentValue = selectedScript && selectedScript.Execution ? selectedScript.Execution.ScriptName || '' : scriptPath.value;
                         scriptPath.innerHTML = '<option value="">Select a script file...</option>';
                         
                         if (scriptList && scriptList.length > 0) {
@@ -1107,9 +1160,7 @@
                             });
                         }
                         
-                        if (currentValue) {
-                            scriptPath.value = currentValue;
-                        }
+                        scriptPath.value = currentValue;
                     }
                 } catch (error) {
                     console.error('Error loading available scripts:', error);
@@ -1337,7 +1388,6 @@
                         document.querySelector('#BashExecutablePath').value = globalSettings.BashExecutablePath || '/bin/bash';
                         document.querySelector('#MaxConcurrentExecutions').value = globalSettings.MaxConcurrentExecutions || 5;
                         document.querySelector('#DefaultTimeoutSeconds').value = globalSettings.DefaultTimeoutSeconds || 300;
-                        document.querySelector('#QueueSize').value = globalSettings.QueueSize || 100;
                         document.querySelector('#EnableVerboseLogging').checked = globalSettings.EnableVerboseLogging || false;
 
                         // Load item grouping settings
@@ -1400,7 +1450,6 @@
                     config.GlobalSettings.BashExecutablePath = document.querySelector('#BashExecutablePath').value;
                     config.GlobalSettings.MaxConcurrentExecutions = parseInt(document.querySelector('#MaxConcurrentExecutions').value || 5, 10);
                     config.GlobalSettings.DefaultTimeoutSeconds = parseInt(document.querySelector('#DefaultTimeoutSeconds').value || 300, 10);
-                    config.GlobalSettings.QueueSize = parseInt(document.querySelector('#QueueSize').value || 100, 10);
                     config.GlobalSettings.EnableVerboseLogging = document.querySelector('#EnableVerboseLogging').checked;
 
                     // Save item grouping settings

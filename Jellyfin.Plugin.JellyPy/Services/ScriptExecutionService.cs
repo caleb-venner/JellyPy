@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -21,10 +20,10 @@ namespace Jellyfin.Plugin.JellyPy.Services;
 /// </summary>
 public class ScriptExecutionService : IScriptExecutionService, IDisposable
 {
+    private static readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = false };
     private readonly ILogger<ScriptExecutionService> _logger;
     private readonly ConditionEvaluator _conditionEvaluator;
     private readonly DataAttributeProcessor _dataAttributeProcessor;
-    private readonly SemaphoreSlim _scriptSemaphore;
     private bool _disposed;
 
     /// <summary>
@@ -41,7 +40,6 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         _logger = logger;
         _conditionEvaluator = conditionEvaluator;
         _dataAttributeProcessor = dataAttributeProcessor;
-        _scriptSemaphore = new SemaphoreSlim(5, 5); // Allow up to 5 concurrent scripts
     }
 
     /// <inheritdoc />
@@ -64,7 +62,9 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
     private async Task ExecuteEnhancedScriptsAsync(PluginConfiguration config, EventData eventData)
     {
         var applicableSettings = config.ScriptSettings
+            .Where(setting => setting.Enabled)
             .Where(setting => setting.Triggers.Contains(eventData.EventType))
+            .OrderBy(setting => setting.Priority)
             .ToList();
 
         if (applicableSettings.Count == 0)
@@ -74,29 +74,31 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         }
 
         var globalSettings = config.GlobalSettings ?? new GlobalScriptSettings();
-        using var semaphore = new SemaphoreSlim(globalSettings.MaxConcurrentExecutions, globalSettings.MaxConcurrentExecutions);
+        var throttler = new SemaphoreSlim(globalSettings.MaxConcurrentExecutions, globalSettings.MaxConcurrentExecutions);
 
-        var tasks = applicableSettings.Select(async setting =>
-        {
-            await semaphore.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                if (_conditionEvaluator.EvaluateConditions(setting.Conditions, eventData))
-                {
-                    await ExecuteScriptSettingAsync(setting, eventData, globalSettings).ConfigureAwait(false);
-                }
-                else
-                {
-                    _logger.LogDebug("Conditions not met for script setting {SettingId}", setting.Id);
-                }
-            }
-            finally
-            {
-                semaphore.Release();
-            }
-        });
+        var tasks = applicableSettings.Select(setting => ExecuteScriptSettingWithThrottleAsync(setting, eventData, globalSettings, throttler));
 
         await Task.WhenAll(tasks).ConfigureAwait(false);
+    }
+
+    private async Task ExecuteScriptSettingWithThrottleAsync(ScriptSetting setting, EventData eventData, GlobalScriptSettings globalSettings, SemaphoreSlim throttler)
+    {
+        await throttler.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            if (_conditionEvaluator.EvaluateConditions(setting.Conditions, eventData))
+            {
+                await ExecuteScriptSettingAsync(setting, eventData, globalSettings).ConfigureAwait(false);
+            }
+            else
+            {
+                _logger.LogDebug("Conditions not met for script setting {SettingId}", setting.Id);
+            }
+        }
+        finally
+        {
+            throttler.Release();
+        }
     }
 
     private async Task ExecuteScriptSettingAsync(ScriptSetting setting, EventData eventData, GlobalScriptSettings globalSettings)
@@ -106,19 +108,30 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
             var arguments = new List<string>();
             var environmentVariables = new Dictionary<string, string>();
 
-            var useJsonPayload = setting.ExecutionMode == ExecutionMode.JsonPayload || !setting.DataAttributes.Any();
+            var useJsonPayload = setting.ExecutionMode == ExecutionMode.JsonPayload || setting.DataAttributes.Count == 0;
 
             if (!useJsonPayload)
             {
                 (arguments, environmentVariables) = _dataAttributeProcessor.ProcessDataAttributes(setting.DataAttributes, eventData);
             }
 
-            var executorPath = GetExecutorPath(setting.Execution.ExecutorType, setting.Execution.ExecutablePath);
+            var scriptPath = ResolveScriptPath(setting.Execution.ScriptName, globalSettings.CustomScriptsDirectory);
+            if (string.IsNullOrEmpty(scriptPath) || !File.Exists(scriptPath))
+            {
+                _logger.LogError("Script path invalid or missing for setting {SettingId}: {ScriptPath}", setting.Id, scriptPath);
+                return;
+            }
+
+            var executorPath = GetExecutorPath(setting.Execution.ExecutorType, setting.Execution.ExecutablePath, globalSettings);
             if (string.IsNullOrEmpty(executorPath))
             {
                 _logger.LogError("Executor path not configured for script setting {SettingId}", setting.Id);
                 return;
             }
+
+            var timeoutSeconds = setting.Execution.TimeoutSeconds > 0
+                ? setting.Execution.TimeoutSeconds
+                : globalSettings.DefaultTimeoutSeconds;
 
             var startInfo = new ProcessStartInfo
             {
@@ -126,16 +139,16 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
-                WorkingDirectory = PluginConfiguration.ScriptsDirectory
+                WorkingDirectory = Path.GetDirectoryName(scriptPath) ?? PluginConfiguration.ScriptsDirectory
             };
 
             // Add script path as first argument
-            startInfo.ArgumentList.Add(setting.Execution.ScriptPath);
+            startInfo.ArgumentList.Add(scriptPath);
 
             if (useJsonPayload)
             {
                 // Add EventData as JSON argument
-                var eventDataJson = JsonSerializer.Serialize(eventData, new JsonSerializerOptions { WriteIndented = false });
+                var eventDataJson = JsonSerializer.Serialize(eventData, _jsonOptions);
                 startInfo.ArgumentList.Add(eventDataJson);
             }
             else
@@ -162,7 +175,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                 startInfo.Environment[key] = value;
             }
 
-            await ExecuteProcessAsync(startInfo, setting.Execution.TimeoutSeconds, eventData.EventType).ConfigureAwait(false);
+            await ExecuteProcessAsync(startInfo, timeoutSeconds, eventData.EventType).ConfigureAwait(false);
         }
         catch (InvalidOperationException ex)
         {
@@ -179,8 +192,19 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         }
     }
 
-    private string GetExecutorPath(ScriptExecutorType executorType, string customExecutorPath)
+    private string GetExecutorPath(ScriptExecutorType executorType, string customExecutorPath, GlobalScriptSettings globalSettings)
     {
+        // Global overrides take precedence when provided
+        if (!string.IsNullOrWhiteSpace(globalSettings.PythonExecutablePath) && executorType == ScriptExecutorType.Python)
+        {
+            return globalSettings.PythonExecutablePath;
+        }
+
+        if (!string.IsNullOrWhiteSpace(globalSettings.BashExecutablePath) && executorType == ScriptExecutorType.Bash)
+        {
+            return globalSettings.BashExecutablePath;
+        }
+
         // If user explicitly set a path (and it's not default), use it
         if (!string.IsNullOrWhiteSpace(customExecutorPath) &&
             customExecutorPath != "auto" &&
@@ -196,8 +220,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
             ScriptExecutorType.PowerShell => ResolvePowerShellPath(),
             ScriptExecutorType.Bash => ResolveBashPath(),
             ScriptExecutorType.NodeJs => ResolveNodePath(),
-            ScriptExecutorType.Binary => string.Empty, // Binary is the script itself
-            _ => customExecutorPath ?? string.Empty
+            _ => customExecutorPath
         };
     }
 
@@ -211,6 +234,25 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
             ScriptExecutorType.NodeJs => path.Equals("/usr/bin/node", StringComparison.OrdinalIgnoreCase),
             _ => false
         };
+    }
+
+    private string ResolveScriptPath(string scriptName, string customScriptsDirectory)
+    {
+        if (string.IsNullOrWhiteSpace(scriptName))
+        {
+            return string.Empty;
+        }
+
+        if (Path.IsPathRooted(scriptName))
+        {
+            return scriptName;
+        }
+
+        var baseDirectory = string.IsNullOrWhiteSpace(customScriptsDirectory)
+            ? PluginConfiguration.ScriptsDirectory
+            : customScriptsDirectory;
+
+        return Path.Join(baseDirectory, scriptName);
     }
 
     /// <summary>
@@ -321,17 +363,15 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
     {
         try
         {
-            using var process = new Process
+            using var process = new Process();
+            process.StartInfo = new ProcessStartInfo
             {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = path,
-                    Arguments = "--version",
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    CreateNoWindow = true
-                }
+                FileName = path,
+                Arguments = "--version",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
             };
 
             if (process.Start())
@@ -346,15 +386,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
 
                 if (!completed)
                 {
-                    try
-                    {
-                        process.Kill(true);
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                        // This is cleanup code where failure is acceptable.
-                    }
+                    process.Kill(true);
                 }
             }
         }
@@ -383,16 +415,14 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         try
         {
             // Try using 'which' command first (Unix-like systems)
-            using var whichProcess = new Process
+            using var whichProcess = new Process();
+            whichProcess.StartInfo = new ProcessStartInfo
             {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "which",
-                    Arguments = executableName,
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    CreateNoWindow = true
-                }
+                FileName = "which",
+                Arguments = executableName,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                CreateNoWindow = true
             };
 
             if (whichProcess.Start())
@@ -405,15 +435,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
 
                 if (!completed)
                 {
-                    try
-                    {
-                        whichProcess.Kill(true);
-                    }
-                    catch (Exception)
-                    {
-                        throw;
-                        // This is cleanup code where failure is acceptable.
-                    }
+                    whichProcess.Kill(true);
                 }
             }
         }
@@ -425,26 +447,19 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         {
             // If 'which' command fails, try direct execution
         }
-        catch (Exception)
-        {
-            // If 'which' command fails, try direct execution
-            throw;
-        }
 
         // Fallback: try direct execution
         try
         {
-            using var process = new Process
+            using var process = new Process();
+            process.StartInfo = new ProcessStartInfo
             {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = executableName,
-                    Arguments = "--version",
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    CreateNoWindow = true
-                }
+                FileName = executableName,
+                Arguments = "--version",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
             };
 
             if (process.Start())
@@ -457,15 +472,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
 
                 if (!completed)
                 {
-                    try
-                    {
-                        process.Kill(true);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogDebug(ex, "Failed to kill timed-out process.");
-                        throw; // Rethrow to maintain CA1031 compliance while still logging the error
-                    }
+                    process.Kill(true);
                 }
             }
         }
@@ -476,11 +483,6 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         catch (System.ComponentModel.Win32Exception)
         {
             // Ignore
-        }
-        catch (Exception)
-        {
-            throw;
-            // This is intentional fallback logic where failure is acceptable.
         }
 
         return false;
@@ -495,11 +497,9 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         {
             _logger.LogWarning("Python auto-detection failed. Diagnostic information:");
 
-            // Log environment info
             _logger.LogInformation("Operating System: {OS}", RuntimeInformation.OSDescription);
             _logger.LogInformation("Architecture: {Arch}", RuntimeInformation.OSArchitecture);
 
-            // Log common directories
             var directories = new[] { "/usr/bin", "/usr/local/bin", "/bin" };
             foreach (var dir in directories)
             {
@@ -507,9 +507,10 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                 {
                     var pythonFiles = Directory.GetFiles(dir, "python*")
                         .Where(f => !Path.GetFileName(f).Contains("config", StringComparison.OrdinalIgnoreCase))
-                        .Take(5);
+                        .Take(5)
+                        .ToArray();
 
-                    if (pythonFiles.Any())
+                    if (pythonFiles.Length > 0)
                     {
                         _logger.LogInformation(
                             "Python-like files in {Directory}: {Files}",
@@ -523,7 +524,6 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                 }
             }
 
-            // Log PATH environment variable
             var pathVar = Environment.GetEnvironmentVariable("PATH");
             if (!string.IsNullOrEmpty(pathVar))
             {
@@ -539,11 +539,6 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         catch (UnauthorizedAccessException ex)
         {
             _logger.LogDebug("Failed to collect Python diagnostics (access denied): {Error}", ex.Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogDebug("Failed to collect Python diagnostics: {Error}", ex.Message);
-            throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
     }
 
@@ -650,7 +645,6 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
     {
         if (!_disposed && disposing)
         {
-            _scriptSemaphore?.Dispose();
             _disposed = true;
         }
     }

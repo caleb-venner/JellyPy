@@ -2,16 +2,8 @@
 
 ## Improve
 
-- Create new execution parameter --> Which users trigger execution; IUserManager?
-- Execution Conditions --> Field; Change to drop down selection.
-- Have ALL sections in all 3 tabs collapsed by default
-- Maybe put a tip/prompt/hint to expand
-- ConfigPage is huge; Possible to break up files (jellyfin dependant)
-- Vague naming in ConfigPage sections; 'Execution Settings' in Global tab --> doesn't align
-- Global Settings probably doesn't need collapsable sections
-  - Otherwise, reduce sections;
-    - 'Paths' have  Interpreters and Script Directory;
-    - 'Scripts' Grouping and Limits;
-    - 'General' verbose logging and future settings.
-- Script Settings --> Data Attributes; Currently 'Event data will be passed as JSON.'
-  - Can make it clearer. 'All available Event Data will be passed as JSON.
+- UI; Overall; Improve visual appearance of config menu?
+- UI; QoL; tighten up vertical spacing between elements?
+- UI; Bug; when click 'add' for new script parameters --> section collapses again; should remain expanded until close is triggered by user.
+- UX; Improvement; Create new execution parameter --> Which users trigger execution; IUserManager?
+- UI; QoL; Maybe put a tip/prompt/hint to expand?

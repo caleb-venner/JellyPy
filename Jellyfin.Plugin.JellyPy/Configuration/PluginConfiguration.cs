@@ -21,16 +21,6 @@ public class PluginConfiguration : BasePluginConfiguration
     /// </summary>
     public PluginConfiguration()
     {
-        // Legacy properties - no defaults to prevent unwanted execution
-        PythonExecutablePath = string.Empty;
-        ScriptWorkingDirectory = string.Empty;
-        EnableEpisodeProcessing = false;
-        EnableMovieProcessing = false;
-        ScriptTimeoutSeconds = 300;
-        SonarrUrl = string.Empty;
-        RadarrUrl = string.Empty;
-
-        // Modern configuration
         ScriptSettings = new Collection<ScriptSetting>();
         GlobalSettings = new GlobalScriptSettings();
 
@@ -57,7 +47,7 @@ public class PluginConfiguration : BasePluginConfiguration
     }
 
     /// <summary>
-    /// Gets the directory where user scripts are stored.
+    /// Gets or sets the directory where user scripts are stored.
     /// This resolves to {AppContext.BaseDirectory}/scripts by default.
     ///
     /// On different platforms:
@@ -68,38 +58,6 @@ public class PluginConfiguration : BasePluginConfiguration
     [System.Text.Json.Serialization.JsonIgnore]
     [System.Xml.Serialization.XmlIgnore]
     public static string ScriptsDirectory { get; set; } = string.Empty;
-
-    // Legacy configuration properties (maintained for backward compatibility)
-
-    /// <summary>
-    /// Gets or sets the absolute path to the Python interpreter used to run scripts.
-    /// </summary>
-    public string PythonExecutablePath { get; set; }
-
-    /// <summary>
-    /// Gets or sets the optional working directory for the script process.
-    /// </summary>
-    public string ScriptWorkingDirectory { get; set; }
-
-    /// <summary>
-    /// Gets or sets an optional argument string appended to every invocation.
-    /// </summary>
-    public string AdditionalArguments { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets a value indicating whether to invoke the script for episodes.
-    /// </summary>
-    public bool EnableEpisodeProcessing { get; set; }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether to invoke the script for movies.
-    /// </summary>
-    public bool EnableMovieProcessing { get; set; }
-
-    /// <summary>
-    /// Gets or sets the maximum amount of time to wait for the script process to exit.
-    /// </summary>
-    public int ScriptTimeoutSeconds { get; set; }
 
     /// <summary>
     /// Gets or sets the encrypted Sonarr API key used when invoking the script.
@@ -160,11 +118,8 @@ public class PluginConfiguration : BasePluginConfiguration
         }
     }
 
-    // Backward compatibility properties (non-serialized)
-
     /// <summary>
-    /// Gets or sets the Sonarr API key (for backward compatibility).
-    /// This property automatically encrypts on set and decrypts on get.
+    /// Gets or sets the Sonarr API key using automatic encryption on set and decryption on get.
     /// </summary>
     [System.Text.Json.Serialization.JsonIgnore]
     [System.Xml.Serialization.XmlIgnore]
@@ -172,23 +127,10 @@ public class PluginConfiguration : BasePluginConfiguration
     {
         get
         {
-            if (string.IsNullOrEmpty(SonarrApiKeyEncrypted))
-            {
-                return string.Empty;
-            }
-
             string encryptionKey = EncryptionHelper.GenerateMachineKey();
-            string decrypted = EncryptionHelper.Decrypt(SonarrApiKeyEncrypted, encryptionKey);
-
-            // If decryption fails, treat as legacy unencrypted data
-            if (string.IsNullOrEmpty(decrypted) && !string.IsNullOrEmpty(SonarrApiKeyEncrypted))
-            {
-                // Migrate legacy plaintext to encrypted
-                SonarrApiKey = SonarrApiKeyEncrypted;
-                return SonarrApiKeyEncrypted;
-            }
-
-            return decrypted;
+            return string.IsNullOrEmpty(SonarrApiKeyEncrypted)
+                ? string.Empty
+                : EncryptionHelper.Decrypt(SonarrApiKeyEncrypted, encryptionKey);
         }
 
         set
@@ -205,8 +147,7 @@ public class PluginConfiguration : BasePluginConfiguration
     }
 
     /// <summary>
-    /// Gets or sets the Radarr API key (for backward compatibility).
-    /// This property automatically encrypts on set and decrypts on get.
+    /// Gets or sets the Radarr API key using automatic encryption on set and decryption on get.
     /// </summary>
     [System.Text.Json.Serialization.JsonIgnore]
     [System.Xml.Serialization.XmlIgnore]
@@ -214,23 +155,10 @@ public class PluginConfiguration : BasePluginConfiguration
     {
         get
         {
-            if (string.IsNullOrEmpty(RadarrApiKeyEncrypted))
-            {
-                return string.Empty;
-            }
-
             string encryptionKey = EncryptionHelper.GenerateMachineKey();
-            string decrypted = EncryptionHelper.Decrypt(RadarrApiKeyEncrypted, encryptionKey);
-
-            // If decryption fails, treat as legacy unencrypted data
-            if (string.IsNullOrEmpty(decrypted) && !string.IsNullOrEmpty(RadarrApiKeyEncrypted))
-            {
-                // Migrate legacy plaintext to encrypted
-                RadarrApiKey = RadarrApiKeyEncrypted;
-                return RadarrApiKeyEncrypted;
-            }
-
-            return decrypted;
+            return string.IsNullOrEmpty(RadarrApiKeyEncrypted)
+                ? string.Empty
+                : EncryptionHelper.Decrypt(RadarrApiKeyEncrypted, encryptionKey);
         }
 
         set
@@ -267,7 +195,7 @@ public class PluginConfiguration : BasePluginConfiguration
 
     /// <summary>
     /// Gets or sets the number of next episodes to monitor and download when watching a TV show.
-    /// This matches the EPISODE_BUFFER setting from the legacy download script.
+    /// This matches the episode buffer used by the previous download script implementation.
     /// Default is 6 episodes.
     /// </summary>
     public int EpisodeDownloadBuffer { get; set; }

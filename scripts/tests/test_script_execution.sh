@@ -93,6 +93,13 @@ main() {
         fi
     done
 
+    # If first argument looks like JSON, log it for JsonPayload mode
+    if [ $# -gt 0 ] && [[ "$1" == \{* || "$1" == \[* ]]; then
+        print_separator "JSON PAYLOAD"
+        log_info "Detected JsonPayload argument"
+        log_info "$1"
+    fi
+
     # Extract and log JellyPy-specific variables
     print_separator "JELLYPY EVENT DATA"
 

@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using Jellyfin.Plugin.JellyPy.Events;
@@ -245,12 +244,7 @@ public enum ScriptExecutorType
     /// <summary>
     /// Node.js script execution.
     /// </summary>
-    NodeJs,
-
-    /// <summary>
-    /// Direct binary execution.
-    /// </summary>
-    Binary
+    NodeJs
 }
 
 /// <summary>

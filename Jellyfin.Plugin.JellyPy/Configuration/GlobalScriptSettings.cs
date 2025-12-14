@@ -37,14 +37,4 @@ public class GlobalScriptSettings
     /// Gets or sets a value indicating whether to enable verbose logging.
     /// </summary>
     public bool EnableVerboseLogging { get; set; } = false;
-
-    /// <summary>
-    /// Gets or sets a value indicating whether to use legacy mode for backward compatibility.
-    /// </summary>
-    public bool UseLegacyMode { get; set; } = true;
-
-    /// <summary>
-    /// Gets or sets the script execution queue size.
-    /// </summary>
-    public int QueueSize { get; set; } = 100;
 }

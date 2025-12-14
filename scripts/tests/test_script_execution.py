@@ -86,8 +86,8 @@ def log_command_line_arguments():
             logger.info(f'Argument {idx}: {arg}')
 
 
-def extract_jellpy_variables():
-    """Extract and log JellyPy-specific variables"""
+def extract_jellpy_variables(json_payload=None):
+    """Extract and log JellyPy-specific variables from env or JSON"""
     log_separator('JELLYPY EVENT DATA')
 
     # List of expected JellyPy environment variables
@@ -115,14 +115,26 @@ def extract_jellpy_variables():
     event_data = {}
     found_count = 0
 
-    for var in jellypy_vars:
-        value = os.getenv(var)
-        if value is not None:
-            event_data[var] = value
-            logger.info(f'{var}: {value}')
-            found_count += 1
-        else:
-            logger.debug(f'{var}: (not provided)')
+    if json_payload:
+        for var in jellypy_vars:
+            # map uppercase env names to JSON keys (EventType -> EVENT_TYPE)
+            key_guess = var.title().replace('_', '')
+            value = json_payload.get(key_guess)
+            if value is not None:
+                event_data[var] = str(value)
+                logger.info(f'{var}: {value}')
+                found_count += 1
+            else:
+                logger.debug(f'{var}: (not provided)')
+    else:
+        for var in jellypy_vars:
+            value = os.getenv(var)
+            if value is not None:
+                event_data[var] = value
+                logger.info(f'{var}: {value}')
+                found_count += 1
+            else:
+                logger.debug(f'{var}: (not provided)')
 
     logger.info(f'Found {found_count}/{len(jellypy_vars)} expected JellyPy variables')
 
@@ -223,10 +235,18 @@ def main():
         logger.info(f'Python version: {sys.version}')
         logger.info(f'Log file: {log_file}')
 
+        json_payload = None
+        if len(sys.argv) > 1:
+            try:
+                json_payload = json.loads(sys.argv[1])
+                logger.info('Detected JsonPayload argument')
+            except json.JSONDecodeError:
+                logger.info('First argument is not JSON; proceeding with env/args')
+
         # Collect and log all data
         log_environment_variables()
         log_command_line_arguments()
-        event_data = extract_jellpy_variables()
+        event_data = extract_jellpy_variables(json_payload)
 
         # Validate the data
         validate_event_data(event_data)

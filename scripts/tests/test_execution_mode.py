@@ -2,12 +2,13 @@
 """
 Test script for JellyPy ExecutionMode functionality
 
-This script tests all three execution modes:
-1. Environment Variables - Traditional mode, data in environment
-2. Command Arguments - Data passed as CLI arguments
-3. JSON Payload - New mode, complete EventData as JSON argument
+This script exercises both plugin execution modes:
+1. JsonPayload (default) - full EventData provided as first argument
+2. Compatibility        - data attributes mapped to env/args per setting
 
-The script logs execution details to /tmp/jellypy_test.log
+The script logs execution details to /tmp/jellypy_test.log and will try to
+parse the JSON payload when present so it works out of the box with the
+default JsonPayload mode.
 """
 
 import sys
@@ -50,11 +51,11 @@ def log_execution():
 
 def detect_execution_mode():
     """Detect which execution mode is being used"""
-    # Check for JSON payload (second argument that's valid JSON)
+    # Check for JSON payload (first argument after script path)
     if len(sys.argv) > 1:
         try:
             json.loads(sys.argv[1])
-            return 'JSON Payload'
+            return 'JsonPayload'
         except (json.JSONDecodeError, ValueError):
             pass
     
@@ -62,7 +63,7 @@ def detect_execution_mode():
     jellypy_env_vars = [k for k in os.environ.keys() 
                         if k in ['EVENT_TYPE', 'USER_NAME', 'ITEM_NAME', 'TIMESTAMP']]
     if jellypy_env_vars:
-        return 'Environment Variables'
+        return 'Compatibility'
     
     # Otherwise assume arguments mode
     if len(sys.argv) > 1:
@@ -73,12 +74,12 @@ def detect_execution_mode():
 
 def log_json_mode(f):
     """Log JSON payload execution mode"""
-    f.write('MODE: JSON Payload (New ExecutionMode)\n')
+    f.write('MODE: JsonPayload (default)\n')
     f.write('-' * 70 + '\n\n')
     
     try:
         json_payload = json.loads(sys.argv[1])
-        f.write('JSON Payload received:\n')
+        f.write('JSON payload received:\n')
         f.write(json.dumps(json_payload, indent=2))
         f.write('\n\n')
         
@@ -100,7 +101,7 @@ def log_json_mode(f):
 
 def log_env_mode(f):
     """Log environment variable execution mode"""
-    f.write('MODE: Environment Variables (Traditional)\n')
+    f.write('MODE: Compatibility (env/args)\n')
     f.write('-' * 70 + '\n\n')
     
     # List of expected JellyPy environment variables

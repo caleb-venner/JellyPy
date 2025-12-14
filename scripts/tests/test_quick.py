@@ -19,6 +19,7 @@ Usage:
 
 import os
 import sys
+import json
 from pathlib import Path
 from datetime import datetime
 
@@ -26,10 +27,17 @@ from datetime import datetime
 test_dir = Path('/tmp/jellypy_quick_test')
 test_dir.mkdir(exist_ok=True)
 
+json_payload = None
+if len(sys.argv) > 1:
+    try:
+        json_payload = json.loads(sys.argv[1])
+    except Exception:
+        json_payload = None
+
 # Get event data
-event_type = os.getenv('EVENT_TYPE', 'UNKNOWN')
-user_name = os.getenv('USER_NAME', 'SYSTEM')
-item_name = os.getenv('ITEM_NAME', 'N/A')
+event_type = (json_payload.get('EventType') if json_payload else None) or os.getenv('EVENT_TYPE', 'UNKNOWN')
+user_name = (json_payload.get('UserName') if json_payload else None) or os.getenv('USER_NAME', 'SYSTEM')
+item_name = (json_payload.get('ItemName') if json_payload else None) or os.getenv('ITEM_NAME', 'N/A')
 timestamp = datetime.now().isoformat()
 
 # Write marker file with event data
