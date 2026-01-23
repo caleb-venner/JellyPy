@@ -507,7 +507,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                 {
                     var pythonFiles = Directory.GetFiles(dir, "python*")
                         .Where(f => !Path.GetFileName(f).Contains("config", StringComparison.OrdinalIgnoreCase))
-                        .Take(5)
+                        .Take(LoggingConstants.MaxErrorLinesToLog)
                         .ToArray();
 
                     if (pythonFiles.Length > 0)
@@ -529,7 +529,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
             {
                 var paths = pathVar.Split(':', StringSplitOptions.RemoveEmptyEntries);
                 _logger.LogInformation("PATH contains {Count} directories", paths.Length);
-                _logger.LogDebug("PATH directories: {Paths}", string.Join(", ", paths.Take(10)));
+                _logger.LogDebug("PATH directories: {Paths}", string.Join(", ", paths.Take(LoggingConstants.MaxPathDirectoriesToLog)));
             }
         }
         catch (InvalidOperationException ex)

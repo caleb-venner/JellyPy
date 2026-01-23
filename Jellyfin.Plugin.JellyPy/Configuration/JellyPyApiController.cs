@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Jellyfin.Plugin.JellyPy.Configuration.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -20,14 +19,17 @@ namespace Jellyfin.Plugin.JellyPy.Configuration;
 public class JellyPyApiController : ControllerBase
 {
     private readonly ILogger<JellyPyApiController> _logger;
+    private readonly IHttpClientFactory _httpClientFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="JellyPyApiController"/> class.
     /// </summary>
     /// <param name="logger">The logger.</param>
-    public JellyPyApiController(ILogger<JellyPyApiController> logger)
+    /// <param name="httpClientFactory">The HTTP client factory.</param>
+    public JellyPyApiController(ILogger<JellyPyApiController> logger, IHttpClientFactory httpClientFactory)
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
     }
 
     /// <summary>
@@ -148,7 +150,7 @@ public class JellyPyApiController : ControllerBase
                 // Get subdirectories
                 var directories = dirInfo.GetDirectories()
                     .OrderBy(d => d.Name)
-                    .Take(100) // Limit to prevent huge responses
+                    .Take(ApiConstants.MaxDirectoryListingResults)
                     .Select(d => new DirectoryInfoDto { Name = d.Name, Path = d.FullName })
                     .ToList();
 
@@ -288,17 +290,16 @@ public class JellyPyApiController : ControllerBase
     /// <returns>Formatted file size string.</returns>
     private string FormatFileSize(long bytes)
     {
-        string[] sizes = { "B", "KB", "MB", "GB", "TB" };
         double len = bytes;
         int order = 0;
 
-        while (len >= 1024 && order < sizes.Length - 1)
+        while (len >= FileSizeConstants.BytesPerKilobyte && order < FileSizeConstants.SizeUnits.Length - 1)
         {
             order++;
-            len = len / 1024;
+            len = len / FileSizeConstants.BytesPerKilobyte;
         }
 
-        return $"{len:0.##} {sizes[order]}";
+        return $"{len:0.##} {FileSizeConstants.SizeUnits[order]}";
     }
 
     /// <summary>
@@ -456,7 +457,8 @@ public class JellyPyApiController : ControllerBase
                 });
             }
 
-            using var httpClient = new HttpClient();
+            using var httpClient = _httpClientFactory.CreateClient();
+            httpClient.Timeout = TimeSpan.FromSeconds(ApiConstants.HttpRequestTimeoutSeconds);
             httpClient.DefaultRequestHeaders.Add("X-Api-Key", request.ApiKey);
 
             // Test Sonarr /system/status endpoint
@@ -539,7 +541,8 @@ public class JellyPyApiController : ControllerBase
                 });
             }
 
-            using var httpClient = new HttpClient();
+            using var httpClient = _httpClientFactory.CreateClient();
+            httpClient.Timeout = TimeSpan.FromSeconds(ApiConstants.HttpRequestTimeoutSeconds);
             httpClient.DefaultRequestHeaders.Add("X-Api-Key", request.ApiKey);
 
             // Test Radarr /system/status endpoint
@@ -629,182 +632,4 @@ public class JellyPyApiController : ControllerBase
             throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
     }
-}
-
-/// <summary>
-/// Represents a script file.
-/// </summary>
-public class ScriptFile
-{
-    /// <summary>
-    /// Gets or sets the file name.
-    /// </summary>
-    public string Name { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the full file path.
-    /// </summary>
-    public string Path { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the relative path from the scripts directory.
-    /// </summary>
-    public string RelativePath { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the directory containing the script.
-    /// </summary>
-    public string Directory { get; set; } = string.Empty;
-}
-
-/// <summary>
-/// Represents a connection test request.
-/// </summary>
-public class ConnectionTestRequest
-{
-    /// <summary>
-    /// Gets or sets the base URL for the service.
-    /// </summary>
-    public string Url { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the API key for authentication.
-    /// </summary>
-    public string ApiKey { get; set; } = string.Empty;
-}
-
-/// <summary>
-/// Represents the result of a connection test.
-/// </summary>
-public class ConnectionTestResult
-{
-    /// <summary>
-    /// Gets or sets a value indicating whether the connection test was successful.
-    /// </summary>
-    public bool Success { get; set; }
-
-    /// <summary>
-    /// Gets or sets the message describing the result.
-    /// </summary>
-    public string Message { get; set; } = string.Empty;
-}
-
-/// <summary>
-/// Represents the decrypted API keys for display in the web interface.
-/// </summary>
-public class ApiKeysResponse
-{
-    /// <summary>
-    /// Gets or sets the decrypted Sonarr API key.
-    /// </summary>
-    public string SonarrApiKey { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the decrypted Radarr API key.
-    /// </summary>
-    public string RadarrApiKey { get; set; } = string.Empty;
-}
-
-/// <summary>
-/// Represents directory browser results for path selection.
-/// </summary>
-public class DirectoryBrowser
-{
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DirectoryBrowser"/> class.
-    /// </summary>
-    public DirectoryBrowser()
-    {
-        Directories = new Collection<DirectoryInfoDto>();
-    }
-
-    /// <summary>
-    /// Gets or sets the current directory path.
-    /// </summary>
-    public string CurrentPath { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the parent directory path, or null if at root.
-    /// </summary>
-    public string? ParentPath { get; set; }
-
-    /// <summary>
-    /// Gets the list of subdirectories in the current path.
-    /// </summary>
-    public Collection<DirectoryInfoDto> Directories { get; }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether this directory contains script files.
-    /// </summary>
-    public bool HasScripts { get; set; }
-}
-
-/// <summary>
-/// Represents a directory in the browser results.
-/// </summary>
-public class DirectoryInfoDto
-{
-    /// <summary>
-    /// Gets or sets the directory name.
-    /// </summary>
-    public string Name { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the full directory path.
-    /// </summary>
-    public string Path { get; set; } = string.Empty;
-}
-
-/// <summary>
-/// Represents a request to test a directory path.
-/// </summary>
-public class DirectoryPathRequest
-{
-    /// <summary>
-    /// Gets or sets the directory path to test.
-    /// </summary>
-    public string Path { get; set; } = string.Empty;
-}
-
-/// <summary>
-/// Represents the result of a scripts directory test.
-/// </summary>
-public class ScriptsDirectoryTestResult
-{
-    /// <summary>
-    /// Gets or sets a value indicating whether the directory test was successful.
-    /// </summary>
-    public bool Success { get; set; }
-
-    /// <summary>
-    /// Gets or sets the message describing the result.
-    /// </summary>
-    public string Message { get; set; } = string.Empty;
-}
-
-/// <summary>
-/// Represents a request to test an executable path.
-/// </summary>
-public class ExecutablePathRequest
-{
-    /// <summary>
-    /// Gets or sets the executable path to test.
-    /// </summary>
-    public string ExecutablePath { get; set; } = string.Empty;
-}
-
-/// <summary>
-/// Represents the result of an executable test.
-/// </summary>
-public class ExecutableTestResult
-{
-    /// <summary>
-    /// Gets or sets a value indicating whether the executable test was successful.
-    /// </summary>
-    public bool Success { get; set; }
-
-    /// <summary>
-    /// Gets or sets the message describing the result.
-    /// </summary>
-    public string Message { get; set; } = string.Empty;
 }

@@ -1,9 +1,6 @@
-#nullable enable
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text.Json;
 using System.Text.RegularExpressions;
 using Jellyfin.Plugin.JellyPy.Configuration;
 using Jellyfin.Plugin.JellyPy.Events;
@@ -120,14 +117,14 @@ public class ConditionEvaluator
     {
         if (eventData.AdditionalData.TryGetValue(field, out var value))
         {
-            return value?.ToString() ?? string.Empty;
+            return value.ToString() ?? string.Empty;
         }
 
         // Try with different casing
         var key = eventData.AdditionalData.Keys.FirstOrDefault(k =>
             string.Equals(k, field, StringComparison.OrdinalIgnoreCase));
 
-        return key != null ? eventData.AdditionalData[key]?.ToString() ?? string.Empty : string.Empty;
+        return key != null ? eventData.AdditionalData[key].ToString() ?? string.Empty : string.Empty;
     }
 
     private bool EvaluateValue(string actualValue, string expectedValue, ConditionOperator operatorType, bool caseSensitive)

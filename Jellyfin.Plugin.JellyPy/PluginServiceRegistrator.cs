@@ -6,8 +6,6 @@ using Jellyfin.Plugin.JellyPy.Events.Managers;
 using Jellyfin.Plugin.JellyPy.Services;
 using Jellyfin.Plugin.JellyPy.Services.Arr;
 using MediaBrowser.Controller;
-using MediaBrowser.Controller.Events;
-using MediaBrowser.Controller.Library;
 using MediaBrowser.Controller.Plugins;
 using Microsoft.Extensions.DependencyInjection;
 

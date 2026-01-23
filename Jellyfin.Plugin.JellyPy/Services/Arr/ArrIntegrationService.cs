@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Jellyfin.Plugin.JellyPy.Configuration;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Entities.TV;
@@ -86,16 +87,18 @@ public class ArrIntegrationService : IArrIntegrationService
             return;
         }
 
+        // Validate configuration before proceeding
+        var validation = ConfigurationValidator.ValidateSonarrConfiguration(config);
+        if (!validation.IsValid)
+        {
+            _logger.LogError("Invalid Sonarr configuration: {Errors}", string.Join("; ", validation.Errors));
+            return;
+        }
+
         _logger.LogInformation(
             "Sonarr config check - URL: '{SonarrUrl}', ApiKey: '{ApiKeyPresent}'",
             config.SonarrUrl ?? "(null)",
             string.IsNullOrEmpty(config.SonarrApiKey) ? "empty" : "present");
-
-        if (string.IsNullOrEmpty(config.SonarrApiKey) || string.IsNullOrEmpty(config.SonarrUrl))
-        {
-            _logger.LogWarning("Sonarr not configured. Skipping episode processing.");
-            return;
-        }
 
         var seriesName = episode.Series?.Name ?? episode.SeriesName;
         if (string.IsNullOrEmpty(seriesName))
@@ -254,16 +257,18 @@ public class ArrIntegrationService : IArrIntegrationService
             return;
         }
 
+        // Validate configuration before proceeding
+        var validation = ConfigurationValidator.ValidateRadarrConfiguration(config);
+        if (!validation.IsValid)
+        {
+            _logger.LogError("Invalid Radarr configuration: {Errors}", string.Join("; ", validation.Errors));
+            return;
+        }
+
         _logger.LogInformation(
             "Radarr config check - URL: '{RadarrUrl}', ApiKey: '{ApiKeyPresent}'",
             config.RadarrUrl ?? "(null)",
             string.IsNullOrEmpty(config.RadarrApiKey) ? "empty" : "present");
-
-        if (string.IsNullOrEmpty(config.RadarrApiKey) || string.IsNullOrEmpty(config.RadarrUrl))
-        {
-            _logger.LogWarning("Radarr not configured. Skipping movie processing.");
-            return;
-        }
 
         var movieName = movie.Name;
         if (string.IsNullOrEmpty(movieName))
@@ -313,6 +318,14 @@ public class ArrIntegrationService : IArrIntegrationService
             return;
         }
 
+        // Validate configuration before proceeding
+        var validation = ConfigurationValidator.ValidateRadarrConfiguration(config);
+        if (!validation.IsValid)
+        {
+            _logger.LogError("Invalid Radarr configuration: {Errors}", string.Join("; ", validation.Errors));
+            return;
+        }
+
         // Check if we should only unmonitor if actually watched
         if (config.UnmonitorOnlyIfWatched)
         {
@@ -337,12 +350,6 @@ public class ArrIntegrationService : IArrIntegrationService
             "Radarr config check - URL: '{RadarrUrl}', ApiKey: '{ApiKeyPresent}'",
             config.RadarrUrl ?? "(null)",
             string.IsNullOrEmpty(config.RadarrApiKey) ? "empty" : "present");
-
-        if (string.IsNullOrEmpty(config.RadarrApiKey) || string.IsNullOrEmpty(config.RadarrUrl))
-        {
-            _logger.LogWarning("Radarr not configured. Skipping movie processing.");
-            return;
-        }
 
         var movieName = movie.Name;
         if (string.IsNullOrEmpty(movieName))
