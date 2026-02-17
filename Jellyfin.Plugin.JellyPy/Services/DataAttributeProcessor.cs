@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text.Json;
 using Jellyfin.Plugin.JellyPy.Configuration;
 using Jellyfin.Plugin.JellyPy.Events;
+using Jellyfin.Plugin.JellyPy.Events.Models;
 using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.JellyPy.Services;

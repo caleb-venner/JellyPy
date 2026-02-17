@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Jellyfin.Plugin.JellyPy.Configuration;
 using Jellyfin.Plugin.JellyPy.Events;
+using Jellyfin.Plugin.JellyPy.Events.Models;
 using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.JellyPy.Services;
@@ -24,6 +25,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
     private readonly ILogger<ScriptExecutionService> _logger;
     private readonly ConditionEvaluator _conditionEvaluator;
     private readonly DataAttributeProcessor _dataAttributeProcessor;
+    private readonly IPluginConfigurationProvider _configProvider;
     private bool _disposed;
 
     /// <summary>
@@ -32,25 +34,23 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
     /// <param name="logger">The logger.</param>
     /// <param name="conditionEvaluator">The condition evaluator service.</param>
     /// <param name="dataAttributeProcessor">The data attribute processor service.</param>
+    /// <param name="configProvider">The configuration provider.</param>
     public ScriptExecutionService(
         ILogger<ScriptExecutionService> logger,
         ConditionEvaluator conditionEvaluator,
-        DataAttributeProcessor dataAttributeProcessor)
+        DataAttributeProcessor dataAttributeProcessor,
+        IPluginConfigurationProvider configProvider)
     {
         _logger = logger;
         _conditionEvaluator = conditionEvaluator;
         _dataAttributeProcessor = dataAttributeProcessor;
+        _configProvider = configProvider;
     }
 
     /// <inheritdoc />
     public async Task ExecuteScriptsAsync(EventData eventData)
     {
-        var config = Plugin.Instance?.Configuration;
-        if (config is null)
-        {
-            _logger.LogWarning("Plugin configuration is unavailable; skipping script execution for event {EventType}", eventData.EventType);
-            return;
-        }
+        var config = _configProvider.GetConfiguration();
 
         // Execute enhanced script settings if available
         if (config.ScriptSettings?.Count > 0)
@@ -74,7 +74,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         }
 
         var globalSettings = config.GlobalSettings ?? new GlobalScriptSettings();
-        var throttler = new SemaphoreSlim(globalSettings.MaxConcurrentExecutions, globalSettings.MaxConcurrentExecutions);
+        using var throttler = new SemaphoreSlim(globalSettings.MaxConcurrentExecutions, globalSettings.MaxConcurrentExecutions);
 
         var tasks = applicableSettings.Select(setting => ExecuteScriptSettingWithThrottleAsync(setting, eventData, globalSettings, throttler));
 
@@ -243,16 +243,24 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
             return string.Empty;
         }
 
-        if (Path.IsPathRooted(scriptName))
-        {
-            return scriptName;
-        }
-
         var baseDirectory = string.IsNullOrWhiteSpace(customScriptsDirectory)
             ? PluginConfiguration.ScriptsDirectory
             : customScriptsDirectory;
 
-        return Path.Join(baseDirectory, scriptName);
+        var resolvedPath = Path.IsPathRooted(scriptName)
+            ? scriptName
+            : Path.Join(baseDirectory, scriptName);
+
+        var fullPath = Path.GetFullPath(resolvedPath);
+        var basePath = Path.GetFullPath(baseDirectory);
+
+        if (!fullPath.StartsWith(basePath, StringComparison.OrdinalIgnoreCase))
+        {
+            _logger.LogError("Script path traversal detected: {ScriptName} resolves outside {BaseDirectory}", scriptName, baseDirectory);
+            return string.Empty;
+        }
+
+        return fullPath;
     }
 
     /// <summary>

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Jellyfin.Plugin.JellyPy.Events.Models;
 using MediaBrowser.Controller.Entities.TV;
 using Microsoft.Extensions.Logging;
 

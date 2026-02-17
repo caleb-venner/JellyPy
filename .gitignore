@@ -88,3 +88,4 @@ yarn-error.log*
 
 # Workspace-specific files (user preferences)
 *.code-workspace
+configpage.md

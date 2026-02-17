@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Jellyfin.Plugin.JellyPy.Configuration;
+using Jellyfin.Plugin.JellyPy.Services.Arr.Models;
 using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.JellyPy.Services.Arr;
@@ -13,40 +14,45 @@ namespace Jellyfin.Plugin.JellyPy.Services.Arr;
 /// <summary>
 /// Service for interacting with Radarr API.
 /// </summary>
-public class RadarrService : IRadarrService
+public class RadarrService : ArrBaseService<RadarrService>, IRadarrService
 {
-    private readonly ILogger<RadarrService> _logger;
-    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IPluginConfigurationProvider _configProvider;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RadarrService"/> class.
     /// </summary>
     /// <param name="logger">The logger.</param>
     /// <param name="httpClientFactory">The HTTP client factory.</param>
-    public RadarrService(ILogger<RadarrService> logger, IHttpClientFactory httpClientFactory)
+    /// <param name="configProvider">The configuration provider.</param>
+    public RadarrService(ILogger<RadarrService> logger, IHttpClientFactory httpClientFactory, IPluginConfigurationProvider configProvider)
+        : base(logger, httpClientFactory)
     {
-        _logger = logger;
-        _httpClientFactory = httpClientFactory;
+        _configProvider = configProvider;
     }
 
     /// <inheritdoc />
-    public async Task<int?> GetMovieIdByNameAsync(string movieName)
+    protected override string ServiceName => "Radarr";
+
+    /// <inheritdoc />
+    public Task<int?> GetMovieIdByNameAsync(string movieName)
     {
-        try
+        return ExecuteApiCallAsync<int?>(
+            async () =>
         {
-            var config = Plugin.Instance?.Configuration;
-            if (config == null || string.IsNullOrEmpty(config.RadarrApiKey))
+            var config = _configProvider.GetConfiguration();
+
+            if (string.IsNullOrEmpty(config.RadarrApiKey))
             {
-                _logger.LogWarning("Radarr API key not configured");
+                Logger.LogWarning("Radarr API key not configured");
                 return null;
             }
 
-            var client = CreateHttpClient(config);
+            var client = CreateHttpClient(config.RadarrUrl, config.RadarrApiKey);
             var response = await client.GetAsync($"/api/v3/movie/lookup?term={Uri.EscapeDataString(movieName)}");
 
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError("Radarr API request failed with status code: {StatusCode}", response.StatusCode);
+                Logger.LogError("Radarr API request failed with status code: {StatusCode}", response.StatusCode);
                 return null;
             }
 
@@ -55,52 +61,30 @@ public class RadarrService : IRadarrService
 
             if (firstMovie != null)
             {
-                _logger.LogInformation("Found Radarr movie: {Title} (ID: {Id})", firstMovie.Title, firstMovie.Id);
+                Logger.LogInformation("Found Radarr movie: {Title} (ID: {Id})", firstMovie.Title, firstMovie.Id);
                 return firstMovie.Id;
             }
 
-            _logger.LogWarning("No movie found in Radarr for: {MovieName}", movieName);
+            Logger.LogWarning("No movie found in Radarr for: {MovieName}", movieName);
             return null;
-        }
-        catch (HttpRequestException ex)
-        {
-            _logger.LogError(ex, "HTTP request failed when getting Radarr movie ID for: {MovieName}", movieName);
-            return null;
-        }
-        catch (JsonException ex)
-        {
-            _logger.LogError(ex, "Failed to deserialize Radarr API response for movie: {MovieName}", movieName);
-            return null;
-        }
-        catch (TaskCanceledException ex)
-        {
-            _logger.LogError(ex, "Request timed out when getting Radarr movie ID for: {MovieName}", movieName);
-            return null;
-        }
-        catch (UriFormatException ex)
-        {
-            _logger.LogError(ex, "Invalid Radarr URL format when getting movie ID for: {MovieName}", movieName);
-            return null;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Unexpected error getting Radarr movie ID for: {MovieName}", movieName);
-            throw; // Rethrow to maintain CA1031 compliance while still logging the error
-        }
+        },
+            $"getting movie ID for: {movieName}")!;
     }
 
     /// <inheritdoc />
-    public async Task<bool> SetMovieMonitoredAsync(int movieId, bool monitored)
+    public Task<bool> SetMovieMonitoredAsync(int movieId, bool monitored)
     {
-        try
+        return ExecuteApiCallAsync(
+            async () =>
         {
-            var config = Plugin.Instance?.Configuration;
-            if (config == null || string.IsNullOrEmpty(config.RadarrApiKey))
+            var config = _configProvider.GetConfiguration();
+
+            if (string.IsNullOrEmpty(config.RadarrApiKey))
             {
                 return false;
             }
 
-            var client = CreateHttpClient(config);
+            var client = CreateHttpClient(config.RadarrUrl, config.RadarrApiKey);
             var request = new UpdateMoviesRequest
             {
                 MovieIds = new[] { movieId },
@@ -111,63 +95,36 @@ public class RadarrService : IRadarrService
 
             if (response.IsSuccessStatusCode)
             {
-                _logger.LogInformation("Set movie {MovieId} monitored status to {Monitored}", movieId, monitored);
+                Logger.LogInformation("Set movie {MovieId} monitored status to {Monitored}", movieId, monitored);
                 return true;
             }
 
-            _logger.LogError("Failed to set movie monitored status. Status code: {StatusCode}", response.StatusCode);
+            Logger.LogError("Failed to set movie monitored status. Status code: {StatusCode}", response.StatusCode);
             return false;
-        }
-        catch (HttpRequestException ex)
-        {
-            _logger.LogError(ex, "HTTP request failed when setting movie monitored status: {MovieId}", movieId);
-            return false;
-        }
-        catch (JsonException ex)
-        {
-            _logger.LogError(ex, "Failed to serialize/deserialize Radarr API request for movie: {MovieId}", movieId);
-            return false;
-        }
-        catch (TaskCanceledException ex)
-        {
-            _logger.LogError(ex, "Request timed out when setting movie monitored status: {MovieId}", movieId);
-            return false;
-        }
-        catch (ArgumentException ex)
-        {
-            _logger.LogError(ex, "Invalid argument when setting movie monitored status: {MovieId}", movieId);
-            return false;
-        }
-        catch (InvalidOperationException ex)
-        {
-            _logger.LogError(ex, "Invalid operation when setting movie monitored status: {MovieId}", movieId);
-            return false;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Unexpected error setting movie monitored status: {MovieId}", movieId);
-            throw; // Rethrow to maintain CA1031 compliance while still logging the error
-        }
+        },
+            $"setting movie monitored status: {movieId.ToString(CultureInfo.InvariantCulture)}");
     }
 
     /// <inheritdoc />
-    public async Task<RadarrMovieDetails?> GetMovieDetailsAsync(int movieId)
+    public Task<RadarrMovieDetails?> GetMovieDetailsAsync(int movieId)
     {
-        try
+        return ExecuteApiCallAsync<RadarrMovieDetails?>(
+            async () =>
         {
-            var config = Plugin.Instance?.Configuration;
-            if (config == null || string.IsNullOrEmpty(config.RadarrApiKey))
+            var config = _configProvider.GetConfiguration();
+
+            if (string.IsNullOrEmpty(config.RadarrApiKey))
             {
-                _logger.LogWarning("Radarr API key not configured");
+                Logger.LogWarning("Radarr API key not configured");
                 return null;
             }
 
-            var client = CreateHttpClient(config);
-            var response = await client.GetAsync($"/api/v3/movie/{movieId}");
+            var client = CreateHttpClient(config.RadarrUrl, config.RadarrApiKey);
+            var response = await client.GetAsync($"/api/v3/movie/{movieId.ToString(CultureInfo.InvariantCulture)}");
 
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError("Radarr API request failed with status code: {StatusCode}", response.StatusCode);
+                Logger.LogError("Radarr API request failed with status code: {StatusCode}", response.StatusCode);
                 return null;
             }
 
@@ -175,7 +132,7 @@ public class RadarrService : IRadarrService
 
             if (movieDetails != null)
             {
-                _logger.LogInformation(
+                Logger.LogInformation(
                     "Retrieved movie details: {Title} (ID: {Id}), HasFile: {HasFile}, QualityCutoffMet: {CutoffMet}",
                     movieDetails.Title,
                     movieDetails.Id,
@@ -184,42 +141,9 @@ public class RadarrService : IRadarrService
                 return movieDetails;
             }
 
-            _logger.LogWarning("No movie details found in Radarr for ID: {MovieId}", movieId);
+            Logger.LogWarning("No movie details found in Radarr for ID: {MovieId}", movieId);
             return null;
-        }
-        catch (HttpRequestException ex)
-        {
-            _logger.LogError(ex, "HTTP request failed when getting Radarr movie details for ID: {MovieId}", movieId);
-            return null;
-        }
-        catch (JsonException ex)
-        {
-            _logger.LogError(ex, "Failed to deserialize Radarr API response for movie ID: {MovieId}", movieId);
-            return null;
-        }
-        catch (TaskCanceledException ex)
-        {
-            _logger.LogError(ex, "Request timed out when getting Radarr movie details for ID: {MovieId}", movieId);
-            return null;
-        }
-        catch (UriFormatException ex)
-        {
-            _logger.LogError(ex, "Invalid Radarr URL format when getting movie details for ID: {MovieId}", movieId);
-            return null;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Unexpected error getting Radarr movie details for ID: {MovieId}", movieId);
-            throw; // Rethrow to maintain CA1031 compliance while still logging the error
-        }
-    }
-
-    private HttpClient CreateHttpClient(PluginConfiguration config)
-    {
-        var client = _httpClientFactory.CreateClient();
-        client.BaseAddress = new Uri(config.RadarrUrl.TrimEnd('/'));
-        client.DefaultRequestHeaders.Add("X-Api-Key", config.RadarrApiKey);
-        // Content-Type is set automatically by HttpClient for JSON content
-        return client;
+        },
+            $"getting movie details for ID: {movieId.ToString(CultureInfo.InvariantCulture)}")!;
     }
 }

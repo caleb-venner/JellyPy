@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Jellyfin.Plugin.JellyPy.Services.Arr.Models;
 
 namespace Jellyfin.Plugin.JellyPy.Services.Arr;
 

@@ -22,6 +22,9 @@ public class PluginServiceRegistrator : IPluginServiceRegistrator
         // Initialize encryption helper with server information for server-based key generation
         EncryptionHelper.Initialize(applicationHost);
 
+        // Register configuration provider
+        serviceCollection.AddSingleton<IPluginConfigurationProvider, PluginConfigurationProvider>();
+
         // Register the entry point
         serviceCollection.AddHostedService<EnhancedEntryPoint>();
 

@@ -1,6 +1,6 @@
 using MediaBrowser.Controller.Entities;
 
-namespace Jellyfin.Plugin.JellyPy.Events.Managers;
+namespace Jellyfin.Plugin.JellyPy.Events;
 
 /// <summary>
 /// Manager interface for processing items added to the library.

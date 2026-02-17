@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using MediaBrowser.Controller.Entities.TV;
 
-namespace Jellyfin.Plugin.JellyPy.Events;
+namespace Jellyfin.Plugin.JellyPy.Events.Models;
 
 /// <summary>
 /// Standardized event data structure for script execution.

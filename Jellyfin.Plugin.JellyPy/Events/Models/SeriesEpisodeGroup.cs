@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using MediaBrowser.Controller.Entities.TV;
 
-namespace Jellyfin.Plugin.JellyPy.Events;
+namespace Jellyfin.Plugin.JellyPy.Events.Models;
 
 /// <summary>
 /// Represents a group of episodes from the same TV series added in the same batch.

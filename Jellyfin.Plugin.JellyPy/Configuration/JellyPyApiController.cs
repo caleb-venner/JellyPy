@@ -14,23 +14,19 @@ namespace Jellyfin.Plugin.JellyPy.Configuration;
 /// <summary>
 /// API controller for JellyPy plugin configuration endpoints.
 /// </summary>
+/// <remarks>
+/// Initializes a new instance of the <see cref="JellyPyApiController"/> class.
+/// </remarks>
+/// <param name="logger">The logger.</param>
+/// <param name="httpClientFactory">The HTTP client factory.</param>
+/// <param name="configProvider">The configuration provider.</param>
 [ApiController]
 [Route("Plugins/Jellypy")]
-public class JellyPyApiController : ControllerBase
+public class JellyPyApiController(ILogger<JellyPyApiController> logger, IHttpClientFactory httpClientFactory, IPluginConfigurationProvider configProvider) : ControllerBase
 {
-    private readonly ILogger<JellyPyApiController> _logger;
-    private readonly IHttpClientFactory _httpClientFactory;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="JellyPyApiController"/> class.
-    /// </summary>
-    /// <param name="logger">The logger.</param>
-    /// <param name="httpClientFactory">The HTTP client factory.</param>
-    public JellyPyApiController(ILogger<JellyPyApiController> logger, IHttpClientFactory httpClientFactory)
-    {
-        _logger = logger;
-        _httpClientFactory = httpClientFactory;
-    }
+    private readonly ILogger<JellyPyApiController> _logger = logger;
+    private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
+    private readonly IPluginConfigurationProvider _configProvider = configProvider;
 
     /// <summary>
     /// Gets available script files from the scripts directory.
@@ -41,7 +37,7 @@ public class JellyPyApiController : ControllerBase
     {
         try
         {
-            var config = Plugin.Instance?.Configuration;
+            var config = _configProvider.GetConfiguration();
             if (config?.GlobalSettings == null)
             {
                 return BadRequest("Configuration not available");
@@ -266,19 +262,29 @@ public class JellyPyApiController : ControllerBase
         }
 
         string trimmedPath = executablePath.Trim();
+
+        // Disallow path traversal sequences as a security precaution.
+        if (trimmedPath.Contains("..", StringComparison.Ordinal))
+        {
+            _logger.LogWarning("Potential path traversal attempt with executable path: {Path}", trimmedPath);
+            return string.Empty;
+        }
+
         try
         {
+            // GetFullPath will throw exceptions for invalid path formats, which we catch below.
             string fullPath = Path.GetFullPath(trimmedPath);
-            if (fullPath.Contains("..", StringComparison.Ordinal))
-            {
-                return string.Empty;
-            }
-
             return fullPath;
         }
         catch (ArgumentException ex)
         {
-            _logger.LogDebug(ex, "Failed to get full path");
+            _logger.LogWarning(ex, "Invalid executable path format: {Path}", trimmedPath);
+            return string.Empty;
+        }
+        catch (Exception ex)
+        {
+            // Catching other exceptions like SecurityException, NotSupportedException that GetFullPath can throw.
+            _logger.LogError(ex, "Error validating executable path: {Path}", trimmedPath);
             return string.Empty;
         }
     }
@@ -288,7 +294,7 @@ public class JellyPyApiController : ControllerBase
     /// </summary>
     /// <param name="bytes">The file size in bytes.</param>
     /// <returns>Formatted file size string.</returns>
-    private string FormatFileSize(long bytes)
+    private static string FormatFileSize(long bytes)
     {
         double len = bytes;
         int order = 0;
@@ -326,32 +332,21 @@ public class JellyPyApiController : ControllerBase
             }
 
             // Normalize and validate the path
-            string validatedPath;
-            try
+            string validatedPath = ValidateExecutablePath(execPath);
+            if (string.IsNullOrEmpty(validatedPath))
             {
-                validatedPath = Path.GetFullPath(execPath);
-                // Validate that the path doesn't contain suspicious patterns
-                if (string.IsNullOrEmpty(validatedPath) || validatedPath.Contains("..", StringComparison.Ordinal))
-                {
-                    return Ok(new ExecutableTestResult
-                    {
-                        Success = false,
-                        Message = "Invalid path"
-                    });
-                }
-            }
-            catch (ArgumentException ex)
-            {
-                _logger.LogError(ex, "Error validating executable path");
                 return Ok(new ExecutableTestResult
                 {
                     Success = false,
-                    Message = "Invalid path format"
+                    Message = "Invalid or unsafe executable path"
                 });
             }
 
             // Check if file exists
+            // CA2050/CA3003: Path has been validated by ValidateExecutablePath (no traversal, normalized)
+#pragma warning disable CA2050, CA3003 // File path injection
             if (!System.IO.File.Exists(validatedPath))
+#pragma warning restore CA2050, CA3003
             {
                 return Ok(new ExecutableTestResult
                 {
@@ -363,9 +358,10 @@ public class JellyPyApiController : ControllerBase
             // Try to get file information and verify it's executable
             try
             {
-#pragma warning disable CA2050 // File path injection
+                // CA2050/CA3003: Path has been validated by ValidateExecutablePath (no traversal, normalized)
+#pragma warning disable CA2050, CA3003 // File path injection
                 var fileInfo = new System.IO.FileInfo(validatedPath);
-#pragma warning restore CA2050
+#pragma warning restore CA2050, CA3003
 
                 // Verify file is readable
                 if (!fileInfo.Exists)
@@ -390,7 +386,10 @@ public class JellyPyApiController : ControllerBase
                 // Try to verify it's actually executable by checking if we can read it
                 try
                 {
+                    // CA3003: Path has been validated by ValidateExecutablePath (no traversal, normalized)
+#pragma warning disable CA3003 // File path injection
                     using (System.IO.File.OpenRead(validatedPath))
+#pragma warning restore CA3003
                     {
                         // Just opening and closing is enough to verify access
                     }
@@ -615,10 +614,7 @@ public class JellyPyApiController : ControllerBase
     {
         try
         {
-            if (Plugin.Instance?.Configuration is not PluginConfiguration config)
-            {
-                return Ok(new ApiKeysResponse());
-            }
+            var config = _configProvider.GetConfiguration();
 
             return Ok(new ApiKeysResponse
             {

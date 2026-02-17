@@ -19,6 +19,7 @@ public class ArrIntegrationService : IArrIntegrationService
     private readonly ILogger<ArrIntegrationService> _logger;
     private readonly ISonarrService _sonarrService;
     private readonly IRadarrService _radarrService;
+    private readonly IPluginConfigurationProvider _configProvider;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ArrIntegrationService"/> class.
@@ -26,14 +27,17 @@ public class ArrIntegrationService : IArrIntegrationService
     /// <param name="logger">The logger.</param>
     /// <param name="sonarrService">The Sonarr service.</param>
     /// <param name="radarrService">The Radarr service.</param>
+    /// <param name="configProvider">The configuration provider.</param>
     public ArrIntegrationService(
         ILogger<ArrIntegrationService> logger,
         ISonarrService sonarrService,
-        IRadarrService radarrService)
+        IRadarrService radarrService,
+        IPluginConfigurationProvider configProvider)
     {
         _logger = logger;
         _sonarrService = sonarrService;
         _radarrService = radarrService;
+        _configProvider = configProvider;
     }
 
     /// <inheritdoc />
@@ -80,8 +84,8 @@ public class ArrIntegrationService : IArrIntegrationService
 
     private async Task ProcessEpisodeAsync(Episode episode)
     {
-        var config = Plugin.Instance?.Configuration;
-        if (config == null || !config.EnableNativeSonarrIntegration)
+        var config = _configProvider.GetConfiguration();
+        if (!config.EnableNativeSonarrIntegration)
         {
             _logger.LogInformation("Native Sonarr integration is disabled");
             return;
@@ -244,8 +248,8 @@ public class ArrIntegrationService : IArrIntegrationService
 
     private async Task ProcessMovieAsync(Movie movie)
     {
-        var config = Plugin.Instance?.Configuration;
-        if (config == null || !config.EnableNativeRadarrIntegration)
+        var config = _configProvider.GetConfiguration();
+        if (!config.EnableNativeRadarrIntegration)
         {
             _logger.LogDebug("Native Radarr integration is disabled");
             return;
@@ -305,8 +309,8 @@ public class ArrIntegrationService : IArrIntegrationService
     /// <inheritdoc />
     public async Task ProcessPlaybackStopAsync(Movie movie, double watchPercentage)
     {
-        var config = Plugin.Instance?.Configuration;
-        if (config == null || !config.EnableNativeRadarrIntegration)
+        var config = _configProvider.GetConfiguration();
+        if (!config.EnableNativeRadarrIntegration)
         {
             _logger.LogDebug("Native Radarr integration is disabled");
             return;

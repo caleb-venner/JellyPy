@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Jellyfin.Plugin.JellyPy.Events.Handlers;
+using Jellyfin.Plugin.JellyPy.Events.Models;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.TV;
 using Microsoft.Extensions.DependencyInjection;

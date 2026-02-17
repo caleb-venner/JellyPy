@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using Jellyfin.Plugin.JellyPy.Events;
+using Jellyfin.Plugin.JellyPy.Events.Models;
 
 namespace Jellyfin.Plugin.JellyPy.Events;
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Jellyfin.Plugin.JellyPy.Configuration;
 using Jellyfin.Plugin.JellyPy.Events;
+using Jellyfin.Plugin.JellyPy.Events.Models;
 using Jellyfin.Plugin.JellyPy.Services;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Model.Serialization;
@@ -52,12 +53,16 @@ public class ScriptExecutionServiceTests : TestFixtureBase, IDisposable
         var configurationField = baseType?.GetField("_configuration", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
         configurationField?.SetValue(_plugin, _config);
 
+        var mockConfigProvider = new Mock<IPluginConfigurationProvider>();
+        mockConfigProvider.Setup(x => x.GetConfiguration()).Returns(_config);
+
         var conditionEvaluator = new ConditionEvaluator(NullLogger<ConditionEvaluator>.Instance);
         var dataAttributeProcessor = new DataAttributeProcessor(NullLogger<DataAttributeProcessor>.Instance);
         _service = new ScriptExecutionService(
             NullLogger<ScriptExecutionService>.Instance,
             conditionEvaluator,
-            dataAttributeProcessor);
+            dataAttributeProcessor,
+            mockConfigProvider.Object);
     }
 
     [Fact]

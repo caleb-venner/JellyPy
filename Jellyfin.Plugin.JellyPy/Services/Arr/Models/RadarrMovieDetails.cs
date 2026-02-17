@@ -1,54 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Jellyfin.Plugin.JellyPy.Services.Arr;
-
-/// <summary>
-/// Represents a Radarr movie.
-/// </summary>
-public class RadarrMovie
-{
-    /// <summary>
-    /// Gets or sets the Radarr movie ID.
-    /// </summary>
-    [JsonPropertyName("id")]
-    public int Id { get; set; }
-
-    /// <summary>
-    /// Gets or sets the movie title.
-    /// </summary>
-    [JsonPropertyName("title")]
-    public string Title { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the movie is monitored.
-    /// </summary>
-    [JsonPropertyName("monitored")]
-    public bool Monitored { get; set; }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the movie has a file.
-    /// </summary>
-    [JsonPropertyName("hasFile")]
-    public bool HasFile { get; set; }
-}
-
-/// <summary>
-/// Request to update movies.
-/// </summary>
-public class UpdateMoviesRequest
-{
-    /// <summary>
-    /// Gets or sets the movie IDs to update.
-    /// </summary>
-    [JsonPropertyName("movieIds")]
-    public int[] MovieIds { get; set; } = System.Array.Empty<int>();
-
-    /// <summary>
-    /// Gets or sets a value indicating whether movies should be monitored.
-    /// </summary>
-    [JsonPropertyName("monitored")]
-    public bool Monitored { get; set; }
-}
+namespace Jellyfin.Plugin.JellyPy.Services.Arr.Models;
 
 /// <summary>
 /// Represents detailed information about a Radarr movie including quality profile.
