@@ -5,6 +5,7 @@ using Jellyfin.Plugin.JellyPy.Events.Handlers;
 using Jellyfin.Plugin.JellyPy.Events.Managers;
 using Jellyfin.Plugin.JellyPy.Services;
 using Jellyfin.Plugin.JellyPy.Services.Arr;
+using Jellyfin.Plugin.JellyPy.Services.Notifications;
 using MediaBrowser.Controller;
 using MediaBrowser.Controller.Plugins;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,6 +45,9 @@ public class PluginServiceRegistrator : IPluginServiceRegistrator
         serviceCollection.AddSingleton<ISonarrService, SonarrService>();
         serviceCollection.AddSingleton<IRadarrService, RadarrService>();
         serviceCollection.AddSingleton<IArrIntegrationService, ArrIntegrationService>();
+
+        // Register notification services
+        serviceCollection.AddSingleton<INtfyService, NtfyService>();
 
         // Register event handlers
         serviceCollection.AddTransient<PlaybackStartHandler>();

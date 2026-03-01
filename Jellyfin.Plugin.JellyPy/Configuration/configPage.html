@@ -102,6 +102,7 @@
                         <div class="tab-buttons" style="display: flex; border-bottom: 1px solid #555; margin-bottom: 20px;">
                             <button type="button" class="tab-button active" onclick="switchTab('advanced')" style="padding: 12px 24px; background: none; border: none; border-bottom: 3px solid #00a4dc; color: #fff; cursor: pointer; font-size: 15px; font-weight: 600;">Script Settings</button>
                             <button type="button" class="tab-button" onclick="switchTab('native')" style="padding: 12px 24px; background: none; border: none; border-bottom: 3px solid transparent; color: #ccc; cursor: pointer; font-size: 15px; font-weight: 600;">Native Integration</button>
+                            <button type="button" class="tab-button" onclick="switchTab('notifications')" style="padding: 12px 24px; background: none; border: none; border-bottom: 3px solid transparent; color: #ccc; cursor: pointer; font-size: 15px; font-weight: 600;">Notifications</button>
                             <button type="button" class="tab-button" onclick="switchTab('global')" style="padding: 12px 24px; background: none; border: none; border-bottom: 3px solid transparent; color: #ccc; cursor: pointer; font-size: 15px; font-weight: 600;">Global Settings</button>
                         </div>
                     </div>
@@ -375,6 +376,159 @@
                         </details>
                     </div>
 
+                    <!-- Notifications Tab -->
+                    <div id="notifications-tab" class="tab-content" style="display: none;">
+                        <div class="section-title" style="margin-bottom: 20px;">Notification Settings</div>
+                        <div class="fieldDescription" style="margin-bottom: 20px;">
+                            Configure push notifications via ntfy to receive alerts when new content is added to your library.
+                        </div>
+
+                        <!-- ntfy Settings -->
+                        <details open style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
+                            <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
+                                ntfy Configuration
+                            </summary>
+                            <div style="padding: 15px;">
+                                <div class="checkboxContainer checkboxContainer-withDescription">
+                                    <label class="emby-checkbox-label">
+                                        <input id="EnableNtfyNotifications" name="EnableNtfyNotifications" type="checkbox" is="emby-checkbox" />
+                                        <span>Enable ntfy Notifications</span>
+                                    </label>
+                                    <div class="fieldDescription">Send push notifications when new content is added to your library.</div>
+                                </div>
+                                <div class="inputContainer">
+                                    <label class="inputLabel inputLabelUnfocused" for="NtfyUrl">ntfy Server URL</label>
+                                    <input id="NtfyUrl" name="NtfyUrl" type="text" is="emby-input" placeholder="https://ntfy.sh" />
+                                    <div class="fieldDescription">The URL of your ntfy server. Use https://ntfy.sh for the public server or your self-hosted instance URL.</div>
+                                </div>
+                                <div class="inputContainer">
+                                    <label class="inputLabel inputLabelUnfocused" for="NtfyTopic">Topic</label>
+                                    <input id="NtfyTopic" name="NtfyTopic" type="text" is="emby-input" placeholder="jellyfin-notifications" />
+                                    <div class="fieldDescription">The ntfy topic to publish notifications to. Choose a unique, hard-to-guess topic name for privacy.</div>
+                                </div>
+                                <div class="inputContainer">
+                                    <label class="inputLabel inputLabelUnfocused" for="NtfyDefaultPriority">Default Priority</label>
+                                    <select id="NtfyDefaultPriority" name="NtfyDefaultPriority" is="emby-select">
+                                        <option value="1">Min (1)</option>
+                                        <option value="2">Low (2)</option>
+                                        <option value="3">Default (3)</option>
+                                        <option value="4">High (4)</option>
+                                        <option value="5">Max (5)</option>
+                                    </select>
+                                    <div class="fieldDescription">Default notification priority. Higher priority notifications may make sound or vibrate.</div>
+                                </div>
+
+                                <!-- Authentication Section -->
+                                <div style="border: 1px solid #555; border-radius: 4px; padding: 15px; margin-top: 15px; background: rgba(0, 0, 0, 0.1);">
+                                    <div style="font-weight: bold; margin-bottom: 10px;">Authentication (Optional)</div>
+                                    <div class="fieldDescription" style="margin-bottom: 15px;">
+                                        Configure authentication if your ntfy topic requires it. Use either an access token (preferred) or username/password.
+                                    </div>
+                                    <div class="inputContainer">
+                                        <label class="inputLabel inputLabelUnfocused" for="NtfyAccessToken">Access Token</label>
+                                        <input id="NtfyAccessToken" name="NtfyAccessToken" type="password" is="emby-input" />
+                                        <div class="fieldDescription">ntfy access token for authentication. Preferred over username/password.</div>
+                                    </div>
+                                    <div style="text-align: center; color: #888; margin: 10px 0;">- OR -</div>
+                                    <div class="inputContainer">
+                                        <label class="inputLabel inputLabelUnfocused" for="NtfyUsername">Username</label>
+                                        <input id="NtfyUsername" name="NtfyUsername" type="text" is="emby-input" />
+                                        <div class="fieldDescription">ntfy username for basic authentication.</div>
+                                    </div>
+                                    <div class="inputContainer">
+                                        <label class="inputLabel inputLabelUnfocused" for="NtfyPassword">Password</label>
+                                        <input id="NtfyPassword" name="NtfyPassword" type="password" is="emby-input" />
+                                        <div class="fieldDescription">ntfy password for basic authentication.</div>
+                                    </div>
+                                </div>
+
+                                <div class="inputContainer" style="margin-top: 15px;">
+                                    <button id="testNtfyConnection" type="button" is="emby-button" class="raised button-submit" style="margin-bottom: 10px; padding: 10px 20px; font-size: 14px; min-height: 40px;">
+                                        <span id="testNtfyText">Send Test Notification</span>
+                                    </button>
+                                    <div id="ntfyTestResult" class="fieldDescription" style="display: none; font-weight: bold;"></div>
+                                </div>
+                            </div>
+                        </details>
+
+                        <!-- Media Image Settings -->
+                        <details style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
+                            <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
+                                Media Images
+                            </summary>
+                            <div style="padding: 15px;">
+                                <div class="checkboxContainer checkboxContainer-withDescription">
+                                    <label class="emby-checkbox-label">
+                                        <input id="NtfyIncludeMediaImage" name="NtfyIncludeMediaImage" type="checkbox" is="emby-checkbox" />
+                                        <span>Include Media Images</span>
+                                    </label>
+                                    <div class="fieldDescription">Attach poster/thumbnail images to notifications. Requires Jellyfin External URL to be configured.</div>
+                                </div>
+                                <div class="inputContainer">
+                                    <label class="inputLabel inputLabelUnfocused" for="JellyfinExternalUrl">Jellyfin External URL</label>
+                                    <input id="JellyfinExternalUrl" name="JellyfinExternalUrl" type="text" is="emby-input" placeholder="https://jellyfin.example.com" />
+                                    <div class="fieldDescription">The external URL of your Jellyfin server. ntfy will use this URL to fetch media images. Must be accessible from the internet.</div>
+                                </div>
+                            </div>
+                        </details>
+
+                        <!-- Item Type Filters -->
+                        <details style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
+                            <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
+                                Item Type Filters
+                            </summary>
+                            <div style="padding: 15px;">
+                                <div class="fieldDescription" style="margin-bottom: 15px;">Choose which types of media items will trigger notifications when added to your library.</div>
+                                <div class="checkboxContainer checkboxContainer-withDescription">
+                                    <label class="emby-checkbox-label">
+                                        <input id="NtfyNotifyOnEpisodes" name="NtfyNotifyOnEpisodes" type="checkbox" is="emby-checkbox" />
+                                        <span>Notify on Episodes</span>
+                                    </label>
+                                    <div class="fieldDescription">Send notifications when new TV episodes are added.</div>
+                                </div>
+                                <div class="checkboxContainer checkboxContainer-withDescription">
+                                    <label class="emby-checkbox-label">
+                                        <input id="NtfyNotifyOnMovies" name="NtfyNotifyOnMovies" type="checkbox" is="emby-checkbox" />
+                                        <span>Notify on Movies</span>
+                                    </label>
+                                    <div class="fieldDescription">Send notifications when new movies are added.</div>
+                                </div>
+                                <div class="checkboxContainer checkboxContainer-withDescription">
+                                    <label class="emby-checkbox-label">
+                                        <input id="NtfyNotifyOnSeasons" name="NtfyNotifyOnSeasons" type="checkbox" is="emby-checkbox" />
+                                        <span>Notify on Seasons</span>
+                                    </label>
+                                    <div class="fieldDescription">Send notifications when new TV seasons are added (in addition to episodes).</div>
+                                </div>
+                                <div class="checkboxContainer checkboxContainer-withDescription">
+                                    <label class="emby-checkbox-label">
+                                        <input id="NtfyNotifyOnSeries" name="NtfyNotifyOnSeries" type="checkbox" is="emby-checkbox" />
+                                        <span>Notify on Series</span>
+                                    </label>
+                                    <div class="fieldDescription">Send notifications when new TV series are added (in addition to episodes).</div>
+                                </div>
+                            </div>
+                        </details>
+
+                        <!-- Notification Timing -->
+                        <details style="border: 1px solid #444; border-radius: 4px; margin-bottom: 20px;">
+                            <summary style="padding: 15px 18px; background: rgba(255, 255, 255, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #555; list-style: none; user-select: none; font-weight: bold; font-size: 16px;">
+                                Notification Timing
+                            </summary>
+                            <div style="padding: 15px;">
+                                <div class="inputContainer">
+                                    <label class="inputLabel inputLabelUnfocused" for="NtfyNotificationDelaySeconds">Notification Delay (seconds)</label>
+                                    <input id="NtfyNotificationDelaySeconds" name="NtfyNotificationDelaySeconds" type="number" is="emby-input" min="0" max="300" />
+                                    <div class="fieldDescription">
+                                        Delay before sending notifications to allow grouping of multiple episodes from the same series.
+                                        When multiple episodes from the same series are added within this window, they will be combined into a single notification.
+                                        Set to 0 for immediate notifications. Default: 30 seconds.
+                                    </div>
+                                </div>
+                            </div>
+                        </details>
+                    </div>
+
                     <!-- Global Settings Tab -->
                     <div id="global-tab" class="tab-content" style="display: none;">
                         <div class="section-title" style="margin-bottom: 12px;">Global Settings</div>
@@ -434,12 +588,12 @@
                                     <input id="EnableItemGrouping" name="EnableItemGrouping" type="checkbox" is="emby-checkbox" />
                                     <span>Enable Item Grouping</span>
                                 </label>
-                                <div class="fieldDescription">Group items added in quick succession (e.g., a full season) into a single event to avoid spam.</div>
+                                <div class="fieldDescription">Group items added in quick succession (e.g., a full season) into a single event to avoid spam. Applies to both script execution and notifications.</div>
                             </div>
                             <div class="inputContainer" style="margin-top: 12px;">
                                 <label class="inputLabel inputLabelUnfocused" for="ItemGroupingDelaySeconds">Grouping Delay (seconds)</label>
-                                <input id="ItemGroupingDelaySeconds" name="ItemGroupingDelaySeconds" type="number" is="emby-input" min="1" max="60" />
-                                <div class="fieldDescription">Time to wait for more items before processing a group (default: 2 seconds).</div>
+                                <input id="ItemGroupingDelaySeconds" name="ItemGroupingDelaySeconds" type="number" is="emby-input" min="1" max="900" />
+                                <div class="fieldDescription">Time to wait for more items before processing a group. Allows multiple episodes from the same series to be combined into a single notification and script event. Max: 900 seconds (15 minutes). Default: 2 seconds.</div>
                             </div>
                         </div>
 
@@ -450,7 +604,7 @@
                                     <input id="EnableVerboseLogging" name="EnableVerboseLogging" type="checkbox" is="emby-checkbox" />
                                     <span>Enable verbose logging</span>
                                 </label>
-                                <div class="fieldDescription">Log detailed information about script execution for debugging.</div>
+                                <div class="fieldDescription">Log detailed information for JellyPy plugin.</div>
                             </div>
                         </div>
                     </div>
@@ -1119,6 +1273,8 @@
                     // Load decrypted API keys into the form fields
                     document.querySelector('#SonarrApiKey').value = apiKeys.SonarrApiKey || '';
                     document.querySelector('#RadarrApiKey').value = apiKeys.RadarrApiKey || '';
+                    document.querySelector('#NtfyAccessToken').value = apiKeys.NtfyAccessToken || '';
+                    document.querySelector('#NtfyPassword').value = apiKeys.NtfyPassword || '';
                 } catch (error) {
                     console.error('Error loading API keys:', error);
                 }
@@ -1368,6 +1524,60 @@
                 await testConnection('radarr');
             }
 
+            // ntfy Test Function
+            async function testNtfyConnection() {
+                const button = document.getElementById('testNtfyConnection');
+                const textElement = document.getElementById('testNtfyText');
+                const resultElement = document.getElementById('ntfyTestResult');
+                const urlElement = document.getElementById('NtfyUrl');
+                const topicElement = document.getElementById('NtfyTopic');
+                const accessTokenElement = document.getElementById('NtfyAccessToken');
+                const usernameElement = document.getElementById('NtfyUsername');
+                const passwordElement = document.getElementById('NtfyPassword');
+
+                const url = urlElement.value.trim();
+                const topic = topicElement.value.trim();
+
+                if (!url || !topic) {
+                    showTestResult(resultElement, false, 'Please enter both URL and Topic');
+                    return;
+                }
+
+                // Disable button and show loading
+                button.disabled = true;
+                textElement.textContent = 'Sending...';
+                resultElement.style.display = 'none';
+
+                try {
+                    const response = await ApiClient.ajax({
+                        type: 'POST',
+                        url: ApiClient.getUrl('/Plugins/Jellypy/test-ntfy'),
+                        data: JSON.stringify({
+                            Url: url,
+                            Topic: topic,
+                            AccessToken: accessTokenElement.value.trim() || null,
+                            Username: usernameElement.value.trim() || null,
+                            Password: passwordElement.value.trim() || null
+                        }),
+                        contentType: 'application/json'
+                    });
+
+                    let result = response;
+                    if (response instanceof Response) {
+                        result = await response.json();
+                    }
+
+                    showTestResult(resultElement, result.Success, result.Message);
+                } catch (error) {
+                    console.error('ntfy test error:', error);
+                    showTestResult(resultElement, false, `Test failed: ${error.message || 'Unknown error'}`);
+                } finally {
+                    // Re-enable button
+                    button.disabled = false;
+                    textElement.textContent = 'Send Test Notification';
+                }
+            }
+
             function showTestResult(element, success, message) {
                 element.style.display = 'block';
                 element.textContent = message;
@@ -1413,6 +1623,20 @@
                         document.querySelector('#MinimumWatchPercentage').value = config.MinimumWatchPercentage || 90;
                         document.querySelector('#UnmonitorAfterUpgrade').checked = config.UnmonitorAfterUpgrade !== undefined ? config.UnmonitorAfterUpgrade : false;
 
+                        // Load ntfy notification settings
+                        document.querySelector('#EnableNtfyNotifications').checked = config.EnableNtfyNotifications !== undefined ? config.EnableNtfyNotifications : false;
+                        document.querySelector('#NtfyUrl').value = config.NtfyUrl || 'https://ntfy.sh';
+                        document.querySelector('#NtfyTopic').value = config.NtfyTopic || '';
+                        document.querySelector('#NtfyDefaultPriority').value = config.NtfyDefaultPriority || 3;
+                        document.querySelector('#NtfyUsername').value = config.NtfyUsername || '';
+                        document.querySelector('#NtfyIncludeMediaImage').checked = config.NtfyIncludeMediaImage !== undefined ? config.NtfyIncludeMediaImage : true;
+                        document.querySelector('#JellyfinExternalUrl').value = config.JellyfinExternalUrl || '';
+                        document.querySelector('#NtfyNotificationDelaySeconds').value = config.NtfyNotificationDelaySeconds || 30;
+                        document.querySelector('#NtfyNotifyOnEpisodes').checked = config.NtfyNotifyOnEpisodes !== undefined ? config.NtfyNotifyOnEpisodes : true;
+                        document.querySelector('#NtfyNotifyOnMovies').checked = config.NtfyNotifyOnMovies !== undefined ? config.NtfyNotifyOnMovies : true;
+                        document.querySelector('#NtfyNotifyOnSeasons').checked = config.NtfyNotifyOnSeasons !== undefined ? config.NtfyNotifyOnSeasons : false;
+                        document.querySelector('#NtfyNotifyOnSeries').checked = config.NtfyNotifyOnSeries !== undefined ? config.NtfyNotifyOnSeries : false;
+
                         // Initialize script settings placeholder
                         JellyPyConfig.scriptSettings = config.ScriptSettings || [];
                         renderScriptList();
@@ -1430,6 +1654,9 @@
                         // Add test executable path button event listeners
                         document.getElementById('testPythonExecutable').addEventListener('click', testPythonExecutable);
                         document.getElementById('testBashExecutable').addEventListener('click', testBashExecutable);
+
+                        // Add test ntfy button event listener
+                        document.getElementById('testNtfyConnection').addEventListener('click', testNtfyConnection);
 
                         Dashboard.hideLoadingMsg();
                     });
@@ -1474,6 +1701,22 @@
                     config.UnmonitorOnlyIfWatched = document.querySelector('#UnmonitorOnlyIfWatched').checked;
                     config.MinimumWatchPercentage = parseInt(document.querySelector('#MinimumWatchPercentage').value || 90, 10);
                     config.UnmonitorAfterUpgrade = document.querySelector('#UnmonitorAfterUpgrade').checked;
+
+                    // Save ntfy notification settings
+                    config.EnableNtfyNotifications = document.querySelector('#EnableNtfyNotifications').checked;
+                    config.NtfyUrl = document.querySelector('#NtfyUrl').value;
+                    config.NtfyTopic = document.querySelector('#NtfyTopic').value;
+                    config.NtfyDefaultPriority = parseInt(document.querySelector('#NtfyDefaultPriority').value || 3, 10);
+                    config.NtfyAccessTokenEncrypted = document.querySelector('#NtfyAccessToken').value;
+                    config.NtfyUsername = document.querySelector('#NtfyUsername').value;
+                    config.NtfyPasswordEncrypted = document.querySelector('#NtfyPassword').value;
+                    config.NtfyIncludeMediaImage = document.querySelector('#NtfyIncludeMediaImage').checked;
+                    config.JellyfinExternalUrl = document.querySelector('#JellyfinExternalUrl').value;
+                    config.NtfyNotificationDelaySeconds = parseInt(document.querySelector('#NtfyNotificationDelaySeconds').value || 30, 10);
+                    config.NtfyNotifyOnEpisodes = document.querySelector('#NtfyNotifyOnEpisodes').checked;
+                    config.NtfyNotifyOnMovies = document.querySelector('#NtfyNotifyOnMovies').checked;
+                    config.NtfyNotifyOnSeasons = document.querySelector('#NtfyNotifyOnSeasons').checked;
+                    config.NtfyNotifyOnSeries = document.querySelector('#NtfyNotifyOnSeries').checked;
 
                     // Save script settings
                     config.ScriptSettings = JellyPyConfig.scriptSettings;

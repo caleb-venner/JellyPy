@@ -151,7 +151,7 @@ public abstract class ArrBaseService<TLogger>(ILogger<TLogger> logger, IHttpClie
         var client = HttpClientFactory.CreateClient();
         client.BaseAddress = new Uri(baseUrl.TrimEnd('/'));
         client.DefaultRequestHeaders.Add("X-Api-Key", apiKey);
-        client.Timeout = TimeSpan.FromSeconds(30);
+        client.Timeout = TimeSpan.FromSeconds(60);
         return client;
     }
 

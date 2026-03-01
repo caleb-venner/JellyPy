@@ -14,4 +14,14 @@ public class ApiKeysResponse
     /// Gets or sets the decrypted Radarr API key.
     /// </summary>
     public string RadarrApiKey { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the decrypted ntfy access token.
+    /// </summary>
+    public string NtfyAccessToken { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the decrypted ntfy password.
+    /// </summary>
+    public string NtfyPassword { get; set; } = string.Empty;
 }

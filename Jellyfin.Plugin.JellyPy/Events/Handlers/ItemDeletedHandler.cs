@@ -42,13 +42,13 @@ public class ItemDeletedHandler
         {
             if (item == null)
             {
-                _logger.LogDebug("ItemDeleted event cannot be handled - no item provided");
+                _logger.LogVerbose("ItemDeleted event cannot be handled - no item provided");
                 return;
             }
 
             var eventData = ExtractEventData(item);
 
-            _logger.LogDebug("Processing ItemDeleted event for item {ItemName} ({ItemId})", item.Name, item.Id);
+            _logger.LogVerbose("Processing ItemDeleted event for item {ItemName} ({ItemId})", item.Name, item.Id);
 
             // Execute custom scripts (if configured)
             await _scriptExecutionService.ExecuteScriptsAsync(eventData).ConfigureAwait(false);

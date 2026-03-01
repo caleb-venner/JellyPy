@@ -44,7 +44,7 @@ public class ItemDeletedManager : IItemDeletedManager, IHostedService
         }
 
         _itemQueue.TryAdd(item.Id, new QueuedItem(item, DateTime.UtcNow));
-        _logger.LogDebug("Queued item for deletion processing: {ItemName} ({ItemId})", item.Name, item.Id);
+        _logger.LogVerbose("Queued item for deletion processing: {ItemName} ({ItemId})", item.Name, item.Id);
     }
 
     /// <inheritdoc/>
@@ -93,8 +93,14 @@ public class ItemDeletedManager : IItemDeletedManager, IHostedService
                 }
 
                 var itemsToProcess = new List<QueuedItem>();
-                while (itemsToProcess.Count < maxBatchSize && _itemQueue.TryRemove(_itemQueue.Keys.First(), out var queuedItem))
+                while (itemsToProcess.Count < maxBatchSize)
                 {
+                    var firstKey = _itemQueue.Keys.FirstOrDefault();
+                    if (firstKey == Guid.Empty || !_itemQueue.TryRemove(firstKey, out var queuedItem))
+                    {
+                        break;
+                    }
+
                     itemsToProcess.Add(queuedItem);
                 }
 
@@ -119,7 +125,7 @@ public class ItemDeletedManager : IItemDeletedManager, IHostedService
 
     private async Task ProcessBatchAsync(List<QueuedItem> items, CancellationToken cancellationToken)
     {
-        _logger.LogDebug("Processing batch of {ItemCount} deleted items", items.Count);
+        _logger.LogVerbose("Processing batch of {ItemCount} deleted items", items.Count);
 
         foreach (var queuedItem in items)
         {

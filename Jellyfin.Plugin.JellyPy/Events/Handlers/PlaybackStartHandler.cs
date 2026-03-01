@@ -106,7 +106,7 @@ public class PlaybackStartHandler : IEventProcessor<PlaybackProgressEventArgs>
         {
             if (!CanHandle(eventArgs))
             {
-                _logger.LogDebug("PlaybackStart event cannot be handled - missing required data");
+                _logger.LogVerbose("PlaybackStart event cannot be handled - missing required data");
                 return;
             }
 

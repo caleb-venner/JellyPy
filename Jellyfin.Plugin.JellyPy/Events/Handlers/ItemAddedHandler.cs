@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Jellyfin.Plugin.JellyPy.Events.Models;
+using Jellyfin.Plugin.JellyPy.Services.Notifications;
 using MediaBrowser.Controller.Entities;
+using MediaBrowser.Controller.Entities.Audio;
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Entities.TV;
 using Microsoft.Extensions.Logging;
@@ -17,18 +19,26 @@ public class ItemAddedHandler : IEventProcessor<BaseItem>
 {
     private readonly ILogger<ItemAddedHandler> _logger;
     private readonly IScriptExecutionService _scriptExecutionService;
+    private readonly INtfyService _ntfyService;
+
+    // Deduplication cache to prevent duplicate notifications when items are deleted and re-added
+    // (e.g., when upgrading to better quality). Uses 30-minute window.
+    private static readonly EventDeduplicationCache DeduplicationCache = new(TimeSpan.FromMinutes(30));
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ItemAddedHandler"/> class.
     /// </summary>
     /// <param name="logger">The logger.</param>
     /// <param name="scriptExecutionService">The script execution service.</param>
+    /// <param name="ntfyService">The ntfy notification service.</param>
     public ItemAddedHandler(
         ILogger<ItemAddedHandler> logger,
-        IScriptExecutionService scriptExecutionService)
+        IScriptExecutionService scriptExecutionService,
+        INtfyService ntfyService)
     {
         _logger = logger;
         _scriptExecutionService = scriptExecutionService;
+        _ntfyService = ntfyService;
     }
 
     /// <inheritdoc />
@@ -37,7 +47,17 @@ public class ItemAddedHandler : IEventProcessor<BaseItem>
     /// <inheritdoc />
     public bool CanHandle(BaseItem eventArgs)
     {
-        return eventArgs != null;
+        if (eventArgs == null)
+        {
+            return false;
+        }
+
+        // Filter out non-media items (Person, Studio, Genre, etc.)
+        // Only process actual media content
+        return eventArgs is Episode
+            || eventArgs is Movie
+            || eventArgs is Season
+            || eventArgs is Series;
     }
 
     /// <inheritdoc />
@@ -60,7 +80,12 @@ public class ItemAddedHandler : IEventProcessor<BaseItem>
             eventData.SeasonNumber = episode.ParentIndexNumber;
             eventData.EpisodeNumber = episode.IndexNumber;
             eventData.AdditionalData["EpisodeName"] = episode.Name;
-            eventData.AdditionalData["SeriesId"] = episode.SeriesId;
+
+            // Only store SeriesId if it's valid (not empty)
+            if (episode.SeriesId != Guid.Empty)
+            {
+                eventData.AdditionalData["SeriesId"] = episode.SeriesId;
+            }
         }
         else if (item is Movie movie)
         {
@@ -99,16 +124,51 @@ public class ItemAddedHandler : IEventProcessor<BaseItem>
         {
             if (!CanHandle(item))
             {
-                _logger.LogDebug("ItemAdded event cannot be handled - no item provided");
+                _logger.LogVerbose("ItemAdded event cannot be handled - no item provided");
                 return;
             }
 
             var eventData = ExtractEventData(item);
 
-            _logger.LogDebug("Processing ItemAdded event for item {ItemName} ({ItemId})", item.Name, item.Id);
+            _logger.LogVerbose("Processing ItemAdded event for item {ItemName} ({ItemId})", item.Name, item.Id);
+
+            // Create deduplication key based on item type and identifier
+            string? deduplicationKey = null;
+            if (item is Episode episode)
+            {
+                // For episodes, use series name + season + episode number
+                deduplicationKey = $"{eventData.SeriesName}:S{episode.ParentIndexNumber?.ToString("D2", System.Globalization.CultureInfo.InvariantCulture) ?? "XX"}E{episode.IndexNumber?.ToString("D2", System.Globalization.CultureInfo.InvariantCulture) ?? "XX"}";
+            }
+            else if (item is Movie movie)
+            {
+                // For movies, use title + year
+                deduplicationKey = $"{movie.Name}:{movie.ProductionYear ?? 0}";
+            }
+            else if (item is Season season)
+            {
+                // For seasons, use series name + season number
+                deduplicationKey = $"{eventData.SeriesName}:Season{season.IndexNumber ?? 0}";
+            }
+            else if (item is Series series)
+            {
+                // For series, use series name
+                deduplicationKey = $"{series.Name}:Series";
+            }
+
+            // Check for duplicates if we have a deduplication key
+            if (deduplicationKey != null && !DeduplicationCache.ShouldProcessEvent(deduplicationKey))
+            {
+                _logger.LogInformation(
+                    "Skipping duplicate notification for {ItemName} (recently processed)",
+                    item.Name);
+                return;
+            }
 
             // Execute custom scripts (if configured)
             await _scriptExecutionService.ExecuteScriptsAsync(eventData).ConfigureAwait(false);
+
+            // Send ntfy notification (if configured)
+            await _ntfyService.SendItemAddedNotificationAsync(eventData).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

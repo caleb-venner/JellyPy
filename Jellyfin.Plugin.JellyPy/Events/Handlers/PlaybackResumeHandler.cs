@@ -104,7 +104,7 @@ public class PlaybackResumeHandler : IEventProcessor<PlaybackProgressEventArgs>
         {
             if (!CanHandle(eventArgs))
             {
-                _logger.LogDebug("PlaybackResume event cannot be handled - missing required data or is paused");
+                _logger.LogVerbose("PlaybackResume event cannot be handled - missing required data or is paused");
                 return;
             }
 
@@ -112,8 +112,7 @@ public class PlaybackResumeHandler : IEventProcessor<PlaybackProgressEventArgs>
             var eventKey = $"resume-{eventArgs.Session?.Id}";
             if (!DeduplicationCache.ShouldProcessEvent(eventKey))
             {
-                _logger.LogDebug("Skipping duplicate PlaybackResume event for session {SessionId}", eventArgs.Session?.Id);
-                return;
+                return; // Normal during playback - progress events fire every second
             }
 
             var eventData = ExtractEventData(eventArgs);

@@ -159,14 +159,14 @@ public class ArrIntegrationService : IArrIntegrationService
         if (config.UnmonitorWatchedEpisodes)
         {
             await _sonarrService.SetEpisodeMonitoredAsync(currentEp.Id, false);
-            _logger.LogDebug(
+            _logger.LogVerbose(
                 "Unmonitored watched episode: S{Season}E{Episode}",
                 currentEp.SeasonNumber,
                 currentEp.EpisodeNumber);
         }
         else
         {
-            _logger.LogDebug(
+            _logger.LogVerbose(
                 "Keeping episode monitored (UnmonitorWatchedEpisodes is disabled): S{Season}E{Episode}",
                 currentEp.SeasonNumber,
                 currentEp.EpisodeNumber);
@@ -201,7 +201,7 @@ public class ArrIntegrationService : IArrIntegrationService
             // Check if we should skip episodes with existing files
             if (config.SkipEpisodesWithFiles && nextEpisode.HasFile)
             {
-                _logger.LogDebug(
+                _logger.LogVerbose(
                     "Episode already has file, skipping: S{Season}E{Episode}",
                     nextEpisode.SeasonNumber,
                     nextEpisode.EpisodeNumber);
@@ -251,13 +251,13 @@ public class ArrIntegrationService : IArrIntegrationService
         var config = _configProvider.GetConfiguration();
         if (!config.EnableNativeRadarrIntegration)
         {
-            _logger.LogDebug("Native Radarr integration is disabled");
+            _logger.LogVerbose("Native Radarr integration is disabled");
             return;
         }
 
         if (!config.UnmonitorWatchedMovies)
         {
-            _logger.LogDebug("Unmonitoring watched movies is disabled");
+            _logger.LogVerbose("Unmonitoring watched movies is disabled");
             return;
         }
 
@@ -312,13 +312,13 @@ public class ArrIntegrationService : IArrIntegrationService
         var config = _configProvider.GetConfiguration();
         if (!config.EnableNativeRadarrIntegration)
         {
-            _logger.LogDebug("Native Radarr integration is disabled");
+            _logger.LogVerbose("Native Radarr integration is disabled");
             return;
         }
 
         if (!config.UnmonitorWatchedMovies)
         {
-            _logger.LogDebug("Unmonitoring watched movies is disabled");
+            _logger.LogVerbose("Unmonitoring watched movies is disabled");
             return;
         }
 

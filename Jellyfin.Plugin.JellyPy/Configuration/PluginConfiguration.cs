@@ -16,6 +16,10 @@ public class PluginConfiguration : BasePluginConfiguration
     private string _sonarrApiKeyEncrypted = string.Empty;
     private string _radarrApiKeyEncrypted = string.Empty;
 
+    // Private backing fields for encrypted ntfy credentials
+    private string _ntfyAccessTokenEncrypted = string.Empty;
+    private string _ntfyPasswordEncrypted = string.Empty;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="PluginConfiguration"/> class.
     /// </summary>
@@ -23,9 +27,6 @@ public class PluginConfiguration : BasePluginConfiguration
     {
         ScriptSettings = new Collection<ScriptSetting>();
         GlobalSettings = new GlobalScriptSettings();
-
-        // Initialize encryption key for API keys
-        EncryptionHelper.GenerateMachineKey();
 
         // Native integration settings - enabled by default
         EnableNativeSonarrIntegration = true;
@@ -44,6 +45,18 @@ public class PluginConfiguration : BasePluginConfiguration
         // Item grouping settings
         EnableItemGrouping = true;
         ItemGroupingDelaySeconds = 2;
+
+        // ntfy notification settings
+        EnableNtfyNotifications = false;
+        NtfyUrl = "https://ntfy.sh";
+        NtfyTopic = string.Empty;
+        NtfyDefaultPriority = 3;
+        NtfyIncludeMediaImage = true;
+        NtfyNotificationDelaySeconds = 30;
+        NtfyNotifyOnEpisodes = true;
+        NtfyNotifyOnMovies = true;
+        NtfyNotifyOnSeasons = false;
+        NtfyNotifyOnSeries = false;
     }
 
     /// <summary>
@@ -70,6 +83,13 @@ public class PluginConfiguration : BasePluginConfiguration
             if (string.IsNullOrEmpty(value))
             {
                 _sonarrApiKeyEncrypted = string.Empty;
+                return;
+            }
+
+            // If EncryptionHelper not initialized yet (during deserialization), store as-is
+            if (!EncryptionHelper.IsInitialized())
+            {
+                _sonarrApiKeyEncrypted = value;
                 return;
             }
 
@@ -105,6 +125,13 @@ public class PluginConfiguration : BasePluginConfiguration
                 return;
             }
 
+            // If EncryptionHelper not initialized yet (during deserialization), store as-is
+            if (!EncryptionHelper.IsInitialized())
+            {
+                _radarrApiKeyEncrypted = value;
+                return;
+            }
+
             // If the value appears to be plaintext, encrypt it
             if (!IsLikelyEncrypted(value))
             {
@@ -127,6 +154,11 @@ public class PluginConfiguration : BasePluginConfiguration
     {
         get
         {
+            if (!EncryptionHelper.IsInitialized())
+            {
+                return string.Empty;
+            }
+
             string encryptionKey = EncryptionHelper.GenerateMachineKey();
             return string.IsNullOrEmpty(SonarrApiKeyEncrypted)
                 ? string.Empty
@@ -139,6 +171,11 @@ public class PluginConfiguration : BasePluginConfiguration
             {
                 SonarrApiKeyEncrypted = string.Empty;
                 return;
+            }
+
+            if (!EncryptionHelper.IsInitialized())
+            {
+                return; // Cannot encrypt without initialization
             }
 
             string encryptionKey = EncryptionHelper.GenerateMachineKey();
@@ -155,6 +192,11 @@ public class PluginConfiguration : BasePluginConfiguration
     {
         get
         {
+            if (!EncryptionHelper.IsInitialized())
+            {
+                return string.Empty;
+            }
+
             string encryptionKey = EncryptionHelper.GenerateMachineKey();
             return string.IsNullOrEmpty(RadarrApiKeyEncrypted)
                 ? string.Empty
@@ -167,6 +209,11 @@ public class PluginConfiguration : BasePluginConfiguration
             {
                 RadarrApiKeyEncrypted = string.Empty;
                 return;
+            }
+
+            if (!EncryptionHelper.IsInitialized())
+            {
+                return; // Cannot encrypt without initialization
             }
 
             string encryptionKey = EncryptionHelper.GenerateMachineKey();
@@ -285,6 +332,256 @@ public class PluginConfiguration : BasePluginConfiguration
     /// </summary>
     public int ItemGroupingDelaySeconds { get; set; }
 
+    // ntfy Notification Settings
+
+    /// <summary>
+    /// Gets or sets a value indicating whether ntfy notifications are enabled.
+    /// </summary>
+    public bool EnableNtfyNotifications { get; set; }
+
+    /// <summary>
+    /// Gets or sets the ntfy server URL.
+    /// Default is https://ntfy.sh for the public server.
+    /// </summary>
+    public string NtfyUrl { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the ntfy topic to publish notifications to.
+    /// </summary>
+    public string NtfyTopic { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the encrypted ntfy access token for authentication.
+    /// </summary>
+    public string NtfyAccessTokenEncrypted
+    {
+        get => _ntfyAccessTokenEncrypted;
+        set
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                _ntfyAccessTokenEncrypted = string.Empty;
+                return;
+            }
+
+            // If EncryptionHelper not initialized yet (during deserialization), store as-is
+            if (!EncryptionHelper.IsInitialized())
+            {
+                _ntfyAccessTokenEncrypted = value;
+                return;
+            }
+
+            // If the value appears to be plaintext, encrypt it
+            if (!IsLikelyEncrypted(value))
+            {
+                string encryptionKey = EncryptionHelper.GenerateMachineKey();
+                _ntfyAccessTokenEncrypted = EncryptionHelper.Encrypt(value, encryptionKey);
+            }
+            else
+            {
+                _ntfyAccessTokenEncrypted = value;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the ntfy access token using automatic encryption on set and decryption on get.
+    /// </summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    [System.Xml.Serialization.XmlIgnore]
+    public string NtfyAccessToken
+    {
+        get
+        {
+            if (!EncryptionHelper.IsInitialized())
+            {
+                return string.Empty;
+            }
+
+            string encryptionKey = EncryptionHelper.GenerateMachineKey();
+            return string.IsNullOrEmpty(NtfyAccessTokenEncrypted)
+                ? string.Empty
+                : EncryptionHelper.Decrypt(NtfyAccessTokenEncrypted, encryptionKey);
+        }
+
+        set
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                NtfyAccessTokenEncrypted = string.Empty;
+                return;
+            }
+
+            if (!EncryptionHelper.IsInitialized())
+            {
+                return; // Cannot encrypt without initialization
+            }
+
+            string encryptionKey = EncryptionHelper.GenerateMachineKey();
+            NtfyAccessTokenEncrypted = EncryptionHelper.Encrypt(value, encryptionKey);
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the ntfy username for basic authentication.
+    /// Used when access token is not provided.
+    /// </summary>
+    public string NtfyUsername { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the encrypted ntfy password for basic authentication.
+    /// </summary>
+    public string NtfyPasswordEncrypted
+    {
+        get => _ntfyPasswordEncrypted;
+        set
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                System.Diagnostics.Debug.WriteLine("NtfyPasswordEncrypted setter: Setting to empty");
+                _ntfyPasswordEncrypted = string.Empty;
+                return;
+            }
+
+            // If EncryptionHelper not initialized yet (during deserialization), store as-is
+            if (!EncryptionHelper.IsInitialized())
+            {
+                System.Diagnostics.Debug.WriteLine($"NtfyPasswordEncrypted setter: EncryptionHelper not initialized, storing as-is (length: {value.Length})");
+                _ntfyPasswordEncrypted = value;
+                return;
+            }
+
+            // If the value appears to be plaintext, encrypt it
+            bool isEncrypted = IsLikelyEncrypted(value);
+            System.Diagnostics.Debug.WriteLine($"NtfyPasswordEncrypted setter: IsLikelyEncrypted={isEncrypted}, value length={value.Length}");
+
+            if (!isEncrypted)
+            {
+                System.Diagnostics.Debug.WriteLine("NtfyPasswordEncrypted setter: Value appears to be plaintext, encrypting it");
+                string encryptionKey = EncryptionHelper.GenerateMachineKey();
+                _ntfyPasswordEncrypted = EncryptionHelper.Encrypt(value, encryptionKey);
+                System.Diagnostics.Debug.WriteLine($"NtfyPasswordEncrypted setter: Encrypted result length={_ntfyPasswordEncrypted?.Length ?? 0}");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("NtfyPasswordEncrypted setter: Value appears to be encrypted, storing as-is");
+                _ntfyPasswordEncrypted = value;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the ntfy password using automatic encryption on set and decryption on get.
+    /// </summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    [System.Xml.Serialization.XmlIgnore]
+    public string NtfyPassword
+    {
+        get
+        {
+            if (!EncryptionHelper.IsInitialized())
+            {
+                System.Diagnostics.Debug.WriteLine("NtfyPassword getter: EncryptionHelper not initialized");
+                return string.Empty;
+            }
+
+            if (string.IsNullOrEmpty(NtfyPasswordEncrypted))
+            {
+                System.Diagnostics.Debug.WriteLine("NtfyPassword getter: NtfyPasswordEncrypted is empty");
+                return string.Empty;
+            }
+
+            try
+            {
+                string encryptionKey = EncryptionHelper.GenerateMachineKey();
+                System.Diagnostics.Debug.WriteLine($"NtfyPassword getter: Attempting to decrypt (encrypted length: {NtfyPasswordEncrypted.Length})");
+                var decrypted = EncryptionHelper.Decrypt(NtfyPasswordEncrypted, encryptionKey);
+                System.Diagnostics.Debug.WriteLine($"NtfyPassword getter: Decryption result length: {decrypted?.Length ?? 0}");
+                return decrypted;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"NtfyPassword getter: Exception during decryption: {ex.Message}");
+                return string.Empty;
+            }
+        }
+
+        set
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                System.Diagnostics.Debug.WriteLine("NtfyPassword setter: Setting to empty");
+                NtfyPasswordEncrypted = string.Empty;
+                return;
+            }
+
+            if (!EncryptionHelper.IsInitialized())
+            {
+                System.Diagnostics.Debug.WriteLine("NtfyPassword setter: EncryptionHelper not initialized, cannot encrypt");
+                return; // Cannot encrypt without initialization
+            }
+
+            try
+            {
+                string encryptionKey = EncryptionHelper.GenerateMachineKey();
+                System.Diagnostics.Debug.WriteLine($"NtfyPassword setter: Attempting to encrypt (plaintext length: {value.Length})");
+                var encrypted = EncryptionHelper.Encrypt(value, encryptionKey);
+                System.Diagnostics.Debug.WriteLine($"NtfyPassword setter: Encryption result length: {encrypted?.Length ?? 0}");
+                NtfyPasswordEncrypted = encrypted;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"NtfyPassword setter: Exception during encryption: {ex.Message}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the default notification priority (1-5).
+    /// 1=min, 2=low, 3=default, 4=high, 5=max.
+    /// </summary>
+    public int NtfyDefaultPriority { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to include media images in notifications.
+    /// Requires JellyfinExternalUrl to be configured.
+    /// </summary>
+    public bool NtfyIncludeMediaImage { get; set; }
+
+    /// <summary>
+    /// Gets or sets the external URL for Jellyfin server.
+    /// Used for media image URLs in ntfy notifications.
+    /// Example: https://jellyfin.example.com.
+    /// </summary>
+    public string JellyfinExternalUrl { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the delay in seconds to wait before sending ntfy notifications.
+    /// This allows batching multiple episodes from the same series into a single notification.
+    /// Default is 30 seconds.
+    /// </summary>
+    public int NtfyNotificationDelaySeconds { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to send notifications for new episodes.
+    /// </summary>
+    public bool NtfyNotifyOnEpisodes { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to send notifications for new movies.
+    /// </summary>
+    public bool NtfyNotifyOnMovies { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to send notifications for new seasons.
+    /// </summary>
+    public bool NtfyNotifyOnSeasons { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to send notifications for new series.
+    /// </summary>
+    public bool NtfyNotifyOnSeries { get; set; }
+
     /// <summary>
     /// Ensures API keys are properly encrypted before saving.
     /// This method should be called before serialization to handle any plaintext API keys.
@@ -308,6 +605,22 @@ public class PluginConfiguration : BasePluginConfiguration
             string plaintext = RadarrApiKeyEncrypted;
             RadarrApiKeyEncrypted = EncryptionHelper.Encrypt(plaintext, encryptionKey);
         }
+
+        // Check if NtfyAccessTokenEncrypted contains plaintext that should be encrypted
+        if (!string.IsNullOrEmpty(NtfyAccessTokenEncrypted) && !IsLikelyEncrypted(NtfyAccessTokenEncrypted))
+        {
+            // Appears to be plaintext - encrypt it
+            string plaintext = NtfyAccessTokenEncrypted;
+            NtfyAccessTokenEncrypted = EncryptionHelper.Encrypt(plaintext, encryptionKey);
+        }
+
+        // Check if NtfyPasswordEncrypted contains plaintext that should be encrypted
+        if (!string.IsNullOrEmpty(NtfyPasswordEncrypted) && !IsLikelyEncrypted(NtfyPasswordEncrypted))
+        {
+            // Appears to be plaintext - encrypt it
+            string plaintext = NtfyPasswordEncrypted;
+            NtfyPasswordEncrypted = EncryptionHelper.Encrypt(plaintext, encryptionKey);
+        }
     }
 
     /// <summary>
@@ -323,8 +636,9 @@ public class PluginConfiguration : BasePluginConfiguration
         }
 
         // Encrypted values should be base64 strings with reasonable length
-        // Encrypted data is much longer than typical API keys (32-64 chars)
-        if (value.Length < 64)
+        // Minimum encrypted size: 16-byte IV + 16-byte cipher block = 32 bytes = ~43 base64 chars
+        // Use 40 as threshold to account for very short passwords
+        if (value.Length < 40)
         {
             return false; // Too short to be encrypted
         }
@@ -333,7 +647,7 @@ public class PluginConfiguration : BasePluginConfiguration
         try
         {
             byte[] data = Convert.FromBase64String(value);
-            return data.Length > 16; // Encrypted data should be longer than a typical API key
+            return data.Length >= 32; // Minimum: 16-byte IV + 16-byte ciphertext
         }
         catch (FormatException)
         {

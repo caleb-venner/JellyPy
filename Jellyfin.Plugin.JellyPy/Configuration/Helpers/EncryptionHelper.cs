@@ -18,6 +18,7 @@ public static class EncryptionHelper
     ];
 
     private static IServerApplicationHost? _applicationHost;
+    private static bool _isFullyInitialized;
 
     /// <summary>
     /// Initializes the EncryptionHelper with the Jellyfin server application host.
@@ -26,6 +27,16 @@ public static class EncryptionHelper
     public static void Initialize(IServerApplicationHost applicationHost)
     {
         _applicationHost = applicationHost;
+        _isFullyInitialized = true;
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether the EncryptionHelper has been initialized.
+    /// </summary>
+    /// <returns>True if initialized, false otherwise.</returns>
+    public static bool IsInitialized()
+    {
+        return _isFullyInitialized;
     }
 
     /// <summary>
@@ -95,12 +106,16 @@ public static class EncryptionHelper
     {
         if (string.IsNullOrEmpty(cipherText))
         {
+            System.Diagnostics.Debug.WriteLine("EncryptionHelper.Decrypt: Empty cipherText provided");
             return string.Empty;
         }
+
+        System.Diagnostics.Debug.WriteLine($"EncryptionHelper.Decrypt: Attempting to decrypt (cipherText length: {cipherText.Length}, passPhrase length: {passPhrase?.Length ?? 0})");
 
         try
         {
             byte[] cipherTextBytesWithIV = Convert.FromBase64String(cipherText);
+            System.Diagnostics.Debug.WriteLine($"EncryptionHelper.Decrypt: Base64 decoded successfully ({cipherTextBytesWithIV.Length} bytes)");
 
             using var password = new Rfc2898DeriveBytes(passPhrase, _salt, 10000, HashAlgorithmName.SHA256);
             byte[] keyBytes = password.GetBytes(256 / 8);
@@ -124,29 +139,31 @@ public static class EncryptionHelper
             cryptoStream.CopyTo(resultStream);
             byte[] plainTextBytes = resultStream.ToArray();
 
-            return Encoding.UTF8.GetString(plainTextBytes);
+            var result = Encoding.UTF8.GetString(plainTextBytes);
+            System.Diagnostics.Debug.WriteLine($"EncryptionHelper.Decrypt: Successfully decrypted (result length: {result.Length})");
+            return result;
         }
         catch (FormatException ex)
         {
             // Invalid Base64 string
-            System.Diagnostics.Debug.WriteLine($"Decryption format error: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"EncryptionHelper.Decrypt: Format error - {ex.Message}");
             return string.Empty;
         }
         catch (CryptographicException ex)
         {
             // Decryption failed (wrong key, corrupted data, etc.)
-            System.Diagnostics.Debug.WriteLine($"Decryption failed: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"EncryptionHelper.Decrypt: Cryptographic error - {ex.Message}");
             return string.Empty;
         }
         catch (ArgumentException ex)
         {
             // Invalid argument (e.g., IV size)
-            System.Diagnostics.Debug.WriteLine($"Decryption argument error: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"EncryptionHelper.Decrypt: Argument error - {ex.Message}");
             return string.Empty;
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Unexpected decryption error: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"EncryptionHelper.Decrypt: Unexpected error - {ex.Message}");
             throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
     }
@@ -157,20 +174,21 @@ public static class EncryptionHelper
     /// but is unique to each Jellyfin installation.
     /// </summary>
     /// <returns>A Jellyfin server-specific encryption key.</returns>
-    /// <exception cref="InvalidOperationException">Thrown when the EncryptionHelper has not been initialized.</exception>
+    /// <remarks>
+    /// If called before Initialize(), returns a temporary fallback key.
+    /// This allows configuration loading during plugin initialization, but the key will be
+    /// updated once Initialize() is called with the actual server host.
+    /// </remarks>
     public static string GenerateMachineKey()
     {
-        if (_applicationHost == null)
-        {
-            throw new InvalidOperationException("EncryptionHelper not initialized. Call Initialize() first.");
-        }
-
         try
         {
             // Three stable components: Plugin GUID + Server ID + Static Salt
             string pluginGuid = "a5bd541f-38dc-467e-9a9a-15fe3f3bcf5c";
-            string serverId = _applicationHost.SystemId ?? "unknown-server";
+            string serverId = _applicationHost?.SystemId ?? "temp-initialization-key";
             string salt = "JellyPy-Server-Key-2024";
+
+            System.Diagnostics.Debug.WriteLine($"EncryptionHelper.GenerateMachineKey: Using serverId='{serverId}', isInitialized={_isFullyInitialized}");
 
             // Simple combination
             string serverKey = $"{pluginGuid}:{serverId}:{salt}";
@@ -178,7 +196,9 @@ public static class EncryptionHelper
             // Hash for consistency
             using var sha256 = SHA256.Create();
             byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(serverKey));
-            return Convert.ToBase64String(hashBytes);
+            var result = Convert.ToBase64String(hashBytes);
+            System.Diagnostics.Debug.WriteLine($"EncryptionHelper.GenerateMachineKey: Generated key length={result.Length}");
+            return result;
         }
         catch (CryptographicException ex)
         {

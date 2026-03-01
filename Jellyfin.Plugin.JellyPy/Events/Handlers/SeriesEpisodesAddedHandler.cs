@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Jellyfin.Plugin.JellyPy.Events.Models;
+using Jellyfin.Plugin.JellyPy.Services.Notifications;
 using MediaBrowser.Controller.Entities.TV;
 using Microsoft.Extensions.Logging;
 
@@ -16,18 +17,26 @@ public class SeriesEpisodesAddedHandler
 {
     private readonly ILogger<SeriesEpisodesAddedHandler> _logger;
     private readonly IScriptExecutionService _scriptExecutionService;
+    private readonly INtfyService _ntfyService;
+
+    // Deduplication cache to prevent duplicate notifications when episodes are deleted and re-added
+    // (e.g., when upgrading to better quality). Uses 30-minute window.
+    private static readonly EventDeduplicationCache DeduplicationCache = new(TimeSpan.FromMinutes(30));
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SeriesEpisodesAddedHandler"/> class.
     /// </summary>
     /// <param name="logger">The logger.</param>
     /// <param name="scriptExecutionService">The script execution service.</param>
+    /// <param name="ntfyService">The ntfy notification service.</param>
     public SeriesEpisodesAddedHandler(
         ILogger<SeriesEpisodesAddedHandler> logger,
-        IScriptExecutionService scriptExecutionService)
+        IScriptExecutionService scriptExecutionService,
+        INtfyService ntfyService)
     {
         _logger = logger;
         _scriptExecutionService = scriptExecutionService;
+        _ntfyService = ntfyService;
     }
 
     /// <summary>
@@ -41,7 +50,7 @@ public class SeriesEpisodesAddedHandler
         {
             if (group == null || group.Episodes.Count == 0)
             {
-                _logger.LogDebug("SeriesEpisodesAdded event cannot be handled - no episodes provided");
+                _logger.LogVerbose("SeriesEpisodesAdded event cannot be handled - no episodes provided");
                 return;
             }
 
@@ -53,8 +62,24 @@ public class SeriesEpisodesAddedHandler
                 group.EpisodeCount,
                 eventData.EpisodeRange);
 
+            // Create deduplication key based on series name and episode range
+            // This prevents duplicate notifications when episodes are deleted and re-added
+            var deduplicationKey = $"{group.SeriesName}:{eventData.EpisodeRange}";
+
+            if (!DeduplicationCache.ShouldProcessEvent(deduplicationKey))
+            {
+                _logger.LogInformation(
+                    "Skipping duplicate notification for {SeriesName} {EpisodeRange} (recently processed)",
+                    group.SeriesName,
+                    eventData.EpisodeRange);
+                return;
+            }
+
             // Execute custom scripts (if configured for SeriesEpisodesAdded event)
             await _scriptExecutionService.ExecuteScriptsAsync(eventData).ConfigureAwait(false);
+
+            // Send ntfy notification (if configured)
+            await _ntfyService.SendItemAddedNotificationAsync(eventData).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -103,6 +128,11 @@ public class SeriesEpisodesAddedHandler
             eventData.AdditionalData["Runtime"] = group.Series.RunTimeTicks;
             eventData.AdditionalData["DateCreated"] = group.Series.DateCreated;
             eventData.AdditionalData["SeriesId"] = group.Series.Id;
+        }
+        else if (firstEpisode != null && firstEpisode.SeriesId != Guid.Empty)
+        {
+            // Fall back to using SeriesId from episode when Series object is unavailable
+            eventData.AdditionalData["SeriesId"] = firstEpisode.SeriesId;
         }
 
         // Add first and last episode details for context

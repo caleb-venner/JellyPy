@@ -69,7 +69,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
 
         if (applicableSettings.Count == 0)
         {
-            _logger.LogDebug("No script settings configured for event type {EventType}", eventData.EventType);
+            _logger.LogVerbose("No script settings configured for event type {EventType}", eventData.EventType);
             return;
         }
 
@@ -92,7 +92,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
             }
             else
             {
-                _logger.LogDebug("Conditions not met for script setting {SettingId}", setting.Id);
+                _logger.LogVerbose("Conditions not met for script setting {SettingId}", setting.Id);
             }
         }
         finally
@@ -388,7 +388,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                 if (completed && process.ExitCode == 0)
                 {
                     var output = process.StandardOutput.ReadToEnd();
-                    _logger.LogDebug("Python version check for {Path}: {Output}", path, output.Trim());
+                    _logger.LogVerbose("Python version check for {Path}: {Output}", path, output.Trim());
                     return output.Contains("Python", StringComparison.OrdinalIgnoreCase);
                 }
 
@@ -400,15 +400,15 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
         }
         catch (InvalidOperationException ex)
         {
-            _logger.LogDebug("Failed to check Python executable {Path}: {Error}", path, ex.Message);
+            _logger.LogVerbose("Failed to check Python executable {Path}: {Error}", path, ex.Message);
         }
         catch (System.ComponentModel.Win32Exception ex)
         {
-            _logger.LogDebug("Python executable not found at {Path}: {Error}", path, ex.Message);
+            _logger.LogVerbose("Python executable not found at {Path}: {Error}", path, ex.Message);
         }
         catch (Exception ex)
         {
-            _logger.LogDebug("Unexpected error checking Python executable {Path}: {Error}", path, ex.Message);
+            _logger.LogVerbose("Unexpected error checking Python executable {Path}: {Error}", path, ex.Message);
             throw; // Rethrow to maintain CA1031 compliance while still logging the error
         }
 
@@ -528,7 +528,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                 }
                 else
                 {
-                    _logger.LogDebug("Directory does not exist: {Directory}", dir);
+                    _logger.LogVerbose("Directory does not exist: {Directory}", dir);
                 }
             }
 
@@ -537,16 +537,16 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
             {
                 var paths = pathVar.Split(':', StringSplitOptions.RemoveEmptyEntries);
                 _logger.LogInformation("PATH contains {Count} directories", paths.Length);
-                _logger.LogDebug("PATH directories: {Paths}", string.Join(", ", paths.Take(LoggingConstants.MaxPathDirectoriesToLog)));
+                _logger.LogVerbose("PATH directories: {Paths}", string.Join(", ", paths.Take(LoggingConstants.MaxPathDirectoriesToLog)));
             }
         }
         catch (InvalidOperationException ex)
         {
-            _logger.LogDebug("Failed to collect Python diagnostics (invalid operation): {Error}", ex.Message);
+            _logger.LogVerbose("Failed to collect Python diagnostics (invalid operation): {Error}", ex.Message);
         }
         catch (UnauthorizedAccessException ex)
         {
-            _logger.LogDebug("Failed to collect Python diagnostics (access denied): {Error}", ex.Message);
+            _logger.LogVerbose("Failed to collect Python diagnostics (access denied): {Error}", ex.Message);
         }
     }
 
@@ -593,7 +593,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogDebug(ex, "Failed to kill timed-out process.");
+                    _logger.LogVerbose(ex, "Failed to kill timed-out process.");
                     throw; // Rethrow to maintain CA1031 compliance while still logging the error
                 }
 
@@ -613,7 +613,7 @@ public class ScriptExecutionService : IScriptExecutionService, IDisposable
             }
             else
             {
-                _logger.LogDebug(
+                _logger.LogVerbose(
                     "Script executed successfully for event {EventType}. StdOut: {StdOut}",
                     eventType,
                     stdOut);

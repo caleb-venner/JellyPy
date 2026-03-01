@@ -56,7 +56,7 @@ public class JellyPyApiController(ILogger<JellyPyApiController> logger, IHttpCli
                 return Ok(scripts);
             }
 
-            _logger.LogDebug("Scanning directory for scripts: {Directory}", scriptDirectory);
+            _logger.LogVerbose("Scanning directory for scripts: {Directory}", scriptDirectory);
 
             var scriptFiles = Directory.GetFiles(scriptDirectory, "*", SearchOption.AllDirectories)
                 .Where(file => IsScriptFile(file))
@@ -606,6 +606,99 @@ public class JellyPyApiController(ILogger<JellyPyApiController> logger, IHttpCli
     }
 
     /// <summary>
+    /// Tests a connection to an ntfy server.
+    /// </summary>
+    /// <param name="request">The connection test request.</param>
+    /// <returns>Connection test result.</returns>
+    [HttpPost("test-ntfy")]
+    public async Task<ActionResult<ConnectionTestResult>> TestNtfyConnection([FromBody] NtfyTestRequest request)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(request.Url) || string.IsNullOrEmpty(request.Topic))
+            {
+                return BadRequest(new ConnectionTestResult
+                {
+                    Success = false,
+                    Message = "URL and Topic are required"
+                });
+            }
+
+            using var httpClient = _httpClientFactory.CreateClient();
+            httpClient.Timeout = TimeSpan.FromSeconds(ApiConstants.HttpRequestTimeoutSeconds);
+
+            // Configure authentication if provided
+            if (!string.IsNullOrWhiteSpace(request.AccessToken))
+            {
+                httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", request.AccessToken);
+            }
+            else if (!string.IsNullOrWhiteSpace(request.Username) && !string.IsNullOrWhiteSpace(request.Password))
+            {
+                var credentials = Convert.ToBase64String(
+                    System.Text.Encoding.UTF8.GetBytes($"{request.Username}:{request.Password}"));
+                httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", credentials);
+            }
+
+            // Send a test notification
+            var notification = new
+            {
+                topic = request.Topic,
+                title = "JellyPy Test Notification",
+                message = "ntfy integration is working correctly!",
+                tags = new[] { "white_check_mark", "jellypy" }
+            };
+
+            var json = JsonSerializer.Serialize(notification);
+            using var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+            var response = await httpClient.PostAsync(request.Url.TrimEnd('/'), content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return Ok(new ConnectionTestResult
+                {
+                    Success = true,
+                    Message = "Test notification sent successfully!"
+                });
+            }
+            else
+            {
+                var responseBody = await response.Content.ReadAsStringAsync();
+                return Ok(new ConnectionTestResult
+                {
+                    Success = false,
+                    Message = $"HTTP {(int)response.StatusCode}: {responseBody}"
+                });
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogWarning(ex, "ntfy connection test failed: {Message}", ex.Message);
+            return Ok(new ConnectionTestResult
+            {
+                Success = false,
+                Message = $"Connection failed: {ex.Message}"
+            });
+        }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogWarning(ex, "ntfy connection test timed out");
+            return Ok(new ConnectionTestResult
+            {
+                Success = false,
+                Message = "Connection timed out"
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error testing ntfy connection");
+            throw; // Rethrow to maintain CA1031 compliance while still logging the error
+        }
+    }
+
+    /// <summary>
     /// Gets the decrypted API keys for display in the web interface.
     /// </summary>
     /// <returns>The decrypted API keys.</returns>
@@ -619,7 +712,9 @@ public class JellyPyApiController(ILogger<JellyPyApiController> logger, IHttpCli
             return Ok(new ApiKeysResponse
             {
                 SonarrApiKey = config.SonarrApiKey, // Uses the compatibility property that auto-decrypts
-                RadarrApiKey = config.RadarrApiKey // Uses the compatibility property that auto-decrypts
+                RadarrApiKey = config.RadarrApiKey, // Uses the compatibility property that auto-decrypts
+                NtfyAccessToken = config.NtfyAccessToken, // Uses the property that auto-decrypts
+                NtfyPassword = config.NtfyPassword // Uses the property that auto-decrypts
             });
         }
         catch (Exception ex)

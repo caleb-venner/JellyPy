@@ -109,7 +109,7 @@ public class PlaybackStopHandler : IEventProcessor<PlaybackStopEventArgs>
         {
             if (!CanHandle(eventArgs))
             {
-                _logger.LogDebug("PlaybackStop event cannot be handled - missing required data");
+                _logger.LogVerbose("PlaybackStop event cannot be handled - missing required data");
                 return;
             }
 
@@ -119,7 +119,7 @@ public class PlaybackStopHandler : IEventProcessor<PlaybackStopEventArgs>
             if (eventArgs.Item is Movie movie)
             {
                 var watchPercentage = CalculateWatchPercentage(eventArgs);
-                _logger.LogDebug(
+                _logger.LogVerbose(
                     "Movie playback stopped: {MovieName}, Watch Percentage: {Percentage}%",
                     movie.Name,
                     watchPercentage);

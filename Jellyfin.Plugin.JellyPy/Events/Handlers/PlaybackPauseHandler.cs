@@ -104,7 +104,7 @@ public class PlaybackPauseHandler : IEventProcessor<PlaybackProgressEventArgs>
         {
             if (!CanHandle(eventArgs))
             {
-                _logger.LogDebug("PlaybackPause event cannot be handled - missing required data or not paused");
+                _logger.LogVerbose("PlaybackPause event cannot be handled - missing required data or not paused");
                 return;
             }
 
@@ -112,8 +112,7 @@ public class PlaybackPauseHandler : IEventProcessor<PlaybackProgressEventArgs>
             var eventKey = $"pause-{eventArgs.Session?.Id}";
             if (!DeduplicationCache.ShouldProcessEvent(eventKey))
             {
-                _logger.LogDebug("Skipping duplicate PlaybackPause event for session {SessionId}", eventArgs.Session?.Id);
-                return;
+                return; // Expected behavior - no need to log
             }
 
             var eventData = ExtractEventData(eventArgs);
