@@ -18,6 +18,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Security
 
+## [2.1.1.0] - 2026-08-27
+
+### Added
+- Dual-build architecture to support both Jellyfin 10.9 and 10.10 simultaneously from the same codebase
+- Automated `meta.json` generation inside the GitHub Action build pipeline
+
+### Fixed
+- Missing `meta.json` file in release packages which previously prevented installation on Jellyfin 10.9+
+- ABI version mismatch by producing dedicated, version-specific release packages for Jellyfin 10.9 and 10.10
+
 ## [2.1.0.0] - 2025-10-29
 
 ### Added

@@ -122,18 +122,18 @@ collect_changelog_text() {
     local version=$1
     local changelog_file=$(mktemp)
     
-    echo ""
-    print_status "Enter release notes for version $version"
-    print_status "(These will be used for the GitHub release description)"
-    print_status "Press Ctrl+D when done, or Ctrl+C to cancel"
-    echo ""
+    echo "" >&2
+    print_status "Enter release notes for version $version" >&2
+    print_status "(These will be used for the GitHub release description)" >&2
+    print_status "Press Ctrl+D when done, or Ctrl+C to cancel" >&2
+    echo "" >&2
     
     # Collect multi-line input
     cat > "$changelog_file"
     
     # Check if anything was entered
     if [ ! -s "$changelog_file" ]; then
-        print_error "No changelog text provided"
+        print_error "No changelog text provided" >&2
         rm "$changelog_file"
         exit 1
     fi
@@ -173,49 +173,14 @@ show_next_steps() {
     echo "   git push origin v$version"
     echo ""
     echo "4. GitHub Actions will automatically:"
-    echo "   • Build the plugin"
-    echo "   • Create release package (jellypy_$version.zip)"
-    echo "   • Calculate MD5 checksum"
+    echo "   • Build the plugin for both 10.9 and 10.10"
+    echo "   • Create release packages and calculate checksums"
     echo "   • Create GitHub Release with your changelog"
-    echo ""
-    echo "5. After GitHub Actions completes, update manifest.json:"
-    echo "   • Add new version entry at the TOP of the versions array"
-    echo "   • Use the checksum from GitHub Actions output"
-    echo "   • Set sourceUrl to:"
-    echo "     https://github.com/caleb-venner/jellypy/releases/download/v$version/jellypy_$version.zip"
-    echo ""
-    echo "6. Commit and push manifest.json to trigger deployment"
+    echo "   • Update manifest.json automatically on the main branch"
     echo ""
     echo "=========================================="
-    print_warning "Remember: manifest.json is what Jellyfin actually reads!"
+    print_success "Ready to ship!"
     echo "=========================================="
-}
-
-# Function to generate manifest entry template
-generate_manifest_template() {
-    local version=$1
-    local changelog_file=$2
-    
-    local template_file="manifest-entry-$version.json"
-    
-    cat > "$template_file" << EOF
-{
-    "version": "$version",
-    "changelog": "YOUR_CHANGELOG_HERE (from GitHub Actions or $changelog_file)",
-    "targetAbi": "10.9.0.0",
-    "sourceUrl": "https://github.com/caleb-venner/jellypy/releases/download/v$version/jellypy_$version.zip",
-    "checksum": "CHECKSUM_FROM_GITHUB_ACTIONS",
-    "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-}
-EOF
-    
-    print_status "Manifest entry template saved to: $template_file"
-    echo ""
-    print_warning "After GitHub Actions completes:"
-    echo "  1. Copy checksum from GitHub Actions output"
-    echo "  2. Copy your changelog text"
-    echo "  3. Add this entry to TOP of manifest.json versions array"
-    echo "  4. Commit and push manifest.json"
 }
 
 # Main function
@@ -265,9 +230,6 @@ main() {
     
     # Collect changelog text
     local changelog_file=$(collect_changelog_text "$version")
-    
-    # Generate manifest template
-    generate_manifest_template "$version" "$changelog_file"
     
     # Show next steps
     show_next_steps "$version" "$changelog_file"
