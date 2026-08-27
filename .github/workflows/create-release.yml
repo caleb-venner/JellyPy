@@ -64,17 +64,16 @@ jobs:
           dotnet publish Jellyfin.Plugin.JellyPy/Jellyfin.Plugin.JellyPy.csproj --configuration Release -p:JellyfinVersion=10.9.0 --no-build --output ./publish_10_9
           
           cd publish_10_9
-          cat <<JSON > meta.json
-          {
+          echo '{
             "id": "a5bd541f-38dc-467e-9a9a-15fe3f3bcf5c",
             "name": "JellyPy",
             "description": "JellyPy automatically manages your Sonarr and Radarr monitoring based on what you watch in Jellyfin.",
             "category": "General",
             "guid": "a5bd541f-38dc-467e-9a9a-15fe3f3bcf5c",
-            "version": "$VERSION",
+            "version": "'"$VERSION"'",
             "targetAbi": "10.9.0.0"
-          }
-JSON
+          }' > meta.json
+          
           zip -r "../${ZIP_FILE}" .
           cd ..
           
@@ -93,17 +92,16 @@ JSON
           dotnet publish Jellyfin.Plugin.JellyPy/Jellyfin.Plugin.JellyPy.csproj --configuration Release -p:JellyfinVersion=10.10.6 --no-build --output ./publish_10_10
           
           cd publish_10_10
-          cat <<JSON > meta.json
-          {
+          echo '{
             "id": "a5bd541f-38dc-467e-9a9a-15fe3f3bcf5c",
             "name": "JellyPy",
             "description": "JellyPy automatically manages your Sonarr and Radarr monitoring based on what you watch in Jellyfin.",
             "category": "General",
             "guid": "a5bd541f-38dc-467e-9a9a-15fe3f3bcf5c",
-            "version": "$VERSION",
+            "version": "'"$VERSION"'",
             "targetAbi": "10.10.0.0"
-          }
-JSON
+          }' > meta.json
+          
           zip -r "../${ZIP_FILE}" .
           cd ..
           
@@ -166,29 +164,23 @@ JSON
           SOURCEURL_10_10="${{ github.server_url }}/${{ github.repository }}/releases/download/${{ steps.version.outputs.tag }}/${{ steps.package_10_10.outputs.zip_file }}"
           CHECKSUM_10_10="${{ steps.package_10_10.outputs.checksum }}"
           
-          NEW_ENTRY_10_9=$(cat <<JSON
-          {
-            "version": "$VERSION",
-            "changelog": $CHANGELOG_JSON,
+          NEW_ENTRY_10_9=$(echo '{
+            "version": "'"$VERSION"'",
+            "changelog": '"$CHANGELOG_JSON"',
             "targetAbi": "10.9.0.0",
-            "sourceUrl": "$SOURCEURL_10_9",
-            "checksum": "$CHECKSUM_10_9",
-            "timestamp": "$TIMESTAMP"
-          }
-          JSON
-          )
+            "sourceUrl": "'"$SOURCEURL_10_9"'",
+            "checksum": "'"$CHECKSUM_10_9"'",
+            "timestamp": "'"$TIMESTAMP"'"
+          }')
           
-          NEW_ENTRY_10_10=$(cat <<JSON
-          {
-            "version": "$VERSION",
-            "changelog": $CHANGELOG_JSON,
+          NEW_ENTRY_10_10=$(echo '{
+            "version": "'"$VERSION"'",
+            "changelog": '"$CHANGELOG_JSON"',
             "targetAbi": "10.10.0.0",
-            "sourceUrl": "$SOURCEURL_10_10",
-            "checksum": "$CHECKSUM_10_10",
-            "timestamp": "$TIMESTAMP"
-          }
-          JSON
-          )
+            "sourceUrl": "'"$SOURCEURL_10_10"'",
+            "checksum": "'"$CHECKSUM_10_10"'",
+            "timestamp": "'"$TIMESTAMP"'"
+          }')
           
           jq --argjson entry9 "$NEW_ENTRY_10_9" --argjson entry10 "$NEW_ENTRY_10_10" \
             '.[0].versions = [$entry10, $entry9] + .[0].versions' \
