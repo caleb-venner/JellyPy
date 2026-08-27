@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+## [2.1.1.1] - 2026-08-27
+
+### Fixed
+- Strictly limited release zip contents to only include the plugin DLL and meta.json, preventing Jellyfin server crashes on startup due to duplicated core assemblies.
+
+
 ### Added
 
 ### Changed

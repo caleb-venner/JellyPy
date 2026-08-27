@@ -74,7 +74,7 @@ jobs:
             "targetAbi": "10.9.0.0"
           }' > meta.json
           
-          zip -r "../${ZIP_FILE}" .
+          zip "../${ZIP_FILE}" Jellyfin.Plugin.JellyPy.dll meta.json
           cd ..
           
           CHECKSUM=$(md5sum "$ZIP_FILE" | cut -d' ' -f1)
@@ -102,7 +102,7 @@ jobs:
             "targetAbi": "10.10.0.0"
           }' > meta.json
           
-          zip -r "../${ZIP_FILE}" .
+          zip "../${ZIP_FILE}" Jellyfin.Plugin.JellyPy.dll meta.json
           cd ..
           
           CHECKSUM=$(md5sum "$ZIP_FILE" | cut -d' ' -f1)
