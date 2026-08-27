@@ -1,8 +1,0 @@
-{
-    "version": "2.1.1.0",
-    "changelog": "YOUR_CHANGELOG_HERE (from GitHub Actions or /var/folders/j9/gymtcm513n58zptr333dbz700000gn/T/tmp.1DaZAkKgqO)",
-    "targetAbi": "10.9.0.0",
-    "sourceUrl": "https://github.com/caleb-venner/jellypy/releases/download/v2.1.1.0/jellypy_2.1.1.0.zip",
-    "checksum": "CHECKSUM_FROM_GITHUB_ACTIONS",
-    "timestamp": "2026-08-27T11:19:04Z"
-}
