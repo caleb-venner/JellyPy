@@ -61,20 +61,20 @@ public class ItemAddedHandler : IEventProcessor<BaseItem>
     }
 
     /// <inheritdoc />
-    public EventData ExtractEventData(BaseItem item)
+    public EventData ExtractEventData(BaseItem eventArgs)
     {
         var eventData = new EventData
         {
             EventType = EventType.ItemAdded,
             Timestamp = DateTime.UtcNow,
-            ItemId = item.Id,
-            ItemName = item.Name,
-            ItemType = item.GetType().Name,
-            ItemPath = item.Path
+            ItemId = eventArgs.Id,
+            ItemName = eventArgs.Name,
+            ItemType = eventArgs.GetType().Name,
+            ItemPath = eventArgs.Path
         };
 
         // Add media-specific information
-        if (item is Episode episode)
+        if (eventArgs is Episode episode)
         {
             eventData.SeriesName = episode.Series?.Name ?? episode.SeriesName;
             eventData.SeasonNumber = episode.ParentIndexNumber;
@@ -87,69 +87,69 @@ public class ItemAddedHandler : IEventProcessor<BaseItem>
                 eventData.AdditionalData["SeriesId"] = episode.SeriesId;
             }
         }
-        else if (item is Movie movie)
+        else if (eventArgs is Movie movie)
         {
             eventData.Year = movie.ProductionYear;
             eventData.AdditionalData["MovieId"] = movie.Id;
         }
-        else if (item is Season season)
+        else if (eventArgs is Season season)
         {
             eventData.SeriesName = season.Series?.Name;
             eventData.SeasonNumber = season.IndexNumber;
         }
-        else if (item is Series series)
+        else if (eventArgs is Series series)
         {
             eventData.SeriesName = series.Name;
         }
 
         // Add common media information
-        var genres = item.Genres?.ToList() ?? new List<string>();
+        var genres = eventArgs.Genres?.ToList() ?? new List<string>();
         foreach (var genre in genres)
         {
             eventData.Genres.Add(genre);
         }
 
-        eventData.ContentRating = item.OfficialRating;
-        eventData.AdditionalData["CommunityRating"] = item.CommunityRating;
-        eventData.AdditionalData["Runtime"] = item.RunTimeTicks;
-        eventData.AdditionalData["DateCreated"] = item.DateCreated;
+        eventData.ContentRating = eventArgs.OfficialRating;
+        eventData.AdditionalData["CommunityRating"] = eventArgs.CommunityRating;
+        eventData.AdditionalData["Runtime"] = eventArgs.RunTimeTicks;
+        eventData.AdditionalData["DateCreated"] = eventArgs.DateCreated;
 
         return eventData;
     }
 
     /// <inheritdoc />
-    public async Task HandleAsync(BaseItem item)
+    public async Task HandleAsync(BaseItem eventArgs)
     {
         try
         {
-            if (!CanHandle(item))
+            if (!CanHandle(eventArgs))
             {
                 _logger.LogVerbose("ItemAdded event cannot be handled - no item provided");
                 return;
             }
 
-            var eventData = ExtractEventData(item);
+            var eventData = ExtractEventData(eventArgs);
 
-            _logger.LogVerbose("Processing ItemAdded event for item {ItemName} ({ItemId})", item.Name, item.Id);
+            _logger.LogVerbose("Processing ItemAdded event for item {ItemName} ({ItemId})", eventArgs.Name, eventArgs.Id);
 
             // Create deduplication key based on item type and identifier
             string? deduplicationKey = null;
-            if (item is Episode episode)
+            if (eventArgs is Episode episode)
             {
                 // For episodes, use series name + season + episode number
                 deduplicationKey = $"{eventData.SeriesName}:S{episode.ParentIndexNumber?.ToString("D2", System.Globalization.CultureInfo.InvariantCulture) ?? "XX"}E{episode.IndexNumber?.ToString("D2", System.Globalization.CultureInfo.InvariantCulture) ?? "XX"}";
             }
-            else if (item is Movie movie)
+            else if (eventArgs is Movie movie)
             {
                 // For movies, use title + year
                 deduplicationKey = $"{movie.Name}:{movie.ProductionYear ?? 0}";
             }
-            else if (item is Season season)
+            else if (eventArgs is Season season)
             {
                 // For seasons, use series name + season number
                 deduplicationKey = $"{eventData.SeriesName}:Season{season.IndexNumber ?? 0}";
             }
-            else if (item is Series series)
+            else if (eventArgs is Series series)
             {
                 // For series, use series name
                 deduplicationKey = $"{series.Name}:Series";
@@ -160,7 +160,7 @@ public class ItemAddedHandler : IEventProcessor<BaseItem>
             {
                 _logger.LogInformation(
                     "Skipping duplicate notification for {ItemName} (recently processed)",
-                    item.Name);
+                    eventArgs.Name);
                 return;
             }
 

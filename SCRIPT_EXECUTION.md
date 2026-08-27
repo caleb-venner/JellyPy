@@ -38,33 +38,29 @@ other services beyond the built-in Sonarr and Radarr support.
 Scripts can be triggered by the following Jellyfin events:
 
 ### Playback Events
-
-• **PlaybackStart**: When media playback begins
-• **PlaybackStop**: When media playback ends
-• **PlaybackPause**: When playback is paused
-• **PlaybackResume**: When playback resumes from pause
+- **PlaybackStart**: When media playback begins
+- **PlaybackStop**: When media playback ends
+- **PlaybackPause**: When playback is paused
+- **PlaybackResume**: When playback resumes from pause
 
 ### Library Events
-
-• **ItemAdded**: When new media is added to the library
-• **ItemUpdated**: When library item metadata is updated
-• **ItemRemoved**: When media is removed from the library
+- **ItemAdded**: When a single item is added to the library
+- **SeriesEpisodesAdded**: Fired when multiple episodes from the same series are added (requires Item Grouping)
+- **ItemUpdated**: When library item metadata is updated
+- **ItemRemoved**: When media is removed from the library
 
 ### User Events
-
-• **UserCreated**: When a new user account is created
-• **UserUpdated**: When user settings are modified
-• **UserDeleted**: When a user account is deleted
+- **UserCreated**: When a new user account is created
+- **UserUpdated**: When user settings are modified
+- **UserDeleted**: When a user account is deleted
 
 ### Session Events
-
-• **SessionStart**: When a user starts a new session
-• **SessionEnd**: When a user session ends
+- **SessionStart**: When a user starts a new session
+- **SessionEnd**: When a user session ends
 
 ### Server Events
-
-• **ServerStartup**: When Jellyfin server starts
-• **ServerShutdown**: When Jellyfin server shuts down
+- **ServerStartup**: When Jellyfin server starts
+- **ServerShutdown**: When Jellyfin server shuts down
 
 ## Script Execution Configuration
 
@@ -174,12 +170,7 @@ Item ID:
 
 Playback Position:
   Name: POSITION_TICKS
-  Source Field: PositionTicks
-  Format: Environment
-
-Runtime:
-  Name: RUNTIME_TICKS
-  Source Field: RuntimeTicks
+  Source Field: PlaybackPositionTicks
   Format: Environment
 
 Client/Device:
@@ -228,17 +219,15 @@ If you have a slow system or are adding a very large number of items at once, yo
 
 ### Receiving Event Data
 
-Your scripts can receive event data in two ways:
+Your scripts can receive event data in two ways, configured via the **Execution Mode** setting:
 
-1. **As a complete JSON object (Default)**:
-By default, if you do not configure any data attributes, the entire event data is automatically passed as a JSON string as the **first argument** to your script.
-This is the recommended way to access all event information, as it provides the most complete data.
-2. **As individual data attributes (Custom)**:
-If you configure any data attributes in the "Data Attributes" section, only those specific fields will be passed as environment variables or command-line arguments.
-The full JSON payload will not be sent in this case. This method is useful for simpler scripts or for maintaining backward compatibility.
+1. **JSON Payload (Default)**:
+The entire event data is passed as a JSON string as the **first argument** to your script. This is the recommended way to access all event information.
+2. **Compatibility**:
+Only the specific fields configured in the "Data Attributes" section will be passed as environment variables or command-line arguments. The full JSON payload will not be sent.
 
-**Accessing the Full JSON Payload (Default Method)**
-This method gives you access to all event details, including grouped episodes. It is used automatically if you do not configure any data attributes.
+**Accessing the Full JSON Payload (JSON Payload Mode)**
+This method gives you access to all event details. It is used automatically if you select "JSON Payload" or do not configure any data attributes.
 
 ```python
 import sys

@@ -22,34 +22,43 @@ based on what you watch. Keep your media organised and automatic without manual 
 
 ### Native Radarr Integration
 
-- **Automatic Movie Unmonitoring**: Unmonitor movies after watching
-- **Percentage-Based Logic**: Only unmonitor if watched past configurable
+- **Automatic Movie Unmonitoring**: Unmonitor movies on playback start (default) or after watching
+- **Percentage-Based Logic**: Optionally only unmonitor if watched past configurable
 threshold (default 90%)
 - **Quality Cutoff Checking**: Only unmonitor movies that have reached their
 quality target
 - **Upgrade Prevention**: Keep monitoring movies that can still be upgraded
 
+### Native ntfy.sh Integration
+
+- **Push Notifications**: Receive alerts on your phone/desktop when new media is added
+- **Item Grouping**: Automatically batches multiple episodes (e.g., a full season) into a single notification
+- **Media Images**: Includes posters and thumbnails in notifications (requires external URL)
+- **Flexible Priority**: Configure notification priority (min to max)
+- **Secure Auth**: Supports access tokens or username/password authentication
+
 ### Custom Script Execution
 
 - Execute Python, Bash, or binary scripts on Jellyfin events
-- Flexible event triggers (PlaybackStart, PlaybackStop, etc.)
+- Flexible event triggers (PlaybackStart, ItemAdded, etc.)
 - **Default JSON Payload**: All event data is passed to your script as a single JSON object by default.
 - **Custom Data Attributes**: Optionally, configure specific data attributes to be passed as environment variables or command-line arguments.
 - Conditional execution based on media properties
 
 ### Security & Configuration
 
-- **Encrypted API Keys**: Automatic AES-256 encryption for Sonarr/Radarr API keys
-- **Test Connections**: Built-in connection testing for API endpoints  
-- **Server-Bound Encryption**: API keys encrypted with Jellyfin server-specific keys
+- **Encrypted API Keys**: Automatic AES-256 encryption for Sonarr/Radarr/ntfy API keys
+- **Test Connections**: Built-in connection testing for all API endpoints  
+- **Server-Bound Encryption**: Keys encrypted with Jellyfin server-specific identifiers
 - **System-Independent**: Encryption survives OS updates, machine renames,
 and user changes
 
 ## Requirements
 
-- **Jellyfin**: 10.10.0 or higher
+- **Jellyfin**: 10.9.0 or higher
 - **Sonarr**: v3 API (optional)
 - **Radarr**: v3 API (optional)
+- **ntfy.sh**: Public or self-hosted instance (optional)
 
 ## Installation
 
@@ -147,13 +156,12 @@ mod enables pip package installation for your custom scripts.
 
    | Setting | Default | Description |
    |---------|---------|-------------|
-   | Episodes to Monitor | 5 | Number of upcoming episodes to keep monitored |
+   | Episodes to Monitor | 6 | Number of upcoming episodes to keep monitored |
    | Auto-Search Episodes | ✓ | Automatically trigger searches for monitored episodes |
    | Monitor Future Episodes | ✓ | Auto-monitor episodes when they become available |
    | Skip Episodes With Files | ✓ | Don't re-monitor episodes that already have files |
    | **Unmonitor Watched Episodes** | ✓ | Unmonitor episodes after watching them |
    | **Monitor Only Current Season** | ✗ | Only monitor episodes in the current season |
-   | **Minimum Episode Buffer** | 2 | Minimum unwatched episodes to maintain |
 
 ### Radarr Setup
 
@@ -176,6 +184,21 @@ mod enables pip package installation for your custom scripts.
    | **Unmonitor Only If Watched** | ✗ | Only unmonitor if watch percentage exceeds threshold |
    | **Minimum Watch Percentage** | 90% | Percentage required to consider movie "watched" |
    | **Unmonitor After Quality Cutoff** | ✗ | Only unmonitor movies at their quality target |
+
+### ntfy.sh Setup
+
+1. Navigate to **Dashboard → Plugins → JellyPy → Settings → Notifications**
+2. Configure ntfy:
+
+   ```text
+   Enable ntfy Notifications: ✓
+   ntfy Server URL: https://ntfy.sh
+   Topic: [Your Unique Topic]
+   ```
+
+3. **Optional Authentication**: Configure Access Token or Username/Password if your topic is protected.
+4. **Media Images**: To include posters, set your **Jellyfin External URL** (must be accessible by the ntfy server).
+5. Click **Send Test Notification** to verify.
 
 ### Script Execution Setup
 
