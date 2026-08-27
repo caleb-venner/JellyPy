@@ -9,6 +9,22 @@
     "category": "General",
     "versions": [
       {
+        "version": "2.1.1.1",
+        "changelog": "Prepare release v2.1.1.1: Fix zip contents\n",
+        "targetAbi": "10.10.0.0",
+        "sourceUrl": "https://github.com/caleb-venner/JellyPy/releases/download/v2.1.1.1/jellypy_10.10_2.1.1.1.zip",
+        "checksum": "b836d94cebba1a3d218bcd958b387060",
+        "timestamp": "2026-08-27T12:09:19Z"
+      },
+      {
+        "version": "2.1.1.1",
+        "changelog": "Prepare release v2.1.1.1: Fix zip contents\n",
+        "targetAbi": "10.9.0.0",
+        "sourceUrl": "https://github.com/caleb-venner/JellyPy/releases/download/v2.1.1.1/jellypy_10.9_2.1.1.1.zip",
+        "checksum": "95c60edea66140b8ff9597fce728a590",
+        "timestamp": "2026-08-27T12:09:19Z"
+      },
+      {
         "version": "2.1.1.0",
         "changelog": "Fix detached HEAD issue in release workflow\n",
         "targetAbi": "10.10.0.0",
